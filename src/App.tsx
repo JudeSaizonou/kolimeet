@@ -82,7 +82,23 @@ const App = () => (
                 }
               />
               <Route
+                path="/publier/trajet/:id"
+                element={
+                  <ProtectedRoute>
+                    <PublishTrip />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/publier/colis"
+                element={
+                  <ProtectedRoute>
+                    <PublishParcel />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/publier/colis/:id"
                 element={
                   <ProtectedRoute>
                     <PublishParcel />

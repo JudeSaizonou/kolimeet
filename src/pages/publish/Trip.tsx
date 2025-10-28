@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -14,10 +15,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { createTripSchema, CreateTripInput } from "@/lib/validations/trips";
 import { useTrips } from "@/hooks/useTrips";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
 
 const PublishTrip = () => {
-  const { createTrip, loading } = useTrips();
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { createTrip, updateTrip, loading } = useTrips();
   const [date, setDate] = useState<Date>();
+  const [isLoading, setIsLoading] = useState(!!id);
 
   const form = useForm<CreateTripInput>({
     resolver: zodResolver(createTripSchema),
@@ -34,18 +40,76 @@ const PublishTrip = () => {
     },
   });
 
-  const onSubmit = async (data: CreateTripInput) => {
-    await createTrip(data);
+  useEffect(() => {
+    if (id) {
+      loadTrip(id);
+    }
+  }, [id]);
+
+  const loadTrip = async (tripId: string) => {
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from("trips")
+        .select("*")
+        .eq("id", tripId)
+        .single();
+
+      if (error) throw error;
+
+      if (data) {
+        form.reset({
+          from_country: data.from_country,
+          from_city: data.from_city,
+          to_country: data.to_country,
+          to_city: data.to_city,
+          date_departure: data.date_departure,
+          capacity_liters: data.capacity_liters,
+          capacity_available_liters: data.capacity_available_liters,
+          price_expect: data.price_expect || undefined,
+          notes: data.notes || "",
+        });
+        setDate(new Date(data.date_departure));
+      }
+    } catch (error: any) {
+      toast({
+        title: "Erreur",
+        description: error.message || "Impossible de charger le trajet",
+        variant: "destructive",
+      });
+      navigate("/mes-annonces");
+    } finally {
+      setIsLoading(false);
+    }
   };
+
+  const onSubmit = async (data: CreateTripInput) => {
+    if (id) {
+      await updateTrip(id, data);
+      navigate("/mes-annonces");
+    } else {
+      await createTrip(data);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background py-8 px-4">
       <div className="max-w-2xl mx-auto">
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl">Publier un trajet</CardTitle>
+            <CardTitle className="text-2xl">
+              {id ? "Modifier le trajet" : "Publier un trajet"}
+            </CardTitle>
             <CardDescription>
-              Partagez votre itinéraire et transportez des colis
+              {id ? "Mettez à jour votre annonce" : "Partagez votre itinéraire et transportez des colis"}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -226,7 +290,7 @@ const PublishTrip = () => {
                 />
 
                 <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? "Publication..." : "Publier le trajet"}
+                  {loading ? (id ? "Mise à jour..." : "Publication...") : (id ? "Mettre à jour" : "Publier le trajet")}
                 </Button>
               </form>
             </Form>

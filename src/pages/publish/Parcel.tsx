@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CalendarIcon, Upload, X } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -16,12 +17,16 @@ import { createParcelSchema, CreateParcelInput } from "@/lib/validations/parcels
 import { useParcels } from "@/hooks/useParcels";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const PublishParcel = () => {
-  const { createParcel, loading } = useParcels();
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { createParcel, updateParcel, loading } = useParcels();
   const [date, setDate] = useState<Date>();
   const [files, setFiles] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(!!id);
 
   const form = useForm<CreateParcelInput>({
     resolver: zodResolver(createParcelSchema),
@@ -37,6 +42,52 @@ const PublishParcel = () => {
       description: "",
     },
   });
+
+  useEffect(() => {
+    if (id) {
+      loadParcel(id);
+    }
+  }, [id]);
+
+  const loadParcel = async (parcelId: string) => {
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from("parcels")
+        .select("*")
+        .eq("id", parcelId)
+        .single();
+
+      if (error) throw error;
+
+      if (data) {
+        form.reset({
+          type: data.type as any,
+          weight_kg: data.weight_kg,
+          size: data.size as any,
+          from_country: data.from_country,
+          from_city: data.from_city,
+          to_country: data.to_country,
+          to_city: data.to_city,
+          deadline: data.deadline,
+          description: data.description || "",
+        });
+        setDate(new Date(data.deadline));
+        if (data.photos && data.photos.length > 0) {
+          setPreviewUrls(data.photos);
+        }
+      }
+    } catch (error: any) {
+      toast({
+        title: "Erreur",
+        description: error.message || "Impossible de charger le colis",
+        variant: "destructive",
+      });
+      navigate("/mes-annonces");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = Array.from(e.target.files || []);
@@ -84,17 +135,32 @@ const PublishParcel = () => {
   };
 
   const onSubmit = async (data: CreateParcelInput) => {
-    await createParcel(data, files);
+    if (id) {
+      await updateParcel(id, data);
+      navigate("/mes-annonces");
+    } else {
+      await createParcel(data, files);
+    }
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background py-8 px-4">
       <div className="max-w-2xl mx-auto">
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl">Publier un colis</CardTitle>
+            <CardTitle className="text-2xl">
+              {id ? "Modifier le colis" : "Publier un colis"}
+            </CardTitle>
             <CardDescription>
-              Trouvez un voyageur pour transporter votre colis
+              {id ? "Mettez à jour votre annonce" : "Trouvez un voyageur pour transporter votre colis"}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -322,7 +388,7 @@ const PublishParcel = () => {
                 </div>
 
                 <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? "Publication..." : "Publier le colis"}
+                  {loading ? (id ? "Mise à jour..." : "Publication...") : (id ? "Mettre à jour" : "Publier le colis")}
                 </Button>
               </form>
             </Form>

@@ -5,11 +5,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
-import { Edit, Trash2, Lock, LockOpen, MapPin, Calendar, Package } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Edit, Trash2, Lock, LockOpen, MapPin, Calendar, Package, Plus, Minus, DollarSign } from "lucide-react";
 import { useTrips } from "@/hooks/useTrips";
 import { useParcels } from "@/hooks/useParcels";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+import { useNavigate } from "react-router-dom";
+import { toast } from "@/hooks/use-toast";
 
 interface Trip {
   id: string;
@@ -18,7 +21,10 @@ interface Trip {
   to_country: string;
   to_city: string;
   date_departure: string;
+  capacity_liters: number;
   capacity_available_liters: number;
+  price_expect?: number;
+  notes?: string;
   status: string;
 }
 
@@ -32,6 +38,8 @@ interface Parcel {
   to_country: string;
   to_city: string;
   deadline: string;
+  description?: string;
+  photos?: string[];
   status: string;
 }
 
@@ -39,8 +47,9 @@ const MyListings = () => {
   const [trips, setTrips] = useState<Trip[]>([]);
   const [parcels, setParcels] = useState<Parcel[]>([]);
   const [loading, setLoading] = useState(true);
-  const { deleteTrip, toggleTripStatus } = useTrips();
+  const { deleteTrip, toggleTripStatus, updateTrip } = useTrips();
   const { deleteParcel, toggleParcelStatus } = useParcels();
+  const navigate = useNavigate();
 
   const fetchMyListings = async () => {
     setLoading(true);
@@ -83,6 +92,27 @@ const MyListings = () => {
 
   const handleToggleParcelStatus = async (id: string, status: string) => {
     await toggleParcelStatus(id, status);
+    fetchMyListings();
+  };
+
+  const handleUpdateCapacity = async (tripId: string, newCapacity: number, maxCapacity: number) => {
+    if (newCapacity < 0) {
+      toast({
+        title: "Erreur",
+        description: "La capacité ne peut pas être négative",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (newCapacity > maxCapacity) {
+      toast({
+        title: "Erreur",
+        description: "La capacité disponible ne peut pas dépasser la capacité totale",
+        variant: "destructive",
+      });
+      return;
+    }
+    await updateTrip(tripId, { capacity_available_liters: newCapacity });
     fetchMyListings();
   };
 
@@ -141,12 +171,38 @@ const MyListings = () => {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Package className="h-4 w-4" />
-                        <span>{trip.capacity_available_liters}L disponibles</span>
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-2 flex-1">
+                          <div className="flex items-center gap-2 text-sm">
+                            <Package className="h-4 w-4 text-muted-foreground" />
+                            <span className="font-medium">{trip.capacity_available_liters}L / {trip.capacity_liters}L</span>
+                          </div>
+                          {trip.price_expect && (
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                              <DollarSign className="h-4 w-4" />
+                              <span>{trip.price_expect}€</span>
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => handleUpdateCapacity(trip.id, trip.capacity_available_liters - 5, trip.capacity_liters)}
+                          >
+                            <Minus className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => handleUpdateCapacity(trip.id, trip.capacity_available_liters + 5, trip.capacity_liters)}
+                          >
+                            <Plus className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </div>
-                      <div className="flex gap-2">
+                      <div className="flex gap-2 flex-wrap">
                         <Button
                           variant="outline"
                           size="sm"
@@ -164,7 +220,11 @@ const MyListings = () => {
                             </>
                           )}
                         </Button>
-                        <Button variant="outline" size="sm" disabled>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => navigate(`/publier/trajet/${trip.id}`)}
+                        >
                           <Edit className="h-4 w-4 mr-1" />
                           Modifier
                         </Button>
@@ -255,7 +315,11 @@ const MyListings = () => {
                             </>
                           )}
                         </Button>
-                        <Button variant="outline" size="sm" disabled>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => navigate(`/publier/colis/${parcel.id}`)}
+                        >
                           <Edit className="h-4 w-4 mr-1" />
                           Modifier
                         </Button>
