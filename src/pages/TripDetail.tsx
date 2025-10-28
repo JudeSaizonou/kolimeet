@@ -49,16 +49,57 @@ const TripDetail = () => {
     fetchTrip();
   }, [id, navigate, toast]);
 
-  const handleContact = () => {
+  const handleContact = async () => {
     if (!user) {
       navigate("/auth/login");
       return;
     }
 
-    toast({
-      title: "Bientôt disponible",
-      description: "La messagerie arrive à l'étape suivante.",
-    });
+    if (user.id === trip.user_id) {
+      toast({
+        title: "Information",
+        description: "Vous ne pouvez pas vous contacter vous-même.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      // Check if thread already exists
+      const { data: existingThread } = await supabase
+        .from("threads")
+        .select("id")
+        .eq("related_id", id)
+        .or(`and(created_by.eq.${user.id},other_user_id.eq.${trip.user_id}),and(created_by.eq.${trip.user_id},other_user_id.eq.${user.id})`)
+        .single();
+
+      if (existingThread) {
+        navigate(`/messages/${existingThread.id}`);
+        return;
+      }
+
+      // Create new thread
+      const { data: newThread, error } = await supabase
+        .from("threads")
+        .insert({
+          created_by: user.id,
+          other_user_id: trip.user_id,
+          related_type: "trip",
+          related_id: id,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      navigate(`/messages/${newThread.id}`);
+    } catch (error: any) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de démarrer la conversation.",
+        variant: "destructive",
+      });
+    }
   };
 
   if (loading) {

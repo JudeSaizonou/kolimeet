@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Package, User, LogOut, FileText, Plane } from "lucide-react";
+import { Package, User, LogOut, FileText, Plane, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -51,27 +51,35 @@ const Navigation = () => {
           </Link>
 
           {user && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button>
-                  Publier
+            <>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button>
+                    Publier
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuItem asChild>
+                    <Link to="/publier/trajet" className="flex items-center gap-2 cursor-pointer">
+                      <Plane className="h-4 w-4" />
+                      Publier un trajet
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/publier/colis" className="flex items-center gap-2 cursor-pointer">
+                      <Package className="h-4 w-4" />
+                      Publier un colis
+                    </Link>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              <Link to="/messages">
+                <Button variant="ghost" size="icon">
+                  <MessageSquare className="h-5 w-5" />
                 </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuItem asChild>
-                  <Link to="/publier/trajet" className="flex items-center gap-2 cursor-pointer">
-                    <Plane className="h-4 w-4" />
-                    Publier un trajet
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/publier/colis" className="flex items-center gap-2 cursor-pointer">
-                    <Package className="h-4 w-4" />
-                    Publier un colis
-                  </Link>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+              </Link>
+            </>
           )}
 
           {user ? (
@@ -112,6 +120,15 @@ const Navigation = () => {
                   >
                     <FileText className="h-4 w-4" />
                     Mes annonces
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link
+                    to="/messages"
+                    className="flex items-center gap-2 cursor-pointer"
+                  >
+                    <MessageSquare className="h-4 w-4" />
+                    Messagerie
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />

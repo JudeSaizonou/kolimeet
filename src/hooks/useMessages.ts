@@ -1,0 +1,131 @@
+import { useEffect, useState, useCallback } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
+import { createMessageSchema } from "@/lib/validations/messages";
+import { z } from "zod";
+
+interface Message {
+  id: string;
+  thread_id: string;
+  sender_id: string;
+  content: string;
+  created_at: string;
+  is_read: boolean;
+}
+
+export const useMessages = (threadId: string) => {
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [sending, setSending] = useState(false);
+
+  useEffect(() => {
+    if (!threadId || !user) {
+      setLoading(false);
+      return;
+    }
+
+    const fetchMessages = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("messages")
+          .select("*")
+          .eq("thread_id", threadId)
+          .order("created_at", { ascending: true });
+
+        if (error) throw error;
+        setMessages(data || []);
+
+        // Mark messages as read
+        await supabase
+          .from("messages")
+          .update({ is_read: true })
+          .eq("thread_id", threadId)
+          .neq("sender_id", user.id)
+          .eq("is_read", false);
+      } catch (error) {
+        console.error("Error fetching messages:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMessages();
+
+    // Subscribe to new messages
+    const channel = supabase
+      .channel(`messages-${threadId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "messages",
+          filter: `thread_id=eq.${threadId}`,
+        },
+        (payload) => {
+          const newMessage = payload.new as Message;
+          setMessages((prev) => [...prev, newMessage]);
+
+          // Mark as read if it's not from current user
+          if (newMessage.sender_id !== user?.id) {
+            supabase
+              .from("messages")
+              .update({ is_read: true })
+              .eq("id", newMessage.id)
+              .then();
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [threadId, user]);
+
+  const sendMessage = useCallback(
+    async (content: string) => {
+      if (!user || !threadId) return;
+
+      try {
+        setSending(true);
+
+        // Validate content
+        const validated = createMessageSchema.parse({
+          thread_id: threadId,
+          content: content.trim(),
+        });
+
+        const { error } = await supabase.from("messages").insert({
+          thread_id: validated.thread_id,
+          sender_id: user.id,
+          content: validated.content,
+        });
+
+        if (error) throw error;
+      } catch (error) {
+        if (error instanceof z.ZodError) {
+          toast({
+            variant: "destructive",
+            title: "Erreur",
+            description: error.errors[0].message,
+          });
+        } else {
+          toast({
+            variant: "destructive",
+            title: "Erreur",
+            description: "Impossible d'envoyer le message.",
+          });
+        }
+      } finally {
+        setSending(false);
+      }
+    },
+    [user, threadId, toast]
+  );
+
+  return { messages, loading, sending, sendMessage };
+};

@@ -54,6 +54,7 @@ export type Database = {
           content: string
           created_at: string
           id: string
+          is_read: boolean | null
           sender_id: string
           thread_id: string
         }
@@ -61,6 +62,7 @@ export type Database = {
           content: string
           created_at?: string
           id?: string
+          is_read?: boolean | null
           sender_id: string
           thread_id: string
         }
@@ -68,6 +70,7 @@ export type Database = {
           content?: string
           created_at?: string
           id?: string
+          is_read?: boolean | null
           sender_id?: string
           thread_id?: string
         }
