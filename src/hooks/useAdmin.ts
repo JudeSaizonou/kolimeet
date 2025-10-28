@@ -8,15 +8,15 @@ export const useAdmin = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let isMounted = true;
+
     const checkAdminRole = async () => {
+      // Wait for auth to be ready
       if (!user) {
-        console.log("[useAdmin] No user, setting isAdmin to false");
         setIsAdmin(false);
         setLoading(false);
         return;
       }
-
-      console.log("[useAdmin] Checking admin role for user:", user.id);
 
       try {
         const { data, error } = await supabase
@@ -24,26 +24,34 @@ export const useAdmin = () => {
           .select("role")
           .eq("user_id", user.id)
           .eq("role", "admin")
-          .single();
+          .maybeSingle();
 
-        console.log("[useAdmin] Query result:", { data, error });
+        if (!isMounted) return;
 
-        if (error && error.code !== "PGRST116") {
+        if (error) {
           console.error("[useAdmin] Error checking admin role:", error);
+          setIsAdmin(false);
+        } else {
+          const hasAdminRole = !!data;
+          setIsAdmin(hasAdminRole);
         }
-
-        const hasAdminRole = !!data;
-        console.log("[useAdmin] Setting isAdmin to:", hasAdminRole);
-        setIsAdmin(hasAdminRole);
       } catch (error) {
         console.error("[useAdmin] Exception checking admin role:", error);
-        setIsAdmin(false);
+        if (isMounted) {
+          setIsAdmin(false);
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
     checkAdminRole();
+
+    return () => {
+      isMounted = false;
+    };
   }, [user]);
 
   return { isAdmin, loading };

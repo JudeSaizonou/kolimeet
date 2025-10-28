@@ -13,12 +13,15 @@ export const AdminRoute = ({ children }: AdminRouteProps) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!authLoading && !adminLoading) {
-      if (!user) {
-        navigate("/auth/login");
-      } else if (!isAdmin) {
-        navigate("/");
-      }
+    // Only redirect when both auth and admin checks are complete
+    if (authLoading || adminLoading) {
+      return;
+    }
+
+    if (!user) {
+      navigate("/auth/login", { replace: true });
+    } else if (!isAdmin) {
+      navigate("/", { replace: true });
     }
   }, [user, isAdmin, authLoading, adminLoading, navigate]);
 
