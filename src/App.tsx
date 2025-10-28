@@ -12,6 +12,7 @@ import TripDetail from "./pages/TripDetail";
 import ParcelDetail from "./pages/ParcelDetail";
 import Messages from "./pages/Messages";
 import MessageThread from "./pages/MessageThread";
+import UserProfile from "./pages/UserProfile";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import Callback from "./pages/auth/Callback";
@@ -38,6 +39,7 @@ const App = () => (
         <Route path="/explorer" element={<Explorer />} />
         <Route path="/trajets/:id" element={<TripDetail />} />
         <Route path="/colis/:id" element={<ParcelDetail />} />
+        <Route path="/u/:userId" element={<UserProfile />} />
               <Route
                 path="/messages"
                 element={

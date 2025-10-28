@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Star } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 interface TripCardProps {
   trip: any;
@@ -19,7 +19,7 @@ export const TripCard = ({ trip }: TripCardProps) => {
     <Card className="hover:shadow-md transition-shadow">
       <CardContent className="pt-6">
         <div className="flex items-start justify-between mb-4">
-          <div className="flex items-center gap-3">
+          <Link to={`/u/${trip.user_id}`} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
             <Avatar>
               <AvatarImage src={profile?.avatar_url} />
               <AvatarFallback>{profile?.full_name?.[0] || "U"}</AvatarFallback>
@@ -28,12 +28,12 @@ export const TripCard = ({ trip }: TripCardProps) => {
               <p className="font-medium text-foreground">{profile?.full_name || "Utilisateur"}</p>
               {profile?.rating_avg > 0 && (
                 <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                  <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                  <span>{profile.rating_avg.toFixed(1)}</span>
+                  <Star className="h-3 w-3 fill-[#F59E0B] text-[#F59E0B]" />
+                  <span>{Number(profile.rating_avg).toFixed(1)}</span>
                 </div>
               )}
             </div>
-          </div>
+          </Link>
           <Badge variant={trip.status === "open" ? "default" : "secondary"}>
             {trip.status === "open" ? "Ouvert" : "Fermé"}
           </Badge>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
@@ -14,6 +14,7 @@ import { ArrowRight, Calendar, Package, Star } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { MatchingSection } from "@/components/explorer/MatchingSection";
+import { ReviewDialog } from "@/components/reviews/ReviewDialog";
 
 const TripDetail = () => {
   const { id } = useParams();
@@ -22,6 +23,7 @@ const TripDetail = () => {
   const { toast } = useToast();
   const [trip, setTrip] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
 
   useEffect(() => {
     const fetchTrip = async () => {
@@ -145,7 +147,10 @@ const TripDetail = () => {
           </CardHeader>
 
           <CardContent className="space-y-6">
-            <div className="flex items-center gap-4 p-4 bg-muted/30 rounded-lg">
+            <Link 
+              to={`/u/${trip.user_id}`}
+              className="flex items-center gap-4 p-4 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors"
+            >
               <Avatar className="h-16 w-16">
                 <AvatarImage src={profile?.avatar_url} />
                 <AvatarFallback className="text-lg">{profile?.full_name?.[0] || "U"}</AvatarFallback>
@@ -154,13 +159,13 @@ const TripDetail = () => {
                 <p className="font-semibold text-lg">{profile?.full_name || "Utilisateur"}</p>
                 {profile?.rating_avg > 0 && (
                   <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                    <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                    <span>{profile.rating_avg.toFixed(1)}</span>
+                    <Star className="h-4 w-4 fill-[#F59E0B] text-[#F59E0B]" />
+                    <span>{Number(profile.rating_avg).toFixed(1)}</span>
                     <span>({profile.rating_count} avis)</span>
                   </div>
                 )}
               </div>
-            </div>
+            </Link>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="p-4 border rounded-lg">
@@ -190,6 +195,18 @@ const TripDetail = () => {
             <Button onClick={handleContact} className="w-full" size="lg">
               Contacter le voyageur
             </Button>
+
+            {user && user.id !== trip.user_id && trip.status === "closed" && (
+              <Button 
+                onClick={() => setReviewDialogOpen(true)} 
+                variant="outline" 
+                className="w-full" 
+                size="lg"
+              >
+                <Star className="w-4 h-4 mr-2" />
+                Laisser un avis
+              </Button>
+            )}
           </CardContent>
         </Card>
 
@@ -197,6 +214,15 @@ const TripDetail = () => {
       </main>
 
       <Footer />
+
+      {user && user.id !== trip.user_id && (
+        <ReviewDialog
+          open={reviewDialogOpen}
+          onOpenChange={setReviewDialogOpen}
+          targetUserId={trip.user_id}
+          targetUserName={profile?.full_name || "ce voyageur"}
+        />
+      )}
     </div>
   );
 };
