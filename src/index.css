@@ -33,6 +33,10 @@ All colors MUST be HSL.
     --accent: 38 92% 50%;
     --accent-foreground: 0 0% 100%;
 
+    /* Jaune warning (alias de accent) - #F59E0B */
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+
     /* Rouge erreur - #EF4444 */
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;

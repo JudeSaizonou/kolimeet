@@ -14,28 +14,79 @@ export type Database = {
   }
   public: {
     Tables: {
+      phone_verification_codes: {
+        Row: {
+          code: string
+          created_at: string
+          expires_at: string
+          id: string
+          phone_e164: string
+          user_id: string
+          verified: boolean | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          phone_e164: string
+          user_id: string
+          verified?: boolean | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          phone_e164?: string
+          user_id?: string
+          verified?: boolean | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
+          city: string | null
+          country: string | null
           created_at: string
           full_name: string | null
           id: string
+          onboarding_completed: boolean | null
+          phone_e164: string | null
+          phone_verified: boolean | null
+          rating_avg: number | null
+          rating_count: number | null
           updated_at: string
           user_id: string
         }
         Insert: {
           avatar_url?: string | null
+          city?: string | null
+          country?: string | null
           created_at?: string
           full_name?: string | null
           id?: string
+          onboarding_completed?: boolean | null
+          phone_e164?: string | null
+          phone_verified?: boolean | null
+          rating_avg?: number | null
+          rating_count?: number | null
           updated_at?: string
           user_id: string
         }
         Update: {
           avatar_url?: string | null
+          city?: string | null
+          country?: string | null
           created_at?: string
           full_name?: string | null
           id?: string
+          onboarding_completed?: boolean | null
+          phone_e164?: string | null
+          phone_verified?: boolean | null
+          rating_avg?: number | null
+          rating_count?: number | null
           updated_at?: string
           user_id?: string
         }

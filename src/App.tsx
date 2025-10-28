@@ -7,6 +7,9 @@ import Home from "./pages/Home";
 import Explorer from "./pages/Explorer";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
+import Callback from "./pages/auth/Callback";
+import Onboarding from "./pages/Onboarding";
+import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -22,6 +25,9 @@ const App = () => (
           <Route path="/explorer" element={<Explorer />} />
           <Route path="/auth/login" element={<Login />} />
           <Route path="/auth/register" element={<Register />} />
+          <Route path="/auth/callback" element={<Callback />} />
+          <Route path="/onboarding" element={<Onboarding />} />
+          <Route path="/profil" element={<Profile />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

@@ -17,6 +17,13 @@ export const useAuth = () => {
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
+
+        // Check if user needs onboarding after login
+        if (session?.user && event === 'SIGNED_IN') {
+          setTimeout(() => {
+            checkOnboarding(session.user.id);
+          }, 0);
+        }
       }
     );
 
@@ -29,6 +36,22 @@ export const useAuth = () => {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  const checkOnboarding = async (userId: string) => {
+    try {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("onboarding_completed")
+        .eq("user_id", userId)
+        .single();
+
+      if (profile && !profile.onboarding_completed) {
+        navigate("/onboarding");
+      }
+    } catch (error) {
+      console.error("Error checking onboarding:", error);
+    }
+  };
 
   const signInWithEmail = async (email: string, password: string) => {
     try {
@@ -89,7 +112,7 @@ export const useAuth = () => {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${window.location.origin}/`,
+          redirectTo: `${window.location.origin}/auth/callback`,
         },
       });
 
@@ -98,6 +121,25 @@ export const useAuth = () => {
       toast({
         title: "Erreur de connexion",
         description: error.message || "Impossible de se connecter avec Google",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const signInWithFacebook = async () => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "facebook",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+
+      if (error) throw error;
+    } catch (error: any) {
+      toast({
+        title: "Erreur de connexion",
+        description: error.message || "Impossible de se connecter avec Facebook",
         variant: "destructive",
       });
     }
@@ -129,6 +171,7 @@ export const useAuth = () => {
     signInWithEmail,
     signUpWithEmail,
     signInWithGoogle,
+    signInWithFacebook,
     signOut,
   };
 };
