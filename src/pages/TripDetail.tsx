@@ -165,8 +165,8 @@ const TripDetail = () => {
                   <Package className="h-5 w-5 text-primary" />
                   <h3 className="font-semibold">Capacité disponible</h3>
                 </div>
-                <p className="text-2xl font-bold">{trip.capacity_available_liters}L</p>
-                <p className="text-sm text-muted-foreground">sur {trip.capacity_liters}L au total</p>
+                <p className="text-2xl font-bold">{trip.capacity_available_kg}kg</p>
+                <p className="text-sm text-muted-foreground">sur {trip.capacity_kg}kg au total</p>
               </div>
 
               {trip.price_expect && (

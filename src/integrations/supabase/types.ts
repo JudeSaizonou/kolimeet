@@ -350,8 +350,8 @@ export type Database = {
       }
       trips: {
         Row: {
-          capacity_available_liters: number
-          capacity_liters: number
+          capacity_available_kg: number
+          capacity_kg: number
           created_at: string
           date_departure: string
           from_city: string
@@ -365,8 +365,8 @@ export type Database = {
           user_id: string
         }
         Insert: {
-          capacity_available_liters: number
-          capacity_liters: number
+          capacity_available_kg: number
+          capacity_kg: number
           created_at?: string
           date_departure: string
           from_city: string
@@ -380,8 +380,8 @@ export type Database = {
           user_id: string
         }
         Update: {
-          capacity_available_liters?: number
-          capacity_liters?: number
+          capacity_available_kg?: number
+          capacity_kg?: number
           created_at?: string
           date_departure?: string
           from_city?: string

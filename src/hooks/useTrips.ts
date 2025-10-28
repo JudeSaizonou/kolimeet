@@ -21,8 +21,8 @@ export const useTrips = () => {
         to_country: data.to_country,
         to_city: data.to_city,
         date_departure: data.date_departure,
-        capacity_liters: data.capacity_liters,
-        capacity_available_liters: data.capacity_available_liters,
+        capacity_kg: data.capacity_kg,
+        capacity_available_kg: data.capacity_available_kg,
         price_expect: data.price_expect,
         notes: data.notes,
       }]);

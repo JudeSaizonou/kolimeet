@@ -23,8 +23,8 @@ interface Trip {
   to_country: string;
   to_city: string;
   date_departure: string;
-  capacity_liters: number;
-  capacity_available_liters: number;
+  capacity_kg: number;
+  capacity_available_kg: number;
   price_expect?: number;
   notes?: string;
   status: string;
@@ -114,7 +114,7 @@ const MyListings = () => {
       });
       return;
     }
-    await updateTrip(tripId, { capacity_available_liters: newCapacity });
+    await updateTrip(tripId, { capacity_available_kg: newCapacity });
     fetchMyListings();
   };
 
@@ -180,7 +180,7 @@ const MyListings = () => {
                         <div className="space-y-2 flex-1">
                           <div className="flex items-center gap-2 text-sm">
                             <Package className="h-4 w-4 text-muted-foreground" />
-                            <span className="font-medium">{trip.capacity_available_liters}L / {trip.capacity_liters}L</span>
+                            <span className="font-medium">{trip.capacity_available_kg}kg / {trip.capacity_kg}kg</span>
                           </div>
                           {trip.price_expect && (
                             <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -193,14 +193,14 @@ const MyListings = () => {
                           <Button
                             variant="outline"
                             size="icon"
-                            onClick={() => handleUpdateCapacity(trip.id, trip.capacity_available_liters - 5, trip.capacity_liters)}
+                            onClick={() => handleUpdateCapacity(trip.id, trip.capacity_available_kg - 5, trip.capacity_kg)}
                           >
                             <Minus className="h-4 w-4" />
                           </Button>
                           <Button
                             variant="outline"
                             size="icon"
-                            onClick={() => handleUpdateCapacity(trip.id, trip.capacity_available_liters + 5, trip.capacity_liters)}
+                            onClick={() => handleUpdateCapacity(trip.id, trip.capacity_available_kg + 5, trip.capacity_kg)}
                           >
                             <Plus className="h-4 w-4" />
                           </Button>

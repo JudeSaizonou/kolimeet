@@ -38,7 +38,7 @@ const calculateScore = (
     if (daysDiff <= 3) score += 20;
 
     const parcelVolume = getSizeVolume(match.size);
-    if (referenceItem.capacity_available_liters >= parcelVolume) score += 15;
+    if (referenceItem.capacity_available_kg >= parcelVolume) score += 15;
   } else {
     const parcelDeadline = new Date(referenceItem.deadline);
     const tripDate = new Date(match.date_departure);
@@ -47,7 +47,7 @@ const calculateScore = (
     if (daysDiff <= 3) score += 20;
 
     const parcelVolume = getSizeVolume(referenceItem.size);
-    if (match.capacity_available_liters >= parcelVolume) score += 15;
+    if (match.capacity_available_kg >= parcelVolume) score += 15;
   }
 
   return score;
@@ -167,7 +167,7 @@ export const MatchingSection = ({ type, item }: MatchingSectionProps) => {
                   ) : (
                     <div className="text-xs">
                       <span className="text-muted-foreground">Capacité :</span>
-                      <span className="ml-1 font-medium">{match.capacity_available_liters}L</span>
+                      <span className="ml-1 font-medium">{match.capacity_available_kg}kg</span>
                     </div>
                   )}
 

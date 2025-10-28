@@ -33,8 +33,8 @@ const PublishTrip = () => {
       to_country: "",
       to_city: "",
       date_departure: "",
-      capacity_liters: 20,
-      capacity_available_liters: 20,
+      capacity_kg: 20,
+      capacity_available_kg: 20,
       price_expect: undefined,
       notes: "",
     },
@@ -64,8 +64,8 @@ const PublishTrip = () => {
           to_country: data.to_country,
           to_city: data.to_city,
           date_departure: data.date_departure,
-          capacity_liters: data.capacity_liters,
-          capacity_available_liters: data.capacity_available_liters,
+          capacity_kg: data.capacity_kg,
+          capacity_available_kg: data.capacity_available_kg,
           price_expect: data.price_expect || undefined,
           notes: data.notes || "",
         });
@@ -216,10 +216,10 @@ const PublishTrip = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
-                    name="capacity_liters"
+                    name="capacity_kg"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Capacité totale (litres)</FormLabel>
+                        <FormLabel>Capacité totale (kg)</FormLabel>
                         <FormControl>
                           <Input
                             type="number"
@@ -233,10 +233,10 @@ const PublishTrip = () => {
                   />
                   <FormField
                     control={form.control}
-                    name="capacity_available_liters"
+                    name="capacity_available_kg"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Capacité disponible (litres)</FormLabel>
+                        <FormLabel>Capacité disponible (kg)</FormLabel>
                         <FormControl>
                           <Input
                             type="number"

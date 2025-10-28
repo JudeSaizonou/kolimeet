@@ -54,7 +54,7 @@ export const useTrips = (filters: TripFilters, page: number = 1, pageSize: numbe
           query = query.gte("date_departure", filters.dateFrom);
         }
         if (filters.minCapacity) {
-          query = query.gte("capacity_available_liters", filters.minCapacity);
+          query = query.gte("capacity_available_kg", filters.minCapacity);
         }
 
         const sortField = filters.sortBy === "price" ? "price_expect" : "date_departure";

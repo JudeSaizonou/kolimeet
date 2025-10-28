@@ -53,7 +53,7 @@ export const TripCard = ({ trip }: TripCardProps) => {
         <div className="flex gap-4 text-sm">
           <div>
             <span className="text-muted-foreground">Capacité dispo :</span>
-            <span className="ml-1 font-medium">{trip.capacity_available_liters}L</span>
+            <span className="ml-1 font-medium">{trip.capacity_available_kg}kg</span>
           </div>
           {trip.price_expect && (
             <div>
