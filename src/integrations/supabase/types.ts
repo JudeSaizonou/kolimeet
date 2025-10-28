@@ -14,6 +14,139 @@ export type Database = {
   }
   public: {
     Tables: {
+      flags: {
+        Row: {
+          created_at: string
+          entity_id: string
+          entity_type: string
+          id: string
+          reason: string
+          reporter_id: string
+        }
+        Insert: {
+          created_at?: string
+          entity_id: string
+          entity_type: string
+          id?: string
+          reason: string
+          reporter_id: string
+        }
+        Update: {
+          created_at?: string
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          reason?: string
+          reporter_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "flags_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          sender_id: string
+          thread_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          sender_id: string
+          thread_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          sender_id?: string
+          thread_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "messages_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "threads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      parcels: {
+        Row: {
+          created_at: string
+          deadline: string
+          description: string | null
+          from_city: string
+          from_country: string
+          id: string
+          photos: string[] | null
+          size: string
+          status: string
+          to_city: string
+          to_country: string
+          type: string
+          user_id: string
+          weight_kg: number
+        }
+        Insert: {
+          created_at?: string
+          deadline: string
+          description?: string | null
+          from_city: string
+          from_country: string
+          id?: string
+          photos?: string[] | null
+          size: string
+          status?: string
+          to_city: string
+          to_country: string
+          type: string
+          user_id: string
+          weight_kg: number
+        }
+        Update: {
+          created_at?: string
+          deadline?: string
+          description?: string | null
+          from_city?: string
+          from_country?: string
+          id?: string
+          photos?: string[] | null
+          size?: string
+          status?: string
+          to_city?: string
+          to_country?: string
+          type?: string
+          user_id?: string
+          weight_kg?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "parcels_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       phone_verification_codes: {
         Row: {
           code: string
@@ -92,15 +225,185 @@ export type Database = {
         }
         Relationships: []
       }
+      reviews: {
+        Row: {
+          comment: string | null
+          created_at: string
+          id: string
+          rating: number
+          reviewer_id: string
+          target_user_id: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          rating: number
+          reviewer_id: string
+          target_user_id: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          rating?: number
+          reviewer_id?: string
+          target_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_reviewer_id_fkey"
+            columns: ["reviewer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "reviews_target_user_id_fkey"
+            columns: ["target_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      threads: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          last_message_at: string
+          other_user_id: string
+          related_id: string
+          related_type: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          last_message_at?: string
+          other_user_id: string
+          related_id: string
+          related_type: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          last_message_at?: string
+          other_user_id?: string
+          related_id?: string
+          related_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "threads_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "threads_other_user_id_fkey"
+            columns: ["other_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      trips: {
+        Row: {
+          capacity_available_liters: number
+          capacity_liters: number
+          created_at: string
+          date_departure: string
+          from_city: string
+          from_country: string
+          id: string
+          notes: string | null
+          price_expect: number | null
+          status: string
+          to_city: string
+          to_country: string
+          user_id: string
+        }
+        Insert: {
+          capacity_available_liters: number
+          capacity_liters: number
+          created_at?: string
+          date_departure: string
+          from_city: string
+          from_country: string
+          id?: string
+          notes?: string | null
+          price_expect?: number | null
+          status?: string
+          to_city: string
+          to_country: string
+          user_id: string
+        }
+        Update: {
+          capacity_available_liters?: number
+          capacity_liters?: number
+          created_at?: string
+          date_departure?: string
+          from_city?: string
+          from_country?: string
+          id?: string
+          notes?: string | null
+          price_expect?: number | null
+          status?: string
+          to_city?: string
+          to_country?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trips_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "moderator" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -227,6 +530,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "moderator", "user"],
+    },
   },
 } as const
