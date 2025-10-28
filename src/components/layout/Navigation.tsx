@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Package, User, LogOut, FileText } from "lucide-react";
+import { Package, User, LogOut, FileText, Plane } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -49,6 +49,30 @@ const Navigation = () => {
               Explorer
             </Button>
           </Link>
+
+          {user && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline">
+                  Publier
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuItem asChild>
+                  <Link to="/publier/trajet" className="flex items-center gap-2 cursor-pointer">
+                    <Plane className="h-4 w-4" />
+                    Publier un trajet
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/publier/colis" className="flex items-center gap-2 cursor-pointer">
+                    <Package className="h-4 w-4" />
+                    Publier un colis
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
 
           {user ? (
             <DropdownMenu>
