@@ -22,6 +22,7 @@ export type Database = {
           id: string
           reason: string
           reporter_id: string
+          status: string | null
         }
         Insert: {
           created_at?: string
@@ -30,6 +31,7 @@ export type Database = {
           id?: string
           reason: string
           reporter_id: string
+          status?: string | null
         }
         Update: {
           created_at?: string
@@ -38,6 +40,7 @@ export type Database = {
           id?: string
           reason?: string
           reporter_id?: string
+          status?: string | null
         }
         Relationships: [
           {
@@ -188,6 +191,7 @@ export type Database = {
           created_at: string
           full_name: string | null
           id: string
+          is_suspended: boolean | null
           onboarding_completed: boolean | null
           phone_e164: string | null
           phone_verified: boolean | null
@@ -203,6 +207,7 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           id?: string
+          is_suspended?: boolean | null
           onboarding_completed?: boolean | null
           phone_e164?: string | null
           phone_verified?: boolean | null
@@ -218,6 +223,7 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           id?: string
+          is_suspended?: boolean | null
           onboarding_completed?: boolean | null
           phone_e164?: string | null
           phone_verified?: boolean | null

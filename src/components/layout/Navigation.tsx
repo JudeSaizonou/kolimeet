@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Package, User, LogOut, FileText, Plane, MessageSquare } from "lucide-react";
+import { Package, User, LogOut, FileText, Plane, MessageSquare, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -10,11 +10,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/useAuth";
+import { useAdmin } from "@/hooks/useAdmin";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 const Navigation = () => {
   const { user, signOut } = useAuth();
+  const { isAdmin } = useAdmin();
   const [profile, setProfile] = useState<any>(null);
 
   useEffect(() => {
@@ -131,6 +133,20 @@ const Navigation = () => {
                     Messagerie
                   </Link>
                 </DropdownMenuItem>
+                {isAdmin && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link
+                        to="/admin"
+                        className="flex items-center gap-2 cursor-pointer text-primary"
+                      >
+                        <Shield className="h-4 w-4" />
+                        Administration
+                      </Link>
+                    </DropdownMenuItem>
+                  </>
+                )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onClick={signOut}
