@@ -1,11 +1,45 @@
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
+import { useState } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Skeleton } from "@/components/ui/skeleton";
 import Navigation from "@/components/layout/Navigation";
 import Footer from "@/components/layout/Footer";
+import { TripCard } from "@/components/explorer/TripCard";
+import { ParcelCard } from "@/components/explorer/ParcelCard";
+import { TripFiltersComponent } from "@/components/explorer/TripFilters";
+import { ParcelFiltersComponent } from "@/components/explorer/ParcelFilters";
+import { useTrips, useParcels, TripFilters, ParcelFilters } from "@/hooks/useExplorer";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 const Explorer = () => {
+  const [tripFilters, setTripFilters] = useState<TripFilters>({ sortBy: "date" });
+  const [parcelFilters, setParcelFilters] = useState<ParcelFilters>({ sortBy: "deadline" });
+  const [tripPage, setTripPage] = useState(1);
+  const [parcelPage, setParcelPage] = useState(1);
+
+  const { trips, loading: tripsLoading, totalCount: tripsTotalCount } = useTrips(tripFilters, tripPage);
+  const { parcels, loading: parcelsLoading, totalCount: parcelsTotalCount } = useParcels(parcelFilters, parcelPage);
+
+  const pageSize = 10;
+  const tripsTotalPages = Math.ceil(tripsTotalCount / pageSize);
+  const parcelsTotalPages = Math.ceil(parcelsTotalCount / pageSize);
+
+  const handleResetTripFilters = () => {
+    setTripFilters({ sortBy: "date" });
+    setTripPage(1);
+  };
+
+  const handleResetParcelFilters = () => {
+    setParcelFilters({ sortBy: "deadline" });
+    setParcelPage(1);
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navigation />
@@ -13,35 +47,152 @@ const Explorer = () => {
       <main className="flex-1">
         <section className="container mx-auto px-4 py-8">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-foreground mb-4">
+            <h1 className="text-3xl font-bold text-foreground mb-2">
               Explorer les annonces
             </h1>
-            <p className="text-muted-foreground mb-6">
+            <p className="text-muted-foreground">
               Trouvez le voyageur ou l'expéditeur qui correspond à vos besoins.
             </p>
-            
-            <div className="flex gap-4 max-w-2xl">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                <Input 
-                  placeholder="Rechercher une destination..." 
-                  className="pl-10"
-                />
-              </div>
-              <Button>
-                Rechercher
-              </Button>
-            </div>
           </div>
 
-          <Card className="p-8 text-center border-2 border-dashed">
-            <p className="text-muted-foreground mb-4">
-              Les annonces seront bientôt disponibles !
-            </p>
-            <p className="text-sm text-muted-foreground">
-              En attendant, créez votre compte pour être notifié des nouvelles fonctionnalités.
-            </p>
-          </Card>
+          <Tabs defaultValue="trips" className="w-full">
+            <TabsList className="mb-6">
+              <TabsTrigger value="trips">Trajets</TabsTrigger>
+              <TabsTrigger value="parcels">Colis</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="trips" className="space-y-6">
+              <TripFiltersComponent 
+                filters={tripFilters}
+                onChange={(newFilters) => {
+                  setTripFilters(newFilters);
+                  setTripPage(1);
+                }}
+                onReset={handleResetTripFilters}
+              />
+
+              {tripsLoading ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {[...Array(6)].map((_, i) => (
+                    <Skeleton key={i} className="h-64" />
+                  ))}
+                </div>
+              ) : trips.length === 0 ? (
+                <div className="text-center py-12">
+                  <p className="text-muted-foreground">Aucun trajet trouvé avec ces critères.</p>
+                </div>
+              ) : (
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {trips.map((trip) => (
+                      <TripCard key={trip.id} trip={trip} />
+                    ))}
+                  </div>
+
+                  {tripsTotalPages > 1 && (
+                    <Pagination>
+                      <PaginationContent>
+                        <PaginationItem>
+                          <PaginationPrevious 
+                            onClick={() => setTripPage(Math.max(1, tripPage - 1))}
+                            className={tripPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                          />
+                        </PaginationItem>
+                        
+                        {[...Array(Math.min(5, tripsTotalPages))].map((_, i) => {
+                          const page = i + 1;
+                          return (
+                            <PaginationItem key={page}>
+                              <PaginationLink
+                                onClick={() => setTripPage(page)}
+                                isActive={tripPage === page}
+                                className="cursor-pointer"
+                              >
+                                {page}
+                              </PaginationLink>
+                            </PaginationItem>
+                          );
+                        })}
+
+                        <PaginationItem>
+                          <PaginationNext 
+                            onClick={() => setTripPage(Math.min(tripsTotalPages, tripPage + 1))}
+                            className={tripPage === tripsTotalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                          />
+                        </PaginationItem>
+                      </PaginationContent>
+                    </Pagination>
+                  )}
+                </>
+              )}
+            </TabsContent>
+
+            <TabsContent value="parcels" className="space-y-6">
+              <ParcelFiltersComponent 
+                filters={parcelFilters}
+                onChange={(newFilters) => {
+                  setParcelFilters(newFilters);
+                  setParcelPage(1);
+                }}
+                onReset={handleResetParcelFilters}
+              />
+
+              {parcelsLoading ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {[...Array(6)].map((_, i) => (
+                    <Skeleton key={i} className="h-64" />
+                  ))}
+                </div>
+              ) : parcels.length === 0 ? (
+                <div className="text-center py-12">
+                  <p className="text-muted-foreground">Aucun colis trouvé avec ces critères.</p>
+                </div>
+              ) : (
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {parcels.map((parcel) => (
+                      <ParcelCard key={parcel.id} parcel={parcel} />
+                    ))}
+                  </div>
+
+                  {parcelsTotalPages > 1 && (
+                    <Pagination>
+                      <PaginationContent>
+                        <PaginationItem>
+                          <PaginationPrevious 
+                            onClick={() => setParcelPage(Math.max(1, parcelPage - 1))}
+                            className={parcelPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                          />
+                        </PaginationItem>
+                        
+                        {[...Array(Math.min(5, parcelsTotalPages))].map((_, i) => {
+                          const page = i + 1;
+                          return (
+                            <PaginationItem key={page}>
+                              <PaginationLink
+                                onClick={() => setParcelPage(page)}
+                                isActive={parcelPage === page}
+                                className="cursor-pointer"
+                              >
+                                {page}
+                              </PaginationLink>
+                            </PaginationItem>
+                          );
+                        })}
+
+                        <PaginationItem>
+                          <PaginationNext 
+                            onClick={() => setParcelPage(Math.min(parcelsTotalPages, parcelPage + 1))}
+                            className={parcelPage === parcelsTotalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                          />
+                        </PaginationItem>
+                      </PaginationContent>
+                    </Pagination>
+                  )}
+                </>
+              )}
+            </TabsContent>
+          </Tabs>
         </section>
       </main>
 

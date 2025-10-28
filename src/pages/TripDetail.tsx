@@ -1,0 +1,163 @@
+import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
+import Navigation from "@/components/layout/Navigation";
+import Footer from "@/components/layout/Footer";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { ArrowRight, Calendar, Package, Star } from "lucide-react";
+import { format } from "date-fns";
+import { fr } from "date-fns/locale";
+import { MatchingSection } from "@/components/explorer/MatchingSection";
+
+const TripDetail = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const [trip, setTrip] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchTrip = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("trips")
+          .select("*, profiles!trips_user_id_fkey(full_name, avatar_url, rating_avg, rating_count)")
+          .eq("id", id)
+          .single();
+
+        if (error) throw error;
+        setTrip(data);
+      } catch (error: any) {
+        toast({
+          variant: "destructive",
+          title: "Erreur",
+          description: "Impossible de charger ce trajet.",
+        });
+        navigate("/explorer");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTrip();
+  }, [id, navigate, toast]);
+
+  const handleContact = () => {
+    if (!user) {
+      navigate("/auth/login");
+      return;
+    }
+
+    toast({
+      title: "Bientôt disponible",
+      description: "La messagerie arrive à l'étape suivante.",
+    });
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Navigation />
+        <main className="flex-1 container mx-auto px-4 py-8">
+          <Skeleton className="h-96 mb-6" />
+          <Skeleton className="h-64" />
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!trip) return null;
+
+  const profile = trip.profiles;
+
+  return (
+    <div className="min-h-screen flex flex-col">
+      <Navigation />
+      
+      <main className="flex-1 container mx-auto px-4 py-8">
+        <Card className="mb-6">
+          <CardHeader>
+            <div className="flex items-start justify-between">
+              <div className="space-y-2 flex-1">
+                <div className="flex items-center gap-2 text-lg font-semibold">
+                  <span>{trip.from_city}, {trip.from_country}</span>
+                  <ArrowRight className="h-5 w-5 text-muted-foreground" />
+                  <span>{trip.to_city}, {trip.to_country}</span>
+                </div>
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Calendar className="h-4 w-4" />
+                  <span>Départ : {format(new Date(trip.date_departure), "d MMMM yyyy", { locale: fr })}</span>
+                </div>
+              </div>
+              <Badge variant={trip.status === "open" ? "default" : "secondary"}>
+                {trip.status === "open" ? "Ouvert" : "Fermé"}
+              </Badge>
+            </div>
+          </CardHeader>
+
+          <CardContent className="space-y-6">
+            <div className="flex items-center gap-4 p-4 bg-muted/30 rounded-lg">
+              <Avatar className="h-16 w-16">
+                <AvatarImage src={profile?.avatar_url} />
+                <AvatarFallback className="text-lg">{profile?.full_name?.[0] || "U"}</AvatarFallback>
+              </Avatar>
+              <div>
+                <p className="font-semibold text-lg">{profile?.full_name || "Utilisateur"}</p>
+                {profile?.rating_avg > 0 && (
+                  <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                    <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                    <span>{profile.rating_avg.toFixed(1)}</span>
+                    <span>({profile.rating_count} avis)</span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="p-4 border rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <Package className="h-5 w-5 text-primary" />
+                  <h3 className="font-semibold">Capacité disponible</h3>
+                </div>
+                <p className="text-2xl font-bold">{trip.capacity_available_liters}L</p>
+                <p className="text-sm text-muted-foreground">sur {trip.capacity_liters}L au total</p>
+              </div>
+
+              {trip.price_expect && (
+                <div className="p-4 border rounded-lg">
+                  <h3 className="font-semibold mb-2">Prix souhaité</h3>
+                  <p className="text-2xl font-bold">{trip.price_expect}€</p>
+                </div>
+              )}
+            </div>
+
+            {trip.notes && (
+              <div className="p-4 bg-muted/30 rounded-lg">
+                <h3 className="font-semibold mb-2">Notes du voyageur</h3>
+                <p className="text-muted-foreground whitespace-pre-wrap">{trip.notes}</p>
+              </div>
+            )}
+
+            <Button onClick={handleContact} className="w-full" size="lg">
+              Contacter le voyageur
+            </Button>
+          </CardContent>
+        </Card>
+
+        <MatchingSection type="trip" item={trip} />
+      </main>
+
+      <Footer />
+    </div>
+  );
+};
+
+export default TripDetail;

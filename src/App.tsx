@@ -8,6 +8,8 @@ import Navigation from "./components/layout/Navigation";
 import Footer from "./components/layout/Footer";
 import Home from "./pages/Home";
 import Explorer from "./pages/Explorer";
+import TripDetail from "./pages/TripDetail";
+import ParcelDetail from "./pages/ParcelDetail";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import Callback from "./pages/auth/Callback";
@@ -30,8 +32,10 @@ const App = () => (
           <Navigation />
           <main className="flex-1">
             <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/explorer" element={<Explorer />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/explorer" element={<Explorer />} />
+        <Route path="/trajets/:id" element={<TripDetail />} />
+        <Route path="/colis/:id" element={<ParcelDetail />} />
               <Route path="/auth/login" element={<Login />} />
               <Route path="/auth/register" element={<Register />} />
               <Route path="/auth/callback" element={<Callback />} />
