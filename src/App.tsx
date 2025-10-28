@@ -8,6 +8,8 @@ import { AdminRoute } from "@/components/auth/AdminRoute";
 import Navigation from "./components/layout/Navigation";
 import Footer from "./components/layout/Footer";
 import { SuspensionBanner } from "@/components/SuspensionBanner";
+import { PWAInstallBanner } from "@/components/PWAInstallBanner";
+import { OfflineBanner } from "@/components/OfflineBanner";
 import Home from "./pages/Home";
 import Explorer from "./pages/Explorer";
 import TripDetail from "./pages/TripDetail";
@@ -23,6 +25,7 @@ import Profile from "./pages/Profile";
 import PublishTrip from "./pages/publish/Trip";
 import PublishParcel from "./pages/publish/Parcel";
 import MyListings from "./pages/MyListings";
+import Feedback from "./pages/Feedback";
 import NotFound from "./pages/NotFound";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 
@@ -36,6 +39,8 @@ const App = () => (
       <BrowserRouter>
         <div className="flex flex-col min-h-screen">
           <Navigation />
+          <OfflineBanner />
+          <PWAInstallBanner />
           <main className="flex-1">
             <div className="container mx-auto px-4 py-4">
               <SuspensionBanner />
@@ -118,6 +123,14 @@ const App = () => (
                 element={
                   <ProtectedRoute>
                     <MyListings />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/feedback"
+                element={
+                  <ProtectedRoute>
+                    <Feedback />
                   </ProtectedRoute>
                 }
               />

@@ -2,6 +2,7 @@ import { useThreads } from "@/hooks/useThreads";
 import { useAuth } from "@/hooks/useAuth";
 import { ThreadCard } from "@/components/messaging/ThreadCard";
 import { Skeleton } from "@/components/ui/skeleton";
+import { EmptyState } from "@/components/EmptyState";
 import { MessageSquare } from "lucide-react";
 
 const Messages = () => {
@@ -20,15 +21,11 @@ const Messages = () => {
             ))}
           </div>
         ) : threads.length === 0 ? (
-          <div className="text-center py-12">
-            <MessageSquare className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-            <h2 className="text-xl font-semibold mb-2">
-              Aucune conversation
-            </h2>
-            <p className="text-muted-foreground">
-              Vos conversations apparaîtront ici
-            </p>
-          </div>
+          <EmptyState
+            icon={MessageSquare}
+            title="Aucune conversation"
+            description="Vos conversations apparaîtront ici après avoir contacté un voyageur ou un expéditeur."
+          />
         ) : (
           <div className="space-y-3">
             {threads.map((thread) => (

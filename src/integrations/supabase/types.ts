@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      feedbacks: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          message: string
+          user_id: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          id?: string
+          message: string
+          user_id?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          message?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       flags: {
         Row: {
           created_at: string
@@ -189,6 +213,7 @@ export type Database = {
           city: string | null
           country: string | null
           created_at: string
+          email_notifications: boolean | null
           full_name: string | null
           id: string
           is_suspended: boolean | null
@@ -205,6 +230,7 @@ export type Database = {
           city?: string | null
           country?: string | null
           created_at?: string
+          email_notifications?: boolean | null
           full_name?: string | null
           id?: string
           is_suspended?: boolean | null
@@ -221,6 +247,7 @@ export type Database = {
           city?: string | null
           country?: string | null
           created_at?: string
+          email_notifications?: boolean | null
           full_name?: string | null
           id?: string
           is_suspended?: boolean | null

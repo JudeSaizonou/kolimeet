@@ -4,6 +4,7 @@ import { AdminFlags } from "./AdminFlags";
 import { AdminUsers } from "./AdminUsers";
 import { AdminListings } from "./AdminListings";
 import { AdminReviews } from "./AdminReviews";
+import AdminFeedbacks from "./AdminFeedbacks";
 import { Shield } from "lucide-react";
 
 export default function AdminDashboard() {
@@ -23,11 +24,12 @@ export default function AdminDashboard() {
 
       <div className="container mx-auto px-4 py-6">
         <Tabs defaultValue="flags" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-6">
+          <TabsList className="grid w-full grid-cols-5 mb-6">
             <TabsTrigger value="flags">Signalements</TabsTrigger>
             <TabsTrigger value="users">Utilisateurs</TabsTrigger>
             <TabsTrigger value="listings">Annonces</TabsTrigger>
             <TabsTrigger value="reviews">Avis</TabsTrigger>
+            <TabsTrigger value="feedbacks">Retours</TabsTrigger>
           </TabsList>
 
           <TabsContent value="flags" className="mt-0">
@@ -44,6 +46,10 @@ export default function AdminDashboard() {
 
           <TabsContent value="reviews" className="mt-0">
             <AdminReviews />
+          </TabsContent>
+
+          <TabsContent value="feedbacks" className="mt-0">
+            <AdminFeedbacks />
           </TabsContent>
         </Tabs>
       </div>

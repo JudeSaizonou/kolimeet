@@ -6,7 +6,9 @@ import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Edit, Trash2, Lock, LockOpen, MapPin, Calendar, Package, Plus, Minus, DollarSign } from "lucide-react";
+import { Loader } from "@/components/ui/loader";
+import { EmptyState } from "@/components/EmptyState";
+import { Edit, Trash2, Lock, LockOpen, MapPin, Calendar, Package, Plus, Minus, DollarSign, Plane } from "lucide-react";
 import { useTrips } from "@/hooks/useTrips";
 import { useParcels } from "@/hooks/useParcels";
 import { format } from "date-fns";
@@ -119,7 +121,7 @@ const MyListings = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        <Loader size="lg" />
       </div>
     );
   }
@@ -142,14 +144,16 @@ const MyListings = () => {
 
           <TabsContent value="trips" className="space-y-4">
             {trips.length === 0 ? (
-              <Card>
-                <CardContent className="py-8 text-center">
-                  <p className="text-muted-foreground mb-4">Aucun trajet publié</p>
+              <EmptyState
+                icon={Plane}
+                title="Aucun trajet publié"
+                description="Vous n'avez encore rien publié. Proposez votre prochain voyage !"
+                action={
                   <Button asChild>
                     <a href="/publier/trajet">Publier un trajet</a>
                   </Button>
-                </CardContent>
-              </Card>
+                }
+              />
             ) : (
               trips.map((trip) => (
                 <Card key={trip.id}>
@@ -260,14 +264,16 @@ const MyListings = () => {
 
           <TabsContent value="parcels" className="space-y-4">
             {parcels.length === 0 ? (
-              <Card>
-                <CardContent className="py-8 text-center">
-                  <p className="text-muted-foreground mb-4">Aucun colis publié</p>
+              <EmptyState
+                icon={Package}
+                title="Aucun colis publié"
+                description="Vous n'avez encore rien publié. Créez votre première annonce de colis !"
+                action={
                   <Button asChild>
                     <a href="/publier/colis">Publier un colis</a>
                   </Button>
-                </CardContent>
-              </Card>
+                }
+              />
             ) : (
               parcels.map((parcel) => (
                 <Card key={parcel.id}>

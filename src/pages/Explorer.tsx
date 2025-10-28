@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
+import { EmptyState } from "@/components/EmptyState";
 import { TripCard } from "@/components/explorer/TripCard";
 import { ParcelCard } from "@/components/explorer/ParcelCard";
 import { TripFiltersComponent } from "@/components/explorer/TripFilters";
 import { ParcelFiltersComponent } from "@/components/explorer/ParcelFilters";
 import { useTrips, useParcels, TripFilters, ParcelFilters } from "@/hooks/useExplorer";
+import { Plane, Package } from "lucide-react";
 import {
   Pagination,
   PaginationContent,
@@ -72,9 +74,11 @@ const Explorer = () => {
               ))}
             </div>
           ) : trips.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-muted-foreground">Aucun trajet trouvé avec ces critères.</p>
-            </div>
+            <EmptyState
+              icon={Plane}
+              title="Aucun trajet disponible"
+              description="Aucune annonce ne correspond à vos filtres. Essayez de modifier vos critères de recherche."
+            />
           ) : (
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -138,9 +142,11 @@ const Explorer = () => {
               ))}
             </div>
           ) : parcels.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-muted-foreground">Aucun colis trouvé avec ces critères.</p>
-            </div>
+            <EmptyState
+              icon={Package}
+              title="Aucun colis disponible"
+              description="Aucune annonce ne correspond à vos filtres. Essayez de modifier vos critères de recherche."
+            />
           ) : (
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

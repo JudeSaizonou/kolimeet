@@ -1,12 +1,16 @@
 {
-  "name": "ColisLink",
+  "name": "ColisLink - Envoi de colis France-Bénin",
   "short_name": "ColisLink",
   "description": "Plateforme de mise en relation entre voyageurs et expéditeurs pour l'envoi de colis entre la France et le Bénin",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#FFFFFF",
+  "background_color": "#F3F4F6",
   "theme_color": "#1F6FEB",
   "orientation": "portrait-primary",
+  "categories": ["travel", "business", "logistics"],
+  "lang": "fr",
+  "dir": "ltr",
   "icons": [
     {
       "src": "/icon-192.png",
@@ -19,6 +23,23 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Explorer",
+      "short_name": "Explorer",
+      "description": "Parcourir les annonces",
+      "url": "/explorer",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Messages",
+      "short_name": "Messages",
+      "description": "Accéder aux conversations",
+      "url": "/messages",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
     }
   ]
 }
