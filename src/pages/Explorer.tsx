@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
-import Navigation from "@/components/layout/Navigation";
-import Footer from "@/components/layout/Footer";
 import { TripCard } from "@/components/explorer/TripCard";
 import { ParcelCard } from "@/components/explorer/ParcelCard";
 import { TripFiltersComponent } from "@/components/explorer/TripFilters";
@@ -41,163 +39,155 @@ const Explorer = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Navigation />
-      
-      <main className="flex-1">
-        <section className="container mx-auto px-4 py-8">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-foreground mb-2">
-              Explorer les annonces
-            </h1>
-            <p className="text-muted-foreground">
-              Trouvez le voyageur ou l'expéditeur qui correspond à vos besoins.
-            </p>
-          </div>
+    <section className="container mx-auto px-4 py-8">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-foreground mb-2">
+          Explorer les annonces
+        </h1>
+        <p className="text-muted-foreground">
+          Trouvez le voyageur ou l'expéditeur qui correspond à vos besoins.
+        </p>
+      </div>
 
-          <Tabs defaultValue="trips" className="w-full">
-            <TabsList className="mb-6">
-              <TabsTrigger value="trips">Trajets</TabsTrigger>
-              <TabsTrigger value="parcels">Colis</TabsTrigger>
-            </TabsList>
+      <Tabs defaultValue="trips" className="w-full">
+        <TabsList className="mb-6">
+          <TabsTrigger value="trips">Trajets</TabsTrigger>
+          <TabsTrigger value="parcels">Colis</TabsTrigger>
+        </TabsList>
 
-            <TabsContent value="trips" className="space-y-6">
-              <TripFiltersComponent 
-                filters={tripFilters}
-                onChange={(newFilters) => {
-                  setTripFilters(newFilters);
-                  setTripPage(1);
-                }}
-                onReset={handleResetTripFilters}
-              />
+        <TabsContent value="trips" className="space-y-6">
+          <TripFiltersComponent 
+            filters={tripFilters}
+            onChange={(newFilters) => {
+              setTripFilters(newFilters);
+              setTripPage(1);
+            }}
+            onReset={handleResetTripFilters}
+          />
 
-              {tripsLoading ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {[...Array(6)].map((_, i) => (
-                    <Skeleton key={i} className="h-64" />
-                  ))}
-                </div>
-              ) : trips.length === 0 ? (
-                <div className="text-center py-12">
-                  <p className="text-muted-foreground">Aucun trajet trouvé avec ces critères.</p>
-                </div>
-              ) : (
-                <>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {trips.map((trip) => (
-                      <TripCard key={trip.id} trip={trip} />
-                    ))}
-                  </div>
+          {tripsLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {[...Array(6)].map((_, i) => (
+                <Skeleton key={i} className="h-64" />
+              ))}
+            </div>
+          ) : trips.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">Aucun trajet trouvé avec ces critères.</p>
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {trips.map((trip) => (
+                  <TripCard key={trip.id} trip={trip} />
+                ))}
+              </div>
 
-                  {tripsTotalPages > 1 && (
-                    <Pagination>
-                      <PaginationContent>
-                        <PaginationItem>
-                          <PaginationPrevious 
-                            onClick={() => setTripPage(Math.max(1, tripPage - 1))}
-                            className={tripPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                          />
+              {tripsTotalPages > 1 && (
+                <Pagination>
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious 
+                        onClick={() => setTripPage(Math.max(1, tripPage - 1))}
+                        className={tripPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                      />
+                    </PaginationItem>
+                    
+                    {[...Array(Math.min(5, tripsTotalPages))].map((_, i) => {
+                      const page = i + 1;
+                      return (
+                        <PaginationItem key={page}>
+                          <PaginationLink
+                            onClick={() => setTripPage(page)}
+                            isActive={tripPage === page}
+                            className="cursor-pointer"
+                          >
+                            {page}
+                          </PaginationLink>
                         </PaginationItem>
-                        
-                        {[...Array(Math.min(5, tripsTotalPages))].map((_, i) => {
-                          const page = i + 1;
-                          return (
-                            <PaginationItem key={page}>
-                              <PaginationLink
-                                onClick={() => setTripPage(page)}
-                                isActive={tripPage === page}
-                                className="cursor-pointer"
-                              >
-                                {page}
-                              </PaginationLink>
-                            </PaginationItem>
-                          );
-                        })}
+                      );
+                    })}
 
-                        <PaginationItem>
-                          <PaginationNext 
-                            onClick={() => setTripPage(Math.min(tripsTotalPages, tripPage + 1))}
-                            className={tripPage === tripsTotalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                          />
-                        </PaginationItem>
-                      </PaginationContent>
-                    </Pagination>
-                  )}
-                </>
+                    <PaginationItem>
+                      <PaginationNext 
+                        onClick={() => setTripPage(Math.min(tripsTotalPages, tripPage + 1))}
+                        className={tripPage === tripsTotalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
               )}
-            </TabsContent>
+            </>
+          )}
+        </TabsContent>
 
-            <TabsContent value="parcels" className="space-y-6">
-              <ParcelFiltersComponent 
-                filters={parcelFilters}
-                onChange={(newFilters) => {
-                  setParcelFilters(newFilters);
-                  setParcelPage(1);
-                }}
-                onReset={handleResetParcelFilters}
-              />
+        <TabsContent value="parcels" className="space-y-6">
+          <ParcelFiltersComponent 
+            filters={parcelFilters}
+            onChange={(newFilters) => {
+              setParcelFilters(newFilters);
+              setParcelPage(1);
+            }}
+            onReset={handleResetParcelFilters}
+          />
 
-              {parcelsLoading ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {[...Array(6)].map((_, i) => (
-                    <Skeleton key={i} className="h-64" />
-                  ))}
-                </div>
-              ) : parcels.length === 0 ? (
-                <div className="text-center py-12">
-                  <p className="text-muted-foreground">Aucun colis trouvé avec ces critères.</p>
-                </div>
-              ) : (
-                <>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {parcels.map((parcel) => (
-                      <ParcelCard key={parcel.id} parcel={parcel} />
-                    ))}
-                  </div>
+          {parcelsLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {[...Array(6)].map((_, i) => (
+                <Skeleton key={i} className="h-64" />
+              ))}
+            </div>
+          ) : parcels.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">Aucun colis trouvé avec ces critères.</p>
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {parcels.map((parcel) => (
+                  <ParcelCard key={parcel.id} parcel={parcel} />
+                ))}
+              </div>
 
-                  {parcelsTotalPages > 1 && (
-                    <Pagination>
-                      <PaginationContent>
-                        <PaginationItem>
-                          <PaginationPrevious 
-                            onClick={() => setParcelPage(Math.max(1, parcelPage - 1))}
-                            className={parcelPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                          />
+              {parcelsTotalPages > 1 && (
+                <Pagination>
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious 
+                        onClick={() => setParcelPage(Math.max(1, parcelPage - 1))}
+                        className={parcelPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                      />
+                    </PaginationItem>
+                    
+                    {[...Array(Math.min(5, parcelsTotalPages))].map((_, i) => {
+                      const page = i + 1;
+                      return (
+                        <PaginationItem key={page}>
+                          <PaginationLink
+                            onClick={() => setParcelPage(page)}
+                            isActive={parcelPage === page}
+                            className="cursor-pointer"
+                          >
+                            {page}
+                          </PaginationLink>
                         </PaginationItem>
-                        
-                        {[...Array(Math.min(5, parcelsTotalPages))].map((_, i) => {
-                          const page = i + 1;
-                          return (
-                            <PaginationItem key={page}>
-                              <PaginationLink
-                                onClick={() => setParcelPage(page)}
-                                isActive={parcelPage === page}
-                                className="cursor-pointer"
-                              >
-                                {page}
-                              </PaginationLink>
-                            </PaginationItem>
-                          );
-                        })}
+                      );
+                    })}
 
-                        <PaginationItem>
-                          <PaginationNext 
-                            onClick={() => setParcelPage(Math.min(parcelsTotalPages, parcelPage + 1))}
-                            className={parcelPage === parcelsTotalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                          />
-                        </PaginationItem>
-                      </PaginationContent>
-                    </Pagination>
-                  )}
-                </>
+                    <PaginationItem>
+                      <PaginationNext 
+                        onClick={() => setParcelPage(Math.min(parcelsTotalPages, parcelPage + 1))}
+                        className={parcelPage === parcelsTotalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
               )}
-            </TabsContent>
-          </Tabs>
-        </section>
-      </main>
-
-      <Footer />
-    </div>
+            </>
+          )}
+        </TabsContent>
+      </Tabs>
+    </section>
   );
 };
 

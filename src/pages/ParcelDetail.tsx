@@ -3,8 +3,6 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
-import Navigation from "@/components/layout/Navigation";
-import Footer from "@/components/layout/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -113,13 +111,9 @@ const ParcelDetail = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col">
-        <Navigation />
-        <main className="flex-1 container mx-auto px-4 py-8">
-          <Skeleton className="h-96 mb-6" />
-          <Skeleton className="h-64" />
-        </main>
-        <Footer />
+      <div className="container mx-auto px-4 py-8">
+        <Skeleton className="h-96 mb-6" />
+        <Skeleton className="h-64" />
       </div>
     );
   }
@@ -129,10 +123,8 @@ const ParcelDetail = () => {
   const profile = parcel.profiles;
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Navigation />
-      
-      <main className="flex-1 container mx-auto px-4 py-8">
+    <>
+      <div className="container mx-auto px-4 py-8">
         <Card className="mb-6">
           <CardHeader>
             <div className="flex items-start justify-between">
@@ -239,9 +231,7 @@ const ParcelDetail = () => {
         </Card>
 
         <MatchingSection type="parcel" item={parcel} />
-      </main>
-
-      <Footer />
+      </div>
 
       {user && user.id !== parcel.user_id && (
         <ReviewDialog
@@ -251,7 +241,7 @@ const ParcelDetail = () => {
           targetUserName={profile?.full_name || "cet expéditeur"}
         />
       )}
-    </div>
+    </>
   );
 };
 

@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import Navigation from "@/components/layout/Navigation";
-import Footer from "@/components/layout/Footer";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -55,38 +53,30 @@ export default function UserProfile() {
 
   if (loading) {
     return (
-      <>
-        <Navigation />
-        <main className="min-h-screen bg-background pt-16 pb-20">
-          <div className="container max-w-4xl mx-auto px-4 py-8">
-            <Skeleton className="h-32 w-full mb-8" />
-            <Skeleton className="h-96 w-full" />
-          </div>
-        </main>
-        <Footer />
-      </>
+      <div className="bg-background py-8">
+        <div className="container max-w-4xl mx-auto px-4">
+          <Skeleton className="h-32 w-full mb-8" />
+          <Skeleton className="h-96 w-full" />
+        </div>
+      </div>
     );
   }
 
   if (!profile) {
     return (
-      <>
-        <Navigation />
-        <main className="min-h-screen bg-background pt-16 pb-20">
-          <div className="container max-w-4xl mx-auto px-4 py-8">
-            <Card className="p-8 text-center">
-              <h1 className="text-xl font-semibold mb-2">Profil introuvable</h1>
-              <p className="text-muted-foreground mb-4">
-                Cet utilisateur n'existe pas ou a supprimé son compte.
-              </p>
-              <Button asChild>
-                <Link to="/">Retour à l'accueil</Link>
-              </Button>
-            </Card>
-          </div>
-        </main>
-        <Footer />
-      </>
+      <div className="bg-background py-8">
+        <div className="container max-w-4xl mx-auto px-4">
+          <Card className="p-8 text-center">
+            <h1 className="text-xl font-semibold mb-2">Profil introuvable</h1>
+            <p className="text-muted-foreground mb-4">
+              Cet utilisateur n'existe pas ou a supprimé son compte.
+            </p>
+            <Button asChild>
+              <Link to="/">Retour à l'accueil</Link>
+            </Button>
+          </Card>
+        </div>
+      </div>
     );
   }
 
@@ -95,9 +85,8 @@ export default function UserProfile() {
 
   return (
     <>
-      <Navigation />
-      <main className="min-h-screen bg-background pt-16 pb-20">
-        <div className="container max-w-4xl mx-auto px-4 py-8">
+      <div className="bg-background py-8">
+        <div className="container max-w-4xl mx-auto px-4">
           {/* Profile Header */}
           <Card className="p-6 mb-8">
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
@@ -163,8 +152,7 @@ export default function UserProfile() {
             <ReviewsList targetUserId={profile.user_id} />
           </div>
         </div>
-      </main>
-      <Footer />
+      </div>
 
       {!isOwnProfile && currentUser && (
         <ReviewDialog

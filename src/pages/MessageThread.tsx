@@ -3,8 +3,6 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useMessages } from "@/hooks/useMessages";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import Navigation from "@/components/layout/Navigation";
-import Footer from "@/components/layout/Footer";
 import { MessageBubble } from "@/components/messaging/MessageBubble";
 import { MessageInput } from "@/components/messaging/MessageInput";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -66,78 +64,68 @@ const MessageThread = () => {
 
   if (loading || !thread || !otherUser) {
     return (
-      <div className="min-h-screen flex flex-col">
-        <Navigation />
-        <main className="flex-1 container mx-auto px-4 py-8">
-          <Skeleton className="h-96" />
-        </main>
-        <Footer />
+      <div className="container mx-auto px-4 py-8">
+        <Skeleton className="h-96" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Navigation />
+    <div className="flex flex-col container mx-auto px-4 py-4 max-w-4xl">
+      {/* Header */}
+      <div className="border-b pb-4 mb-4">
+        <div className="flex items-center gap-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate("/messages")}
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
 
-      <main className="flex-1 flex flex-col container mx-auto px-4 py-4 max-w-4xl">
-        {/* Header */}
-        <div className="border-b pb-4 mb-4">
-          <div className="flex items-center gap-4">
+          <Avatar className="h-10 w-10">
+            <AvatarImage src={otherUser.avatar_url} />
+            <AvatarFallback>{otherUser.full_name[0]}</AvatarFallback>
+          </Avatar>
+
+          <div className="flex-1">
+            <h2 className="font-semibold">{otherUser.full_name}</h2>
             <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => navigate("/messages")}
+              variant="link"
+              size="sm"
+              className="h-auto p-0 text-xs"
+              onClick={() => navigate(getRelatedLink()!)}
             >
-              <ArrowLeft className="h-5 w-5" />
+              Voir l'annonce
+              <ExternalLink className="h-3 w-3 ml-1" />
             </Button>
-
-            <Avatar className="h-10 w-10">
-              <AvatarImage src={otherUser.avatar_url} />
-              <AvatarFallback>{otherUser.full_name[0]}</AvatarFallback>
-            </Avatar>
-
-            <div className="flex-1">
-              <h2 className="font-semibold">{otherUser.full_name}</h2>
-              <Button
-                variant="link"
-                size="sm"
-                className="h-auto p-0 text-xs"
-                onClick={() => navigate(getRelatedLink()!)}
-              >
-                Voir l'annonce
-                <ExternalLink className="h-3 w-3 ml-1" />
-              </Button>
-            </div>
           </div>
         </div>
+      </div>
 
-        {/* Messages */}
-        <div className="flex-1 overflow-y-auto px-4 py-2">
-          {messages.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground">
-              Aucun message pour le moment
-            </div>
-          ) : (
-            <>
-              {messages.map((message) => (
-                <MessageBubble
-                  key={message.id}
-                  content={message.content}
-                  createdAt={message.created_at}
-                  isOwn={message.sender_id === user?.id}
-                />
-              ))}
-              <div ref={messagesEndRef} />
-            </>
-          )}
-        </div>
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto px-4 py-2">
+        {messages.length === 0 ? (
+          <div className="text-center py-12 text-muted-foreground">
+            Aucun message pour le moment
+          </div>
+        ) : (
+          <>
+            {messages.map((message) => (
+              <MessageBubble
+                key={message.id}
+                content={message.content}
+                createdAt={message.created_at}
+                isOwn={message.sender_id === user?.id}
+              />
+            ))}
+            <div ref={messagesEndRef} />
+          </>
+        )}
+      </div>
 
-        {/* Input */}
-        <MessageInput onSend={sendMessage} disabled={sending} />
-      </main>
-
-      <Footer />
+      {/* Input */}
+      <MessageInput onSend={sendMessage} disabled={sending} />
     </div>
   );
 };
