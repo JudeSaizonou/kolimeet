@@ -53,7 +53,7 @@ const Navigation = () => {
           {user && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline">
+                <Button>
                   Publier
                 </Button>
               </DropdownMenuTrigger>
