@@ -28,6 +28,9 @@ import MyListings from "./pages/MyListings";
 import Feedback from "./pages/Feedback";
 import NotFound from "./pages/NotFound";
 import AdminDashboard from "./pages/admin/AdminDashboard";
+import CGU from "./pages/CGU";
+import FAQ from "./pages/FAQ";
+import Contact from "./pages/Contact";
 
 const queryClient = new QueryClient();
 
@@ -134,6 +137,9 @@ const App = () => (
                   </ProtectedRoute>
                 }
               />
+              <Route path="/cgu" element={<CGU />} />
+              <Route path="/faq" element={<FAQ />} />
+              <Route path="/contact" element={<Contact />} />
               <Route
                 path="/admin"
                 element={

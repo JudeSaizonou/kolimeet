@@ -10,10 +10,13 @@ export const useAdmin = () => {
   useEffect(() => {
     const checkAdminRole = async () => {
       if (!user) {
+        console.log("[useAdmin] No user, setting isAdmin to false");
         setIsAdmin(false);
         setLoading(false);
         return;
       }
+
+      console.log("[useAdmin] Checking admin role for user:", user.id);
 
       try {
         const { data, error } = await supabase
@@ -23,13 +26,17 @@ export const useAdmin = () => {
           .eq("role", "admin")
           .single();
 
+        console.log("[useAdmin] Query result:", { data, error });
+
         if (error && error.code !== "PGRST116") {
-          console.error("Error checking admin role:", error);
+          console.error("[useAdmin] Error checking admin role:", error);
         }
 
-        setIsAdmin(!!data);
+        const hasAdminRole = !!data;
+        console.log("[useAdmin] Setting isAdmin to:", hasAdminRole);
+        setIsAdmin(hasAdminRole);
       } catch (error) {
-        console.error("Error checking admin role:", error);
+        console.error("[useAdmin] Exception checking admin role:", error);
         setIsAdmin(false);
       } finally {
         setLoading(false);
