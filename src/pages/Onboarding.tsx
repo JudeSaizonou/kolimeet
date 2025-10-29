@@ -9,8 +9,6 @@ import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { Upload, User } from "lucide-react";
-import { PhoneVerification } from "@/components/profile/PhoneVerification";
-
 const Onboarding = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -22,7 +20,6 @@ const Onboarding = () => {
     city: "",
     phone_e164: "",
   });
-  const [phoneVerified, setPhoneVerified] = useState(false);
 
   useEffect(() => {
     loadProfile();
@@ -53,7 +50,6 @@ const Onboarding = () => {
           phone_e164: profile.phone_e164 || "",
         });
         setAvatarUrl(profile.avatar_url || "");
-        setPhoneVerified(profile.phone_verified || false);
       }
     } catch (error: any) {
       console.error("Error loading profile:", error);
@@ -124,15 +120,6 @@ const Onboarding = () => {
       toast({
         title: "Champs requis",
         description: "Veuillez remplir tous les champs obligatoires",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (formData.phone_e164 && !phoneVerified) {
-      toast({
-        title: "Téléphone non vérifié",
-        description: "Veuillez vérifier votre numéro de téléphone",
         variant: "destructive",
       });
       return;
@@ -284,15 +271,6 @@ const Onboarding = () => {
                   Format : +33612345678 (avec indicatif pays)
                 </p>
               </div>
-
-              {/* Phone Verification */}
-              {formData.phone_e164 && (
-                <PhoneVerification
-                  phoneNumber={formData.phone_e164}
-                  isVerified={phoneVerified}
-                  onVerified={() => setPhoneVerified(true)}
-                />
-              )}
 
               <Button
                 type="submit"
