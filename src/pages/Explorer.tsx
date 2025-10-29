@@ -7,7 +7,6 @@ import { ParcelCard } from "@/components/explorer/ParcelCard";
 import { TripFiltersComponent } from "@/components/explorer/TripFilters";
 import { ParcelFiltersComponent } from "@/components/explorer/ParcelFilters";
 import { useTrips, useParcels, TripFilters, ParcelFilters } from "@/hooks/useExplorer";
-import { useDataSync } from "@/hooks/useDataSync";
 import { Plane, Package } from "lucide-react";
 import {
   Pagination,
@@ -23,16 +22,6 @@ const Explorer = () => {
   const [parcelFilters, setParcelFilters] = useState<ParcelFilters>({ sortBy: "deadline" });
   const [tripPage, setTripPage] = useState(1);
   const [parcelPage, setParcelPage] = useState(1);
-
-  // Sync explorer data when updates occur
-  useDataSync({ 
-    queryKeys: ['trips', 'parcels', 'explorer'],
-    onSync: () => {
-      if (import.meta.env.DEV) {
-        console.log('[Explorer] Data synchronized');
-      }
-    }
-  });
 
   const { trips, loading: tripsLoading, totalCount: tripsTotalCount } = useTrips(tripFilters, tripPage);
   const { parcels, loading: parcelsLoading, totalCount: parcelsTotalCount } = useParcels(parcelFilters, parcelPage);

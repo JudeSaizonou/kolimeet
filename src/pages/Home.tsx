@@ -2,19 +2,8 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Package, Users, Shield, ArrowRight } from "lucide-react";
-import { useDataSync } from "@/hooks/useDataSync";
 
 const Home = () => {
-  // Sync trips and parcels data when updates occur
-  useDataSync({ 
-    queryKeys: ['trips', 'parcels', 'search', 'explorer'],
-    onSync: () => {
-      if (import.meta.env.DEV) {
-        console.log('[Home] Data synchronized');
-      }
-    }
-  });
-
   return (
     <>
       {/* Hero Section */}

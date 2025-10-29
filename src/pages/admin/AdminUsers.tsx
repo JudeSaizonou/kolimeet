@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
-import { useDataSync } from "@/hooks/useDataSync";
 import { UserX, UserCheck, ExternalLink, Star, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
@@ -36,17 +35,6 @@ export function AdminUsers() {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
-
-  // Sync user data when updates occur
-  useDataSync({ 
-    queryKeys: ['profiles', 'users'],
-    onSync: () => {
-      fetchProfiles();
-      if (import.meta.env.DEV) {
-        console.log('[AdminUsers] Data synchronized');
-      }
-    }
-  });
 
   const fetchProfiles = async () => {
     try {
