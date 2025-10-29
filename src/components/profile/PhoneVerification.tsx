@@ -43,9 +43,20 @@ export const PhoneVerification = ({
       if (dbError) throw dbError;
 
       // Send SMS via edge function
-      const { error: smsError } = await supabase.functions.invoke("send-sms-verification", {
+      const { data: smsData, error: smsError } = await supabase.functions.invoke("send-sms-verification", {
         body: { phoneNumber, code },
       });
+
+      // Handle Twilio trial limitation
+      if (smsError || (smsData && smsData.error === "trial_limitation")) {
+        toast({
+          title: "Mode développement",
+          description: `Code de vérification : ${smsData?.code || code}. Pour la production, configurez un compte Twilio payant.`,
+          duration: 10000,
+        });
+        setCodeSent(true);
+        return;
+      }
 
       if (smsError) throw smsError;
 

@@ -44,9 +44,25 @@ serve(async (req) => {
     );
 
     if (!response.ok) {
-      const error = await response.text();
-      console.error("Twilio error:", error);
-      throw new Error("Failed to send SMS");
+      const errorData = await response.json();
+      console.error("Twilio error:", JSON.stringify(errorData));
+      
+      // Handle Twilio trial account limitation
+      if (errorData.code === 21608) {
+        return new Response(
+          JSON.stringify({ 
+            error: "trial_limitation",
+            message: "Compte Twilio en mode essai. Le numéro doit être vérifié dans Twilio.",
+            code: code // Return code for development/testing
+          }),
+          {
+            status: 400,
+            headers: { "Content-Type": "application/json", ...corsHeaders },
+          }
+        );
+      }
+      
+      throw new Error(`Twilio error: ${errorData.message || "Failed to send SMS"}`);
     }
 
     const data = await response.json();
