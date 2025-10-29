@@ -32,6 +32,11 @@ import CGU from "./pages/CGU";
 import FAQ from "./pages/FAQ";
 import Contact from "./pages/Contact";
 
+// Import admin utilities for console access (development only)
+if (import.meta.env.DEV) {
+  import("./utils/adminUtils");
+}
+
 const queryClient = new QueryClient();
 
 const App = () => (

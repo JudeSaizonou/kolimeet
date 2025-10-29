@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 
 export const useAdmin = () => {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -12,29 +12,36 @@ export const useAdmin = () => {
 
     const checkAdminRole = async () => {
       const timestamp = new Date().toISOString();
-      console.log(`[useAdmin][${timestamp}] Starting admin check`);
+      const isDev = import.meta.env.DEV;
       
-      // Wait for auth to be ready
+      if (isDev) console.log(`[useAdmin][${timestamp}] Starting admin check`);
+      
+      // Wait for auth to finish loading first
+      if (authLoading) {
+        if (isDev) console.log(`[useAdmin][${timestamp}] Auth still loading, waiting...`);
+        return; // Don't do anything while auth is loading
+      }
+      
+      // Now auth is done - check if user exists
       if (!user) {
-        console.log(`[useAdmin][${timestamp}] No user, setting isAdmin to false`);
+        if (isDev) console.log(`[useAdmin][${timestamp}] No user after auth complete, setting isAdmin to false`);
         setIsAdmin(false);
         setLoading(false);
         return;
       }
 
-      console.log(`[useAdmin][${timestamp}] User found:`, user.id);
+      if (isDev) console.log(`[useAdmin][${timestamp}] User found:`, user.id);
 
       try {
-        // Use the new SECURITY DEFINER function to bypass RLS
-        console.log(`[useAdmin][${timestamp}] Calling is_user_admin function for user:`, user.id);
+        if (isDev) console.log(`[useAdmin][${timestamp}] Calling is_user_admin function for user:`, user.id);
         
         const { data, error } = await supabase
           .rpc("is_user_admin", { user_uuid: user.id });
 
-        console.log(`[useAdmin][${timestamp}] RPC response:`, { data, error });
+        if (isDev) console.log(`[useAdmin][${timestamp}] RPC response:`, { data, error });
 
         if (!isMounted) {
-          console.log(`[useAdmin][${timestamp}] Component unmounted, skipping state update`);
+          if (isDev) console.log(`[useAdmin][${timestamp}] Component unmounted, skipping state update`);
           return;
         }
 
@@ -43,7 +50,7 @@ export const useAdmin = () => {
           setIsAdmin(false);
         } else {
           const hasAdminRole = data === true;
-          console.log(`[useAdmin][${timestamp}] Admin status:`, hasAdminRole);
+          if (isDev) console.log(`[useAdmin][${timestamp}] Admin status:`, hasAdminRole);
           setIsAdmin(hasAdminRole);
         }
       } catch (error) {
@@ -53,7 +60,7 @@ export const useAdmin = () => {
         }
       } finally {
         if (isMounted) {
-          console.log(`[useAdmin][${timestamp}] Setting loading to false`);
+          if (isDev) console.log(`[useAdmin][${timestamp}] Setting loading to false`);
           setLoading(false);
         }
       }
@@ -64,7 +71,21 @@ export const useAdmin = () => {
     return () => {
       isMounted = false;
     };
-  }, [user]);
+  }, [user, authLoading]); // 🔧 FIX: Also depend on authLoading
 
-  return { isAdmin, loading };
+  // Keep loading true while auth is loading
+  const actualLoading = authLoading || loading;
+  
+  // Only log in development
+  if (import.meta.env.DEV) {
+    console.log(`[useAdmin] Current state:`, { 
+      isAdmin, 
+      loading: actualLoading, 
+      authLoading, 
+      adminLoading: loading,
+      user: user?.id 
+    });
+  }
+
+  return { isAdmin, loading: actualLoading };
 };
