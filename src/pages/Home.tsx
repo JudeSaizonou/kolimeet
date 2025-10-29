@@ -1,35 +1,18 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Package, Users, Shield, ArrowRight } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
-import { useEffect } from "react";
-import heroImage from "@/assets/hero-delivery.jpg";
 
 const Home = () => {
-  const { user } = useAuth();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (user) {
-      navigate("/explorer");
-    }
-  }, [user, navigate]);
-
   return (
     <>
       {/* Hero Section */}
-      <section 
-        className="relative bg-cover bg-center py-24 md:py-32"
-        style={{ backgroundImage: `url(${heroImage})` }}
-      >
-        <div className="absolute inset-0 bg-black/50"></div>
-        <div className="container relative mx-auto px-4">
+      <section className="container mx-auto px-4 py-16 md:py-24">
         <div className="max-w-3xl mx-auto text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 drop-shadow-lg">
-            Envoyer ou transporter un colis facilement entre la France et le Bénin
+          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
+            Envoyer ou transporter un colis facilement entre plusieurs destinations
           </h1>
-          <p className="text-lg md:text-xl text-white/90 mb-8 drop-shadow-md">
+          <p className="text-lg md:text-xl text-muted-foreground mb-8">
             ColisLink met en relation les voyageurs avec les expéditeurs pour un transport de colis sécurisé et économique.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -40,12 +23,11 @@ const Home = () => {
               </Button>
             </Link>
             <Link to="/auth/register">
-              <Button size="lg" variant="outline" className="w-full sm:w-auto font-semibold border-white text-white hover:bg-white hover:text-black">
+              <Button size="lg" variant="outline" className="w-full sm:w-auto font-semibold">
                 Créer un compte
               </Button>
             </Link>
           </div>
-        </div>
         </div>
       </section>
 
