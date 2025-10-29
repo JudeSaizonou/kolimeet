@@ -18,7 +18,7 @@ import { cn } from "@/lib/utils";
 
 const Navigation = () => {
   const { user, signOut } = useAuth();
-  const { isAdmin } = useAdmin();
+  const { isAdmin, loading: adminLoading } = useAdmin();
   const [profile, setProfile] = useState<any>(null);
   const location = useLocation();
   const isHomePage = location.pathname === "/";
@@ -122,6 +122,9 @@ const Navigation = () => {
                   </p>
                   <p className="text-xs text-muted-foreground">
                     {user.email}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Admin: {adminLoading ? "⏳ Checking..." : isAdmin ? "✅ Yes" : "❌ No"}
                   </p>
                 </div>
                 <DropdownMenuSeparator />
