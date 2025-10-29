@@ -1,4 +1,4 @@
-const CACHE_NAME = 'colislink-v2';
+const CACHE_NAME = 'kolimeet-v3';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -9,25 +9,37 @@ const urlsToCache = [
 
 // Install event - cache essential resources
 self.addEventListener('install', (event) => {
+  console.log('[SW] Installing new service worker');
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then((cache) => cache.addAll(urlsToCache))
-      .then(() => self.skipWaiting())
+      .then((cache) => {
+        console.log('[SW] Caching essential resources');
+        return cache.addAll(urlsToCache);
+      })
+      .then(() => {
+        console.log('[SW] Skip waiting for new SW');
+        return self.skipWaiting();
+      })
   );
 });
 
 // Activate event - clean up old caches
 self.addEventListener('activate', (event) => {
+  console.log('[SW] Activating new service worker');
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
           if (cacheName !== CACHE_NAME) {
+            console.log('[SW] Deleting old cache:', cacheName);
             return caches.delete(cacheName);
           }
         })
       );
-    }).then(() => self.clients.claim())
+    }).then(() => {
+      console.log('[SW] Taking control of all pages');
+      return self.clients.claim();
+    })
   );
 });
 
@@ -63,4 +75,13 @@ self.addEventListener('fetch', (event) => {
           });
       })
   );
+});
+
+// Handle messages from the main thread
+self.addEventListener('message', (event) => {
+  console.log('[SW] Received message:', event.data);
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    console.log('[SW] Skipping waiting and activating new SW');
+    self.skipWaiting();
+  }
 });

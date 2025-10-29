@@ -31,25 +31,38 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import CGU from "./pages/CGU";
 import FAQ from "./pages/FAQ";
 import Contact from "./pages/Contact";
+import { RealTimeProvider } from "./components/RealTimeProvider";
+import { UpdateNotification } from "./components/UpdateNotification";
 
 // Import admin utilities for console access (development only)
 if (import.meta.env.DEV) {
   import("./utils/adminUtils");
 }
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      gcTime: 10 * 60 * 1000, // 10 minutes (replaces cacheTime)
+      refetchOnWindowFocus: true,
+      refetchOnReconnect: true,
+    },
+  },
+});
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <div className="flex flex-col min-h-screen">
-          <Navigation />
-          <OfflineBanner />
-          <PWAInstallBanner />
-          <main className="flex-1">
+      <RealTimeProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <div className="flex flex-col min-h-screen">
+            <Navigation />
+            <OfflineBanner />
+            <PWAInstallBanner />
+            <UpdateNotification />
+            <main className="flex-1">
             <div className="container mx-auto px-4 py-4">
               <SuspensionBanner />
             </div>
@@ -159,6 +172,7 @@ const App = () => (
           <Footer />
         </div>
       </BrowserRouter>
+      </RealTimeProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );
