@@ -28,25 +28,30 @@ export const PhoneVerification = ({
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Non authentifié");
 
-      // Generate mock code (in production, this would call an SMS service)
-      const mockCode = Math.floor(100000 + Math.random() * 900000).toString();
+      // Generate verification code
+      const code = Math.floor(100000 + Math.random() * 900000).toString();
 
       // Store code in database
-      const { error } = await supabase
+      const { error: dbError } = await supabase
         .from("phone_verification_codes")
         .insert({
           user_id: user.id,
           phone_e164: phoneNumber,
-          code: mockCode,
+          code: code,
         });
 
-      if (error) throw error;
+      if (dbError) throw dbError;
 
-      // In production, send SMS here
-      // For demo, show the code in toast
+      // Send SMS via edge function
+      const { error: smsError } = await supabase.functions.invoke("send-sms-verification", {
+        body: { phoneNumber, code },
+      });
+
+      if (smsError) throw smsError;
+
       toast({
-        title: "Code envoyé (DEMO)",
-        description: `Code de vérification : ${mockCode}`,
+        title: "Code envoyé",
+        description: "Un code de vérification a été envoyé à votre numéro",
       });
 
       setCodeSent(true);
