@@ -13,7 +13,7 @@ const Home = () => {
             Envoyer ou transporter un colis facilement entre plusieurs destinations
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground mb-8">
-            ColisLink met en relation les voyageurs avec les expéditeurs pour un transport de colis sécurisé et économique.
+            kilomeet met en relation les voyageurs avec les expéditeurs pour un transport de colis sécurisé et économique.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link to="/explorer">
@@ -84,7 +84,7 @@ const Home = () => {
             Prêt à commencer ?
           </h2>
           <p className="text-lg text-muted-foreground mb-8">
-            Rejoignez ColisLink aujourd'hui et découvrez une nouvelle façon d'envoyer vos colis.
+            Rejoignez kilomeet aujourd'hui et découvrez une nouvelle façon d'envoyer vos colis.
           </p>
           <Link to="/auth/register">
             <Button size="lg" className="font-semibold">

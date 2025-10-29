@@ -82,8 +82,8 @@ const Contact = () => {
   return (
     <>
       <Helmet>
-        <title>Contact - ColisLink</title>
-        <meta name="description" content="Contactez l'équipe ColisLink pour toute question, suggestion ou signalement." />
+        <title>Contact - kilomeet</title>
+        <meta name="description" content="Contactez l'équipe kilomeet pour toute question, suggestion ou signalement." />
       </Helmet>
 
       <div className="min-h-screen bg-secondary">
@@ -99,8 +99,8 @@ const Contact = () => {
 
             <p className="text-muted-foreground mb-6 leading-relaxed">
               Vous avez une question, une suggestion ou souhaitez signaler un problème ? Remplissez le formulaire ci-dessous ou écrivez-nous directement à{" "}
-              <a href="mailto:contact@colislink.com" className="text-primary hover:underline">
-                contact@colislink.com
+              <a href="mailto:contact@kilomeet.com" className="text-primary hover:underline">
+                contact@kilomeet.com
               </a>
             </p>
 

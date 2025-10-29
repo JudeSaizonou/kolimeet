@@ -30,7 +30,7 @@ const Login = () => {
       <Card className="w-full max-w-md p-8 border-2">
         <Link to="/" className="flex items-center justify-center gap-2 mb-8">
           <Package className="h-8 w-8 text-primary" />
-          <span className="text-2xl font-bold text-foreground">ColisLink</span>
+          <span className="text-2xl font-bold text-foreground">kilomeet</span>
         </Link>
 
         <h1 className="text-2xl font-bold text-center text-foreground mb-2">

@@ -73,7 +73,7 @@ export const useAuth = () => {
 
       toast({
         title: "Connexion réussie",
-        description: "Bienvenue sur ColisLink !",
+        description: "Bienvenue sur kilomeet !",
       });
       navigate("/explorer");
     } catch (error: any) {
@@ -161,7 +161,7 @@ export const useAuth = () => {
 
       toast({
         title: "Déconnexion réussie",
-        description: "À bientôt sur ColisLink !",
+        description: "À bientôt sur kilomeet !",
       });
       navigate("/");
     } catch (error: any) {

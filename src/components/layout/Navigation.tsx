@@ -50,7 +50,7 @@ const Navigation = () => {
         <Link to="/" className="flex items-center gap-2">
           <Package className={cn("h-6 w-6", isHomePage ? "text-white" : "text-primary")} />
           <span className={cn("text-xl font-bold", isHomePage ? "text-white" : "text-foreground")}>
-            ColisLink
+            kilomeet
           </span>
         </Link>
         

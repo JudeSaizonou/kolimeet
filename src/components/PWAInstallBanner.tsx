@@ -60,7 +60,7 @@ export function PWAInstallBanner() {
         </div>
         
         <div className="flex-1">
-          <h3 className="font-semibold text-sm mb-1">Installer ColisLink</h3>
+          <h3 className="font-semibold text-sm mb-1">Installer kilomeet</h3>
           <p className="text-xs text-muted-foreground mb-3">
             Installez l'application pour un accès rapide et une meilleure expérience
           </p>

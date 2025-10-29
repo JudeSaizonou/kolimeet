@@ -10,12 +10,12 @@ import {
 const FAQ = () => {
   const faqs = [
     {
-      question: "Comment fonctionne ColisLink ?",
-      answer: "ColisLink met en relation des voyageurs ayant de la place dans leurs bagages et des personnes souhaitant envoyer un colis entre la France et le Bénin. Vous pouvez publier ou consulter une annonce en quelques clics, puis contacter directement l'autre partie via notre messagerie intégrée."
+      question: "Comment fonctionne kilomeet ?",
+      answer: "kilomeet met en relation des voyageurs ayant de la place dans leurs bagages et des personnes souhaitant envoyer un colis entre la France et le Bénin. Vous pouvez publier ou consulter une annonce en quelques clics, puis contacter directement l'autre partie via notre messagerie intégrée."
     },
     {
-      question: "ColisLink transporte-t-il les colis ?",
-      answer: "Non. ColisLink n'est qu'un intermédiaire, une plateforme de mise en relation. Le transport est effectué directement entre particuliers. Nous ne sommes pas responsables du contenu des colis ni de leur acheminement."
+      question: "kilomeet transporte-t-il les colis ?",
+      answer: "Non. kilomeet n'est qu'un intermédiaire, une plateforme de mise en relation. Le transport est effectué directement entre particuliers. Nous ne sommes pas responsables du contenu des colis ni de leur acheminement."
     },
     {
       question: "Comment publier une annonce ?",
@@ -34,8 +34,8 @@ const FAQ = () => {
       answer: "Depuis une annonce de trajet ou de colis, cliquez sur le bouton 'Contacter'. Une conversation privée s'ouvrira dans la messagerie. Vous pourrez échanger directement avec l'autre utilisateur pour convenir des détails."
     },
     {
-      question: "Les paiements passent-ils par ColisLink ?",
-      answer: "Non, dans cette version actuelle. Le paiement et les modalités d'échange se font directement entre le voyageur et l'expéditeur. ColisLink ne prend aucune commission et n'intervient pas dans la transaction financière."
+      question: "Les paiements passent-ils par kilomeet ?",
+      answer: "Non, dans cette version actuelle. Le paiement et les modalités d'échange se font directement entre le voyageur et l'expéditeur. kilomeet ne prend aucune commission et n'intervient pas dans la transaction financière."
     },
     {
       question: "Comment signaler un abus ou un comportement suspect ?",
@@ -43,11 +43,11 @@ const FAQ = () => {
     },
     {
       question: "Que se passe-t-il si mon colis est perdu ou endommagé ?",
-      answer: "ColisLink n'est pas responsable du contenu, de la livraison ou de l'état des colis. Il est fortement recommandé de vérifier la fiabilité du voyageur (notes, avis, profil vérifié) avant de confier un colis. Vous pouvez également souscrire une assurance personnelle."
+      answer: "kilomeet n'est pas responsable du contenu, de la livraison ou de l'état des colis. Il est fortement recommandé de vérifier la fiabilité du voyageur (notes, avis, profil vérifié) avant de confier un colis. Vous pouvez également souscrire une assurance personnelle."
     },
     {
-      question: "ColisLink est-il gratuit ?",
-      answer: "Oui, l'utilisation de ColisLink est entièrement gratuite dans sa version actuelle (MVP). Vous pouvez publier des annonces et contacter des utilisateurs sans frais. Des options premium pourront être proposées dans le futur."
+      question: "kilomeet est-il gratuit ?",
+      answer: "Oui, l'utilisation de kilomeet est entièrement gratuite dans sa version actuelle (MVP). Vous pouvez publier des annonces et contacter des utilisateurs sans frais. Des options premium pourront être proposées dans le futur."
     },
     {
       question: "Comment vérifier la fiabilité d'un utilisateur ?",
@@ -62,8 +62,8 @@ const FAQ = () => {
   return (
     <>
       <Helmet>
-        <title>Foire Aux Questions - ColisLink</title>
-        <meta name="description" content="Retrouvez les réponses aux questions fréquentes sur l'utilisation de ColisLink, la plateforme de mise en relation pour l'envoi de colis." />
+        <title>Foire Aux Questions - kilomeet</title>
+        <meta name="description" content="Retrouvez les réponses aux questions fréquentes sur l'utilisation de kilomeet, la plateforme de mise en relation pour l'envoi de colis." />
       </Helmet>
 
       <div className="min-h-screen bg-secondary">
