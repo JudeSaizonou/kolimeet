@@ -135,24 +135,6 @@ export const useAuth = () => {
     }
   };
 
-  const signInWithFacebook = async () => {
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "facebook",
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-        },
-      });
-
-      if (error) throw error;
-    } catch (error: any) {
-      toast({
-        title: "Erreur de connexion",
-        description: error.message || "Impossible de se connecter avec Facebook",
-        variant: "destructive",
-      });
-    }
-  };
 
   const signOut = async () => {
     try {
@@ -180,7 +162,6 @@ export const useAuth = () => {
     signInWithEmail,
     signUpWithEmail,
     signInWithGoogle,
-    signInWithFacebook,
     signOut,
   };
 };
