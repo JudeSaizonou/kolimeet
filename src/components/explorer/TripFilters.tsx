@@ -65,7 +65,7 @@ export const TripFiltersComponent = ({ filters, onChange, onReset }: TripFilters
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="minCapacity">Capacité min (L)</Label>
+          <Label htmlFor="minCapacity">Capacité min (kg)</Label>
           <Input
             id="minCapacity"
             type="number"

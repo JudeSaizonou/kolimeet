@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Package, User, LogOut, FileText, Plane, MessageSquare, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -13,11 +13,15 @@ import { useAuth } from "@/hooks/useAuth";
 import { useAdmin } from "@/hooks/useAdmin";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { MobileMenu } from "./MobileMenu";
+import { cn } from "@/lib/utils";
 
 const Navigation = () => {
   const { user, signOut } = useAuth();
   const { isAdmin } = useAdmin();
   const [profile, setProfile] = useState<any>(null);
+  const location = useLocation();
+  const isHomePage = location.pathname === "/";
 
   useEffect(() => {
     if (user) {
@@ -38,16 +42,27 @@ const Navigation = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background">
+    <header className={cn(
+      "sticky top-0 z-50 w-full border-b",
+      isHomePage ? "bg-black/30 backdrop-blur-sm border-white/20" : "bg-background"
+    )}>
       <nav className="container mx-auto flex h-16 items-center justify-between px-4">
         <Link to="/" className="flex items-center gap-2">
-          <Package className="h-6 w-6 text-primary" />
-          <span className="text-xl font-bold text-foreground">ColisLink</span>
+          <Package className={cn("h-6 w-6", isHomePage ? "text-white" : "text-primary")} />
+          <span className={cn("text-xl font-bold", isHomePage ? "text-white" : "text-foreground")}>
+            ColisLink
+          </span>
         </Link>
         
-        <div className="flex items-center gap-4">
+        <div className="hidden md:flex items-center gap-4">
           <Link to="/explorer">
-            <Button variant="ghost" className="font-medium">
+            <Button 
+              variant="ghost" 
+              className={cn(
+                "font-medium",
+                isHomePage && "text-white hover:bg-white/20 hover:text-white"
+              )}
+            >
               Explorer
             </Button>
           </Link>
@@ -77,7 +92,11 @@ const Navigation = () => {
               </DropdownMenu>
 
               <Link to="/messages">
-                <Button variant="ghost" size="icon">
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  className={cn(isHomePage && "text-white hover:bg-white/20 hover:text-white")}
+                >
                   <MessageSquare className="h-5 w-5" />
                 </Button>
               </Link>
@@ -165,6 +184,13 @@ const Navigation = () => {
             </Link>
           )}
         </div>
+
+        <MobileMenu 
+          user={user} 
+          profile={profile} 
+          isAdmin={isAdmin} 
+          onSignOut={signOut} 
+        />
       </nav>
     </header>
   );

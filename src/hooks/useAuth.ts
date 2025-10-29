@@ -75,7 +75,7 @@ export const useAuth = () => {
         title: "Connexion réussie",
         description: "Bienvenue sur ColisLink !",
       });
-      navigate("/");
+      navigate("/explorer");
     } catch (error: any) {
       toast({
         title: "Erreur de connexion",
@@ -106,7 +106,7 @@ export const useAuth = () => {
         title: "Inscription réussie",
         description: "Votre compte a été créé avec succès !",
       });
-      navigate("/");
+      navigate("/explorer");
     } catch (error: any) {
       toast({
         title: "Erreur d'inscription",

@@ -1,6 +1,7 @@
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+import { sanitizeMessage } from "@/lib/utils/sanitizeMessage";
 
 interface MessageBubbleProps {
   content: string;
@@ -13,6 +14,8 @@ export const MessageBubble = ({
   createdAt,
   isOwn,
 }: MessageBubbleProps) => {
+  const sanitizedContent = sanitizeMessage(content);
+  
   return (
     <div
       className={cn(
@@ -28,7 +31,7 @@ export const MessageBubble = ({
             : "bg-muted text-foreground"
         )}
       >
-        <p className="whitespace-pre-wrap break-words">{content}</p>
+        <p className="whitespace-pre-wrap break-words">{sanitizedContent}</p>
         <span
           className={cn(
             "text-xs mt-1 block",

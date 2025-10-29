@@ -8,7 +8,8 @@ import { MessageInput } from "@/components/messaging/MessageInput";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowLeft, ExternalLink } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { ArrowLeft, ExternalLink, AlertTriangle } from "lucide-react";
 
 const MessageThread = () => {
   const { id } = useParams();
@@ -72,6 +73,15 @@ const MessageThread = () => {
 
   return (
     <div className="flex flex-col container mx-auto px-4 py-4 max-w-4xl">
+      {/* Safety Warning Banner */}
+      <Alert className="mb-4 border-yellow-500 bg-yellow-50 dark:bg-yellow-950/20">
+        <AlertTriangle className="h-4 w-4 text-yellow-600" />
+        <AlertDescription className="text-sm text-yellow-800 dark:text-yellow-200">
+          <strong>⚠️ Restez en sécurité !</strong> Gardez toutes vos communications sur ColisLink. 
+          Ne partagez jamais votre numéro de téléphone ou email avant de rencontrer la personne.
+        </AlertDescription>
+      </Alert>
+
       {/* Header */}
       <div className="border-b pb-4 mb-4">
         <div className="flex items-center gap-4">
