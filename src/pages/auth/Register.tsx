@@ -4,9 +4,199 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Package } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Separator } from "@/components/ui/separator";
 import { GlassCard } from "@/components/LiquidGlass";
+
+/**
+ * Effet de déformation en vague qui suit la souris
+ */
+function MouseWaveEffect() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const mouseRef = useRef({ x: 0, y: 0, targetX: 0, targetY: 0 });
+  const wavePointsRef = useRef<Array<{ x: number; y: number; vx: number; vy: number; intensity: number }>>([]);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const resize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+    resize();
+    window.addEventListener('resize', resize);
+
+    const handleMouseMove = (e: MouseEvent) => {
+      mouseRef.current.targetX = e.clientX;
+      mouseRef.current.targetY = e.clientY;
+
+      wavePointsRef.current.push({
+        x: e.clientX,
+        y: e.clientY,
+        vx: (Math.random() - 0.5) * 2,
+        vy: (Math.random() - 0.5) * 2,
+        intensity: 1,
+      });
+
+      if (wavePointsRef.current.length > 30) {
+        wavePointsRef.current.shift();
+      }
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+
+    let animationId: number;
+    const animate = () => {
+      mouseRef.current.x += (mouseRef.current.targetX - mouseRef.current.x) * 0.15;
+      mouseRef.current.y += (mouseRef.current.targetY - mouseRef.current.y) * 0.15;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      wavePointsRef.current = wavePointsRef.current.filter(point => {
+        point.intensity *= 0.95;
+        point.x += point.vx;
+        point.y += point.vy;
+        return point.intensity > 0.01;
+      });
+
+      const gridSize = 40;
+      const rows = Math.ceil(canvas.height / gridSize) + 1;
+      const cols = Math.ceil(canvas.width / gridSize) + 1;
+
+      ctx.strokeStyle = 'rgba(31, 111, 235, 0.15)';
+      ctx.lineWidth = 1.5;
+
+      for (let i = 0; i < rows; i++) {
+        ctx.beginPath();
+        for (let j = 0; j < cols; j++) {
+          const x = j * gridSize;
+          const y = i * gridSize;
+
+          let offsetX = 0;
+          let offsetY = 0;
+
+          const dx = x - mouseRef.current.x;
+          const dy = y - mouseRef.current.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          const maxDistance = 200;
+
+          if (distance < maxDistance) {
+            const influence = (1 - distance / maxDistance) * 30;
+            const angle = Math.atan2(dy, dx);
+            offsetX = Math.cos(angle + Math.PI / 2) * influence * Math.sin(Date.now() / 500);
+            offsetY = Math.sin(angle + Math.PI / 2) * influence * Math.sin(Date.now() / 500);
+          }
+
+          wavePointsRef.current.forEach(point => {
+            const pdx = x - point.x;
+            const pdy = y - point.y;
+            const pdist = Math.sqrt(pdx * pdx + pdy * pdy);
+            const pmax = 150;
+
+            if (pdist < pmax) {
+              const pinfluence = (1 - pdist / pmax) * 20 * point.intensity;
+              const pangle = Math.atan2(pdy, pdx);
+              offsetX += Math.cos(pangle) * pinfluence;
+              offsetY += Math.sin(pangle) * pinfluence;
+            }
+          });
+
+          const finalX = x + offsetX;
+          const finalY = y + offsetY;
+
+          if (j === 0) {
+            ctx.moveTo(finalX, finalY);
+          } else {
+            ctx.lineTo(finalX, finalY);
+          }
+        }
+        ctx.stroke();
+      }
+
+      for (let j = 0; j < cols; j++) {
+        ctx.beginPath();
+        for (let i = 0; i < rows; i++) {
+          const x = j * gridSize;
+          const y = i * gridSize;
+
+          let offsetX = 0;
+          let offsetY = 0;
+
+          const dx = x - mouseRef.current.x;
+          const dy = y - mouseRef.current.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          const maxDistance = 200;
+
+          if (distance < maxDistance) {
+            const influence = (1 - distance / maxDistance) * 30;
+            const angle = Math.atan2(dy, dx);
+            offsetX = Math.cos(angle + Math.PI / 2) * influence * Math.sin(Date.now() / 500);
+            offsetY = Math.sin(angle + Math.PI / 2) * influence * Math.sin(Date.now() / 500);
+          }
+
+          wavePointsRef.current.forEach(point => {
+            const pdx = x - point.x;
+            const pdy = y - point.y;
+            const pdist = Math.sqrt(pdx * pdx + pdy * pdy);
+            const pmax = 150;
+
+            if (pdist < pmax) {
+              const pinfluence = (1 - pdist / pmax) * 20 * point.intensity;
+              const pangle = Math.atan2(pdy, pdx);
+              offsetX += Math.cos(pangle) * pinfluence;
+              offsetY += Math.sin(pangle) * pinfluence;
+            }
+          });
+
+          const finalX = x + offsetX;
+          const finalY = y + offsetY;
+
+          if (i === 0) {
+            ctx.moveTo(finalX, finalY);
+          } else {
+            ctx.lineTo(finalX, finalY);
+          }
+        }
+        ctx.stroke();
+      }
+
+      const gradient = ctx.createRadialGradient(
+        mouseRef.current.x, mouseRef.current.y, 0,
+        mouseRef.current.x, mouseRef.current.y, 100
+      );
+      gradient.addColorStop(0, 'rgba(31, 111, 235, 0.3)');
+      gradient.addColorStop(0.5, 'rgba(31, 111, 235, 0.1)');
+      gradient.addColorStop(1, 'rgba(31, 111, 235, 0)');
+
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.arc(mouseRef.current.x, mouseRef.current.y, 100, 0, Math.PI * 2);
+      ctx.fill();
+
+      animationId = requestAnimationFrame(animate);
+    };
+
+    animate();
+
+    return () => {
+      window.removeEventListener('resize', resize);
+      window.removeEventListener('mousemove', handleMouseMove);
+      cancelAnimationFrame(animationId);
+    };
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="fixed inset-0 pointer-events-none z-50"
+      style={{ mixBlendMode: 'screen' }}
+    />
+  );
+}
 
 const Register = () => {
   const [fullName, setFullName] = useState("");
@@ -58,7 +248,9 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-8 relative overflow-hidden -mt-16 pt-16">
+    <>
+      <MouseWaveEffect />
+      <div className="min-h-screen flex items-center justify-center px-4 py-8 relative overflow-hidden -mt-16 pt-16">
       {/* Image de fond qui remonte pour couvrir la navigation */}
       <div 
         className="absolute w-full h-full"
@@ -225,6 +417,7 @@ const Register = () => {
         </div>
       </GlassCard>
     </div>
+    </>
   );
 };
 
