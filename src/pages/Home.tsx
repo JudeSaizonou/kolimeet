@@ -1,45 +1,61 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Package, Users, Shield, ArrowRight } from "lucide-react";
+import FloatingShapes from "@/components/3d/FloatingShapes";
+import ParticleField from "@/components/3d/ParticleField";
+import AnimatedGradient from "@/components/3d/AnimatedGradient";
+import ParallaxShapes from "@/components/3d/ParallaxShapes";
+import InteractiveParticles from "@/components/3d/InteractiveParticles";
+import TiltCard from "@/components/3d/TiltCard";
+import MagneticButton from "@/components/3d/MagneticButton";
+import CursorGlow from "@/components/3d/CursorGlow";
 
 const Home = () => {
   return (
     <>
+      {/* Lueur du curseur sur toute la page */}
+      <CursorGlow />
+      
       {/* Hero Section */}
-      <section className="container mx-auto px-4 py-16 md:py-24">
-        <div className="max-w-3xl mx-auto text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
+      <section className="relative container mx-auto px-4 py-16 md:py-24 overflow-hidden">
+        {/* Fond 3D animé */}
+        <AnimatedGradient />
+        <ParallaxShapes />
+        <FloatingShapes />
+        <InteractiveParticles />
+        
+        <div className="max-w-3xl mx-auto text-center relative z-10">
+          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-6 animate-fade-in">
             Envoyer ou transporter un colis facilement entre plusieurs destinations
           </h1>
-          <p className="text-lg md:text-xl text-muted-foreground mb-8">
+          <p className="text-lg md:text-xl text-muted-foreground mb-8 animate-fade-in" style={{ animationDelay: '0.2s' }}>
             kilomeet met en relation les voyageurs avec les expéditeurs pour un transport de colis sécurisé et économique.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in" style={{ animationDelay: '0.4s' }}>
             <Link to="/explorer">
-              <Button size="lg" className="w-full sm:w-auto font-semibold">
+              <MagneticButton size="lg" className="w-full sm:w-auto font-semibold" magnetStrength={0.4}>
                 Explorer les annonces
                 <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
+              </MagneticButton>
             </Link>
             <Link to="/auth/register">
-              <Button size="lg" variant="outline" className="w-full sm:w-auto font-semibold">
+              <MagneticButton size="lg" variant="outline" className="w-full sm:w-auto font-semibold" magnetStrength={0.4}>
                 Créer un compte
-              </Button>
+              </MagneticButton>
             </Link>
           </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section className="bg-secondary py-16">
-        <div className="container mx-auto px-4">
+      <section className="bg-secondary py-16 relative overflow-hidden">
+        <div className="container mx-auto px-4 relative z-10">
           <h2 className="text-3xl font-bold text-center text-foreground mb-12">
             Comment ça marche ?
           </h2>
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            <Card className="p-6 border-2">
-              <div className="h-12 w-12 rounded-lg bg-primary flex items-center justify-center mb-4">
+            <TiltCard className="p-6 border-2" tiltAmount={10}>
+              <div className="h-12 w-12 rounded-lg bg-primary flex items-center justify-center mb-4 hover:rotate-12 transition-transform duration-300">
                 <Package className="h-6 w-6 text-primary-foreground" />
               </div>
               <h3 className="text-xl font-semibold mb-3 text-foreground">
@@ -48,10 +64,10 @@ const Home = () => {
               <p className="text-muted-foreground">
                 Que vous soyez voyageur ou expéditeur, créez votre annonce en quelques clics.
               </p>
-            </Card>
+            </TiltCard>
 
-            <Card className="p-6 border-2">
-              <div className="h-12 w-12 rounded-lg bg-success flex items-center justify-center mb-4">
+            <TiltCard className="p-6 border-2" tiltAmount={10}>
+              <div className="h-12 w-12 rounded-lg bg-success flex items-center justify-center mb-4 hover:rotate-12 transition-transform duration-300">
                 <Users className="h-6 w-6 text-success-foreground" />
               </div>
               <h3 className="text-xl font-semibold mb-3 text-foreground">
@@ -60,10 +76,10 @@ const Home = () => {
               <p className="text-muted-foreground">
                 Parcourez les annonces et contactez les personnes qui correspondent à vos besoins.
               </p>
-            </Card>
+            </TiltCard>
 
-            <Card className="p-6 border-2">
-              <div className="h-12 w-12 rounded-lg bg-accent flex items-center justify-center mb-4">
+            <TiltCard className="p-6 border-2" tiltAmount={10}>
+              <div className="h-12 w-12 rounded-lg bg-accent flex items-center justify-center mb-4 hover:rotate-12 transition-transform duration-300">
                 <Shield className="h-6 w-6 text-accent-foreground" />
               </div>
               <h3 className="text-xl font-semibold mb-3 text-foreground">
@@ -72,7 +88,7 @@ const Home = () => {
               <p className="text-muted-foreground">
                 Communiquez directement avec les autres utilisateurs via notre plateforme sécurisée.
               </p>
-            </Card>
+            </TiltCard>
           </div>
         </div>
       </section>
@@ -87,9 +103,9 @@ const Home = () => {
             Rejoignez kilomeet aujourd'hui et découvrez une nouvelle façon d'envoyer vos colis.
           </p>
           <Link to="/auth/register">
-            <Button size="lg" className="font-semibold">
+            <MagneticButton size="lg" className="font-semibold shadow-lg hover:shadow-xl" magnetStrength={0.5}>
               S'inscrire gratuitement
-            </Button>
+            </MagneticButton>
           </Link>
         </div>
       </section>

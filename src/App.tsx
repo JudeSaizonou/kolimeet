@@ -25,12 +25,15 @@ import Profile from "./pages/Profile";
 import PublishTrip from "./pages/publish/Trip";
 import PublishParcel from "./pages/publish/Parcel";
 import MyListings from "./pages/MyListings";
+import MyReservations from "./pages/MyReservations";
 import Feedback from "./pages/Feedback";
 import NotFound from "./pages/NotFound";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import CGU from "./pages/CGU";
 import FAQ from "./pages/FAQ";
 import Contact from "./pages/Contact";
+import PaymentTest from "./pages/PaymentTest";
+import AwwwardsLanding from "./pages/AwwwardsLanding";
 
 // Import admin utilities for console access (development only)
 if (import.meta.env.DEV) {
@@ -54,7 +57,9 @@ const App = () => (
               <SuspensionBanner />
             </div>
             <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<AwwwardsLanding />} />
+        <Route path="/home" element={<Home />} />
+        <Route path="/awwwards" element={<AwwwardsLanding />} />
         <Route path="/explorer" element={<Explorer />} />
         <Route path="/trajets/:id" element={<TripDetail />} />
         <Route path="/colis/:id" element={<ParcelDetail />} />
@@ -135,6 +140,14 @@ const App = () => (
                 }
               />
               <Route
+                path="/mes-reservations"
+                element={
+                  <ProtectedRoute>
+                    <MyReservations />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/feedback"
                 element={
                   <ProtectedRoute>
@@ -145,6 +158,14 @@ const App = () => (
               <Route path="/cgu" element={<CGU />} />
               <Route path="/faq" element={<FAQ />} />
               <Route path="/contact" element={<Contact />} />
+              <Route
+                path="/payment-test"
+                element={
+                  <AdminRoute>
+                    <PaymentTest />
+                  </AdminRoute>
+                }
+              />
               <Route
                 path="/admin"
                 element={

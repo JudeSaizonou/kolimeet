@@ -62,12 +62,46 @@ export function AdminUsers() {
 
   const toggleSuspension = async (userId: string, currentStatus: boolean) => {
     try {
-      const { error } = await supabase
+      setLoading(true);
+      
+      console.log("Attempting to toggle suspension for user:", userId, "current status:", currentStatus);
+      
+      // First update the local state optimistically
+      setProfiles(prev => 
+        prev.map(profile => 
+          profile.user_id === userId 
+            ? { ...profile, is_suspended: !currentStatus }
+            : profile
+        )
+      );
+
+      const { error, data } = await supabase
         .from("profiles")
         .update({ is_suspended: !currentStatus })
-        .eq("user_id", userId);
+        .eq("user_id", userId)
+        .select();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Suspension toggle error details:", error);
+        
+        // Revert optimistic update on error
+        setProfiles(prev => 
+          prev.map(profile => 
+            profile.user_id === userId 
+              ? { ...profile, is_suspended: currentStatus }
+              : profile
+          )
+        );
+        
+        // Check if it's a permission error
+        if (error.message.includes('permission') || error.message.includes('policy')) {
+          throw new Error("Permissions insuffisantes. Vérifiez que vous avez bien les droits d'administrateur et que les politiques de sécurité sont correctement configurées.");
+        }
+        
+        throw error;
+      }
+
+      console.log("Suspension toggle successful:", data);
 
       toast({
         title: currentStatus ? "Utilisateur réactivé" : "Utilisateur suspendu",
@@ -76,38 +110,89 @@ export function AdminUsers() {
           : "Le compte a été suspendu 🚫",
       });
 
-      fetchProfiles();
+      // Refresh data to ensure consistency
+      await fetchProfiles();
     } catch (error: any) {
+      console.error("Toggle suspension error:", error);
       toast({
-        title: "Erreur",
-        description: error.message,
+        title: "Erreur de modification",
+        description: error.message || "Une erreur est survenue lors de la modification du statut",
         variant: "destructive",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
   const deleteUser = async (userId: string) => {
     try {
-      // Delete profile (cascade will delete all related data)
-      const { error } = await supabase
+      setLoading(true);
+      
+      console.log("Attempting to delete user:", userId);
+      
+      // Optimistically remove user from UI
+      const userToDelete = profiles.find(p => p.user_id === userId);
+      setProfiles(prev => prev.filter(profile => profile.user_id !== userId));
+
+      // Try direct profile deletion first (which should work with admin policies)
+      const { error: profileError, data } = await supabase
         .from("profiles")
         .delete()
-        .eq("user_id", userId);
+        .eq("user_id", userId)
+        .select();
+      
+      if (profileError) {
+        console.error("Profile delete error:", profileError);
+        
+        // Restore user to UI on error
+        if (userToDelete) {
+          setProfiles(prev => [...prev, userToDelete].sort((a, b) => 
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+          ));
+        }
+        
+        // Check if it's a permission error
+        if (profileError.message.includes('permission') || profileError.message.includes('policy')) {
+          throw new Error("Permissions insuffisantes pour supprimer cet utilisateur. Vérifiez que vous avez bien les droits d'administrateur et que les politiques de sécurité sont correctement configurées.");
+        }
+        
+        throw profileError;
+      }
 
-      if (error) throw error;
+      console.log("Profile deletion successful:", data);
+
+      // Optionally try to delete from auth.users as well (this might fail if no service role)
+      try {
+        const { error: authError } = await supabase.auth.admin.deleteUser(userId);
+        if (authError) {
+          console.log("Auth user deletion failed (this is expected if no service role):", authError);
+        } else {
+          console.log("Auth user deletion successful");
+        }
+      } catch (authError) {
+        console.log("Auth deletion attempt failed:", authError);
+      }
 
       toast({
         title: "Utilisateur supprimé",
-        description: "Le compte et toutes ses données ont été supprimés définitivement",
+        description: "Le profil utilisateur a été supprimé avec succès ✅",
       });
 
-      fetchProfiles();
+      // Refresh data to ensure consistency
+      await fetchProfiles();
     } catch (error: any) {
+      console.error("Delete user error:", error);
+      
       toast({
-        title: "Erreur",
-        description: error.message,
+        title: "Erreur de suppression",
+        description: error.message || "Impossible de supprimer l'utilisateur. Vérifiez vos permissions d'administration.",
         variant: "destructive",
       });
+      
+      // Refresh data in case of partial failure
+      await fetchProfiles();
+    } finally {
+      setLoading(false);
     }
   };
 

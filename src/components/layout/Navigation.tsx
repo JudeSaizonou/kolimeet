@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Package, User, LogOut, FileText, Plane, MessageSquare, Shield } from "lucide-react";
+import { Package, User, LogOut, FileText, Plane, MessageSquare, Shield, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -22,6 +22,8 @@ const Navigation = () => {
   const [profile, setProfile] = useState<any>(null);
   const location = useLocation();
   const isHomePage = location.pathname === "/";
+  const isAuthPage = location.pathname.startsWith("/auth/");
+  const isTransparentNav = isHomePage || isAuthPage;
 
   useEffect(() => {
     if (user) {
@@ -44,12 +46,12 @@ const Navigation = () => {
   return (
     <header className={cn(
       "sticky top-0 z-50 w-full border-b",
-      isHomePage ? "bg-black/30 backdrop-blur-sm border-white/20" : "bg-background"
+      isTransparentNav ? "bg-black/30 backdrop-blur-sm border-white/20" : "bg-background"
     )}>
       <nav className="container mx-auto flex h-16 items-center justify-between px-4">
         <Link to="/" className="flex items-center gap-2">
-          <Package className={cn("h-6 w-6", isHomePage ? "text-white" : "text-primary")} />
-          <span className={cn("text-xl font-bold", isHomePage ? "text-white" : "text-foreground")}>
+          <Package className={cn("h-6 w-6", isTransparentNav ? "text-white" : "text-primary")} />
+          <span className={cn("text-xl font-bold", isTransparentNav ? "text-white" : "text-foreground")}>
             kilomeet
           </span>
         </Link>
@@ -60,7 +62,7 @@ const Navigation = () => {
               variant="ghost" 
               className={cn(
                 "font-medium",
-                isHomePage && "text-white hover:bg-white/20 hover:text-white"
+                isTransparentNav && "text-white hover:bg-white/20 hover:text-white"
               )}
             >
               Explorer
@@ -95,7 +97,7 @@ const Navigation = () => {
                 <Button 
                   variant="ghost" 
                   size="icon"
-                  className={cn(isHomePage && "text-white hover:bg-white/20 hover:text-white")}
+                  className={cn(isTransparentNav && "text-white hover:bg-white/20 hover:text-white")}
                 >
                   <MessageSquare className="h-5 w-5" />
                 </Button>
@@ -144,6 +146,15 @@ const Navigation = () => {
                   >
                     <FileText className="h-4 w-4" />
                     Mes annonces
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link
+                    to="/mes-reservations"
+                    className="flex items-center gap-2 cursor-pointer"
+                  >
+                    <CreditCard className="h-4 w-4" />
+                    Mes réservations
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>

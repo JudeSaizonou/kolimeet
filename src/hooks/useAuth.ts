@@ -118,14 +118,24 @@ export const useAuth = () => {
 
   const signInWithGoogle = async () => {
     try {
+      const redirectUrl = `${window.location.origin}/auth/callback`;
+      console.log("Google OAuth redirect URL:", redirectUrl);
+      
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: redirectUrl,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          }
         },
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Google OAuth error:", error);
+        throw error;
+      }
     } catch (error: any) {
       toast({
         title: "Erreur de connexion",

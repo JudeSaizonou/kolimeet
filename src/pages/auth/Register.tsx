@@ -2,17 +2,19 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card } from "@/components/ui/card";
 import { Package } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useState, useEffect } from "react";
 import { Separator } from "@/components/ui/separator";
+import { GlassCard } from "@/components/LiquidGlass";
 
 const Register = () => {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [buttonPosition, setButtonPosition] = useState({ x: 0, y: 0 });
+  const [isButtonRunning, setIsButtonRunning] = useState(false);
   const { signUpWithEmail, signInWithGoogle, user } = useAuth();
   const navigate = useNavigate();
 
@@ -32,9 +34,64 @@ const Register = () => {
     await signUpWithEmail(email, password, fullName);
   };
 
+  const isFormValid = 
+    fullName.trim() !== "" && 
+    email.trim() !== "" && 
+    password.trim() !== "" && 
+    confirmPassword.trim() !== "" &&
+    password === confirmPassword;
+
+  const handleButtonHover = () => {
+    if (!isFormValid && !isButtonRunning) {
+      setIsButtonRunning(true);
+      // Génère une position aléatoire pour faire fuir le bouton
+      const randomX = (Math.random() - 0.5) * 200; // -100 à 100
+      const randomY = (Math.random() - 0.5) * 100; // -50 à 50
+      setButtonPosition({ x: randomX, y: randomY });
+      
+      // Réinitialise après l'animation
+      setTimeout(() => {
+        setButtonPosition({ x: 0, y: 0 });
+        setIsButtonRunning(false);
+      }, 600);
+    }
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-secondary px-4 py-8">
-      <Card className="w-full max-w-md p-8 border-2">
+    <div className="min-h-screen flex items-center justify-center px-4 py-8 relative overflow-hidden -mt-16 pt-16">
+      {/* Image de fond qui remonte pour couvrir la navigation */}
+      <div 
+        className="absolute w-full h-full"
+        style={{
+          backgroundImage: 'url(/delivery-person-getting-parcel-out-delivery.jpg)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          zIndex: 0,
+          top: '-4rem',
+          bottom: 0,
+          height: 'calc(100% + 4rem)',
+        }}
+      />
+      
+      {/* Overlay sombre pour améliorer la lisibilité */}
+      <div 
+        className="absolute w-full h-full bg-black/30"
+        style={{ 
+          zIndex: 1,
+          top: '-4rem',
+          bottom: 0,
+          height: 'calc(100% + 4rem)',
+        }}
+      />
+
+      <GlassCard
+        intensity="medium"
+        variant="iridescent"
+        padding="lg"
+        rounded="xl"
+        className="w-full max-w-md relative backdrop-blur-xl bg-white/10 border border-white/20 shadow-2xl z-10"
+      >
         <Link to="/" className="flex items-center justify-center gap-2 mb-8">
           <Package className="h-8 w-8 text-primary" />
           <span className="text-2xl font-bold text-foreground">kilomeet</span>
@@ -132,9 +189,30 @@ const Register = () => {
             />
           </div>
 
-          <Button type="submit" className="w-full font-semibold">
-            S'inscrire
-          </Button>
+          <div 
+            onMouseEnter={handleButtonHover}
+            className="relative"
+            style={{
+              transform: `translate(${buttonPosition.x}px, ${buttonPosition.y}px)`,
+              transition: isButtonRunning ? 'transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55)' : 'transform 0.3s ease',
+            }}
+          >
+            <Button 
+              type="submit" 
+              className={`w-full font-semibold ${!isFormValid ? 'cursor-not-allowed' : ''}`}
+              disabled={!isFormValid}
+            >
+              S'inscrire
+            </Button>
+          </div>
+
+          {!isFormValid && (
+            <p className="text-xs text-center text-muted-foreground italic">
+              👆 {password !== confirmPassword && password && confirmPassword 
+                ? "Les mots de passe ne correspondent pas !" 
+                : "Remplissez tous les champs pour attraper le bouton !"}
+            </p>
+          )}
         </form>
 
         <div className="mt-6 text-center">
@@ -145,7 +223,7 @@ const Register = () => {
             </Link>
           </p>
         </div>
-      </Card>
+      </GlassCard>
     </div>
   );
 };

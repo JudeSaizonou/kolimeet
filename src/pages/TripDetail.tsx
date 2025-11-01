@@ -8,11 +8,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowRight, Calendar, Package, Star } from "lucide-react";
+import { ArrowRight, Calendar, Package, Star, CreditCard, MessageCircle } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { MatchingSection } from "@/components/explorer/MatchingSection";
 import { ReviewDialog } from "@/components/reviews/ReviewDialog";
+import { BookingDialog } from "@/components/booking/BookingDialog";
 
 const TripDetail = () => {
   const { id } = useParams();
@@ -22,6 +23,7 @@ const TripDetail = () => {
   const [trip, setTrip] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
+  const [bookingDialogOpen, setBookingDialogOpen] = useState(false);
 
   useEffect(() => {
     const fetchTrip = async () => {
@@ -184,9 +186,36 @@ const TripDetail = () => {
               </div>
             )}
 
-            <Button onClick={handleContact} className="w-full" size="lg">
-              Contacter le voyageur
-            </Button>
+            {/* Boutons d'action */}
+            <div className="space-y-3">
+              {trip.capacity_available_kg > 0 ? (
+                <Button 
+                  onClick={() => setBookingDialogOpen(true)} 
+                  className="w-full" 
+                  size="lg"
+                  disabled={!user || user.id === trip.user_id}
+                >
+                  <CreditCard className="w-4 h-4 mr-2" />
+                  Réserver des kilos ({trip.price_expect ? `${trip.price_expect}€/kg` : 'Prix à négocier'})
+                </Button>
+              ) : (
+                <Button disabled className="w-full" size="lg">
+                  <Package className="w-4 h-4 mr-2" />
+                  Capacité épuisée
+                </Button>
+              )}
+              
+              <Button 
+                onClick={handleContact} 
+                variant="outline" 
+                className="w-full" 
+                size="lg"
+                disabled={!user || user.id === trip.user_id}
+              >
+                <MessageCircle className="w-4 h-4 mr-2" />
+                Contacter le voyageur
+              </Button>
+            </div>
 
             {user && user.id !== trip.user_id && trip.status === "closed" && (
               <Button 
@@ -206,12 +235,19 @@ const TripDetail = () => {
       </div>
 
       {user && user.id !== trip.user_id && (
-        <ReviewDialog
-          open={reviewDialogOpen}
-          onOpenChange={setReviewDialogOpen}
-          targetUserId={trip.user_id}
-          targetUserName={profile?.full_name || "ce voyageur"}
-        />
+        <>
+          <ReviewDialog
+            open={reviewDialogOpen}
+            onOpenChange={setReviewDialogOpen}
+            targetUserId={trip.user_id}
+            targetUserName={profile?.full_name || "ce voyageur"}
+          />
+          <BookingDialog
+            open={bookingDialogOpen}
+            onOpenChange={setBookingDialogOpen}
+            trip={trip}
+          />
+        </>
       )}
     </>
   );

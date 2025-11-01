@@ -7,7 +7,7 @@ import { ParcelCard } from "@/components/explorer/ParcelCard";
 import { TripFiltersComponent } from "@/components/explorer/TripFilters";
 import { ParcelFiltersComponent } from "@/components/explorer/ParcelFilters";
 import { useTrips, useParcels, TripFilters, ParcelFilters } from "@/hooks/useExplorer";
-import { Plane, Package } from "lucide-react";
+import { Plane, Package, Search } from "lucide-react";
 import {
   Pagination,
   PaginationContent,
@@ -43,18 +43,45 @@ const Explorer = () => {
   return (
     <section className="container mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-foreground mb-2">
-          Explorer les annonces
-        </h1>
-        <p className="text-muted-foreground">
+        <div className="flex items-center gap-3 mb-2">
+          <div className="p-2 bg-primary rounded-lg">
+            <Search className="h-6 w-6 text-white" />
+          </div>
+          <h1 className="text-3xl md:text-4xl font-bold text-foreground">
+            Explorer les annonces
+          </h1>
+        </div>
+        <p className="text-muted-foreground text-lg">
           Trouvez le voyageur ou l'expéditeur qui correspond à vos besoins.
         </p>
       </div>
 
       <Tabs defaultValue="trips" className="w-full">
-        <TabsList className="mb-6">
-          <TabsTrigger value="trips">Trajets</TabsTrigger>
-          <TabsTrigger value="parcels">Colis</TabsTrigger>
+        <TabsList className="mb-6 bg-white/80 backdrop-blur-md border border-border/50 p-1 h-auto">
+          <TabsTrigger 
+            value="trips" 
+            className="data-[state=active]:bg-primary data-[state=active]:text-white transition-all px-6 py-3 rounded-md"
+          >
+            <Plane className="h-4 w-4 mr-2" />
+            Trajets
+            {tripsTotalCount > 0 && (
+              <span className="ml-2 px-2 py-0.5 text-xs bg-white/20 rounded-full">
+                {tripsTotalCount}
+              </span>
+            )}
+          </TabsTrigger>
+          <TabsTrigger 
+            value="parcels"
+            className="data-[state=active]:bg-primary data-[state=active]:text-white transition-all px-6 py-3 rounded-md"
+          >
+            <Package className="h-4 w-4 mr-2" />
+            Colis
+            {parcelsTotalCount > 0 && (
+              <span className="ml-2 px-2 py-0.5 text-xs bg-white/20 rounded-full">
+                {parcelsTotalCount}
+              </span>
+            )}
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="trips" className="space-y-6">
@@ -68,9 +95,9 @@ const Explorer = () => {
           />
 
           {tripsLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[...Array(6)].map((_, i) => (
-                <Skeleton key={i} className="h-64" />
+                <Skeleton key={i} className="h-64 rounded-xl" />
               ))}
             </div>
           ) : trips.length === 0 ? (
@@ -81,19 +108,19 @@ const Explorer = () => {
             />
           ) : (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {trips.map((trip) => (
                   <TripCard key={trip.id} trip={trip} />
                 ))}
               </div>
 
               {tripsTotalPages > 1 && (
-                <Pagination>
+                <Pagination className="mt-8">
                   <PaginationContent>
                     <PaginationItem>
                       <PaginationPrevious 
                         onClick={() => setTripPage(Math.max(1, tripPage - 1))}
-                        className={tripPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                        className={tripPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer hover:bg-primary/10"}
                       />
                     </PaginationItem>
                     
@@ -104,7 +131,7 @@ const Explorer = () => {
                           <PaginationLink
                             onClick={() => setTripPage(page)}
                             isActive={tripPage === page}
-                            className="cursor-pointer"
+                            className={`cursor-pointer ${tripPage === page ? 'bg-primary text-white' : 'hover:bg-primary/10'}`}
                           >
                             {page}
                           </PaginationLink>
@@ -115,7 +142,7 @@ const Explorer = () => {
                     <PaginationItem>
                       <PaginationNext 
                         onClick={() => setTripPage(Math.min(tripsTotalPages, tripPage + 1))}
-                        className={tripPage === tripsTotalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                        className={tripPage === tripsTotalPages ? "pointer-events-none opacity-50" : "cursor-pointer hover:bg-primary/10"}
                       />
                     </PaginationItem>
                   </PaginationContent>
@@ -136,9 +163,9 @@ const Explorer = () => {
           />
 
           {parcelsLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[...Array(6)].map((_, i) => (
-                <Skeleton key={i} className="h-64" />
+                <Skeleton key={i} className="h-64 rounded-xl" />
               ))}
             </div>
           ) : parcels.length === 0 ? (
@@ -149,19 +176,19 @@ const Explorer = () => {
             />
           ) : (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {parcels.map((parcel) => (
                   <ParcelCard key={parcel.id} parcel={parcel} />
                 ))}
               </div>
 
               {parcelsTotalPages > 1 && (
-                <Pagination>
+                <Pagination className="mt-8">
                   <PaginationContent>
                     <PaginationItem>
                       <PaginationPrevious 
                         onClick={() => setParcelPage(Math.max(1, parcelPage - 1))}
-                        className={parcelPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                        className={parcelPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer hover:bg-primary/10"}
                       />
                     </PaginationItem>
                     
@@ -172,7 +199,7 @@ const Explorer = () => {
                           <PaginationLink
                             onClick={() => setParcelPage(page)}
                             isActive={parcelPage === page}
-                            className="cursor-pointer"
+                            className={`cursor-pointer ${parcelPage === page ? 'bg-primary text-white' : 'hover:bg-primary/10'}`}
                           >
                             {page}
                           </PaginationLink>
@@ -183,7 +210,7 @@ const Explorer = () => {
                     <PaginationItem>
                       <PaginationNext 
                         onClick={() => setParcelPage(Math.min(parcelsTotalPages, parcelPage + 1))}
-                        className={parcelPage === parcelsTotalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                        className={parcelPage === parcelsTotalPages ? "pointer-events-none opacity-50" : "cursor-pointer hover:bg-primary/10"}
                       />
                     </PaginationItem>
                   </PaginationContent>
