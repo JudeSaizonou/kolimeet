@@ -36,15 +36,22 @@ export const useMessages = (threadId: string) => {
           .order("created_at", { ascending: true });
 
         if (error) throw error;
+        console.log('[useMessages] Fetched messages:', data?.length, 'for thread:', threadId);
         setMessages(data || []);
 
         // Mark messages as read
-        await supabase
+        const { error: markError } = await supabase
           .from("messages")
           .update({ is_read: true })
           .eq("thread_id", threadId)
           .neq("sender_id", user.id)
           .eq("is_read", false);
+
+        if (markError) {
+          console.error('[useMessages] ❌ Failed to mark messages as read:', markError);
+        } else {
+          console.log('[useMessages] ✅ Marked messages as read for thread:', threadId);
+        }
       } catch (error) {
         console.error("Error fetching messages:", error);
       } finally {
@@ -67,6 +74,7 @@ export const useMessages = (threadId: string) => {
         },
         (payload) => {
           const newMessage = payload.new as Message;
+          console.log('[useMessages] 📨 New message received:', newMessage.id, 'from:', newMessage.sender_id);
           setMessages((prev) => [...prev, newMessage]);
 
           // Mark as read if it's not from current user
@@ -75,11 +83,19 @@ export const useMessages = (threadId: string) => {
               .from("messages")
               .update({ is_read: true })
               .eq("id", newMessage.id)
-              .then();
+              .then(({ error }) => {
+                if (error) {
+                  console.error('[useMessages] ❌ Failed to mark new message as read:', error);
+                } else {
+                  console.log('[useMessages] ✅ Auto-marked new message as read:', newMessage.id);
+                }
+              });
           }
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('[useMessages] 📡 Subscription status:', status, 'for thread:', threadId);
+      });
 
     return () => {
       supabase.removeChannel(channel);

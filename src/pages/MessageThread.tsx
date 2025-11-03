@@ -2,20 +2,24 @@ import { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useMessages } from "@/hooks/useMessages";
 import { useAuth } from "@/hooks/useAuth";
+import { useTypingStatus } from "@/hooks/useTypingStatus";
 import { supabase } from "@/integrations/supabase/client";
 import { MessageBubble } from "@/components/messaging/MessageBubble";
 import { MessageInput } from "@/components/messaging/MessageInput";
+import { TypingIndicator } from "@/components/messaging/TypingIndicator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ArrowLeft, ExternalLink, AlertTriangle } from "lucide-react";
+import { AnimatePresence } from "framer-motion";
 
 const MessageThread = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
   const { messages, loading, sending, sendMessage } = useMessages(id!);
+  const { otherUserTyping, setTyping } = useTypingStatus(id!);
   const [thread, setThread] = useState<any>(null);
   const [otherUser, setOtherUser] = useState<any>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -129,13 +133,25 @@ const MessageThread = () => {
                 isOwn={message.sender_id === user?.id}
               />
             ))}
+            
+            {/* Typing indicator */}
+            <AnimatePresence>
+              {otherUserTyping && (
+                <TypingIndicator userName={otherUser?.full_name} />
+              )}
+            </AnimatePresence>
+            
             <div ref={messagesEndRef} />
           </>
         )}
       </div>
 
       {/* Input */}
-      <MessageInput onSend={sendMessage} disabled={sending} />
+      <MessageInput 
+        onSend={sendMessage} 
+        onTyping={setTyping}
+        disabled={sending} 
+      />
     </div>
   );
 };

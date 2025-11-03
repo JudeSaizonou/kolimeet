@@ -33,6 +33,7 @@ export const useThreads = () => {
 
     const fetchThreads = async () => {
       try {
+        console.log('[useThreads] 🔄 Fetching threads for user:', user.id);
         const { data, error } = await supabase
           .from("threads")
           .select(`
@@ -89,6 +90,7 @@ export const useThreads = () => {
           })
         );
 
+        console.log('[useThreads] ✅ Processed threads:', processedThreads.map(t => ({ id: t.id, unread: t.unread_count })));
         setThreads(processedThreads);
       } catch (error) {
         console.error("Error fetching threads:", error);
@@ -109,11 +111,14 @@ export const useThreads = () => {
           schema: "public",
           table: "messages",
         },
-        () => {
+        (payload) => {
+          console.log('[useThreads] 📬 Realtime message change:', payload.eventType, payload.new);
           fetchThreads();
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('[useThreads] 📡 Subscription status:', status);
+      });
 
     return () => {
       supabase.removeChannel(channel);

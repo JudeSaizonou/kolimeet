@@ -2,6 +2,7 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { sanitizeMessage } from "@/lib/utils/sanitizeMessage";
+import { motion } from "framer-motion";
 
 interface MessageBubbleProps {
   content: string;
@@ -17,7 +18,15 @@ export const MessageBubble = ({
   const sanitizedContent = sanitizeMessage(content);
   
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0, y: 20, scale: 0.8 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ 
+        type: "spring",
+        stiffness: 500,
+        damping: 30,
+        mass: 1
+      }}
       className={cn(
         "flex w-full mb-4",
         isOwn ? "justify-end" : "justify-start"
@@ -41,6 +50,6 @@ export const MessageBubble = ({
           {format(new Date(createdAt), "HH:mm", { locale: fr })}
         </span>
       </div>
-    </div>
+    </motion.div>
   );
 };
