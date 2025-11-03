@@ -77,7 +77,7 @@ const MessageThread = () => {
       <Alert className="mb-4 border-yellow-500 bg-yellow-50 dark:bg-yellow-950/20">
         <AlertTriangle className="h-4 w-4 text-yellow-600" />
         <AlertDescription className="text-sm text-yellow-800 dark:text-yellow-200">
-          <strong>⚠️ Restez en sécurité !</strong> Gardez toutes vos communications sur ColisLink. 
+          <strong>⚠️ Restez en sécurité !</strong> Gardez toutes vos communications sur kilomeet. 
           Ne partagez jamais votre numéro de téléphone ou email avant de rencontrer la personne.
         </AlertDescription>
       </Alert>

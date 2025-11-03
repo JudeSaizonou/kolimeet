@@ -1,4 +1,4 @@
--- Seed data for ColisLink
+-- Seed data for kilomeet
 -- This script creates demo users, trips, and parcels
 
 -- Insert demo profiles (requires manual user creation in auth first, so we'll use a function)

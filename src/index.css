@@ -8,7 +8,7 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* ColisLink Design System - Couleurs opaques uniquement */
+    /* kilomeet Design System - Couleurs opaques uniquement */
     --background: 0 0% 100%;
     --foreground: 220 39% 11%;
 

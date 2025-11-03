@@ -118,8 +118,15 @@ export const useAuth = () => {
 
   const signInWithGoogle = async () => {
     try {
-      const redirectUrl = `${window.location.origin}/auth/callback`;
-      console.log("Google OAuth redirect URL:", redirectUrl);
+      // Use window.location.origin to get the current URL (works for both local and production)
+      const origin = window.location.origin;
+      const redirectUrl = `${origin}/auth/callback`;
+      
+      console.log("🔐 Google OAuth Configuration:");
+      console.log("  - Origin:", origin);
+      console.log("  - Redirect URL:", redirectUrl);
+      console.log("  - Make sure this URL is whitelisted in Supabase Dashboard");
+      console.log("  - Go to: Authentication → URL Configuration → Redirect URLs");
       
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
@@ -133,10 +140,11 @@ export const useAuth = () => {
       });
 
       if (error) {
-        console.error("Google OAuth error:", error);
+        console.error("❌ Google OAuth error:", error);
         throw error;
       }
     } catch (error: any) {
+      console.error("❌ Sign in with Google failed:", error);
       toast({
         title: "Erreur de connexion",
         description: error.message || "Impossible de se connecter avec Google",
