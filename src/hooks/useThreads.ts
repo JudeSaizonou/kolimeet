@@ -34,61 +34,85 @@ export const useThreads = () => {
     const fetchThreads = async () => {
       try {
         console.log('[useThreads] 🔄 Fetching threads for user:', user.id);
+        
+        // Fetch threads
         const { data, error } = await supabase
           .from("threads")
-          .select(`
-            *,
-            messages!inner(content, sender_id, is_read, created_at)
-          `)
+          .select("*")
           .or(`created_by.eq.${user.id},other_user_id.eq.${user.id}`)
           .order("last_message_at", { ascending: false });
 
         if (error) throw error;
 
-        // Process threads to get other user info and last message
-        const processedThreads = await Promise.all(
-          (data || []).map(async (thread: any) => {
-            const otherUserId = thread.created_by === user.id 
-              ? thread.other_user_id 
-              : thread.created_by;
+        // Get all thread IDs and user IDs for batch queries
+        const threadIds = (data || []).map(t => t.id);
+        const userIds = new Set<string>();
+        (data || []).forEach(t => {
+          userIds.add(t.created_by);
+          userIds.add(t.other_user_id);
+        });
+        
+        if (threadIds.length === 0) {
+          setThreads([]);
+          return;
+        }
 
-            // Get other user profile
-            const { data: profile } = await supabase
-              .from("profiles")
-              .select("full_name, avatar_url")
-              .eq("user_id", otherUserId)
-              .single();
+        // Batch fetch profiles
+        const { data: profiles } = await supabase
+          .from("profiles")
+          .select("user_id, full_name, avatar_url")
+          .in("user_id", Array.from(userIds));
 
-            // Get last message
-            const { data: lastMessage } = await supabase
-              .from("messages")
-              .select("content, sender_id")
-              .eq("thread_id", thread.id)
-              .order("created_at", { ascending: false })
-              .limit(1)
-              .single();
+        const profileMap = new Map(
+          (profiles || []).map(p => [p.user_id, p])
+        );
 
-            // Count unread messages
+        // Batch fetch last messages
+        const { data: lastMessages } = await supabase
+          .from("messages")
+          .select("thread_id, content, sender_id, created_at")
+          .in("thread_id", threadIds)
+          .order("created_at", { ascending: false });
+
+        // Batch fetch unread counts
+        const unreadCounts = await Promise.all(
+          threadIds.map(async (threadId) => {
             const { count } = await supabase
               .from("messages")
               .select("*", { count: "exact", head: true })
-              .eq("thread_id", thread.id)
+              .eq("thread_id", threadId)
               .eq("is_read", false)
               .neq("sender_id", user.id);
-
-            return {
-              id: thread.id,
-              created_by: thread.created_by,
-              other_user_id: thread.other_user_id,
-              related_type: thread.related_type,
-              related_id: thread.related_id,
-              last_message_at: thread.last_message_at,
-              other_user: profile || undefined,
-              last_message: lastMessage || undefined,
-              unread_count: count || 0,
-            };
+            return { thread_id: threadId, count: count || 0 };
           })
         );
+
+        // Process threads
+        const processedThreads = (data || []).map((thread: any) => {
+          const isCreator = thread.created_by === user.id;
+          const otherUserId = isCreator ? thread.other_user_id : thread.created_by;
+          const otherUserProfile = profileMap.get(otherUserId);
+
+          // Get last message for this thread
+          const threadLastMessages = (lastMessages || [])
+            .filter((m: any) => m.thread_id === thread.id);
+          const lastMessage = threadLastMessages[0];
+
+          // Get unread count
+          const unreadData = unreadCounts.find((u: any) => u.thread_id === thread.id);
+
+          return {
+            id: thread.id,
+            created_by: thread.created_by,
+            other_user_id: thread.other_user_id,
+            related_type: thread.related_type,
+            related_id: thread.related_id,
+            last_message_at: thread.last_message_at,
+            other_user: otherUserProfile || undefined,
+            last_message: lastMessage || undefined,
+            unread_count: unreadData?.count || 0,
+          };
+        });
 
         console.log('[useThreads] ✅ Processed threads:', processedThreads.map(t => ({ id: t.id, unread: t.unread_count })));
         setThreads(processedThreads);
@@ -101,7 +125,7 @@ export const useThreads = () => {
 
     fetchThreads();
 
-    // Subscribe to new messages for real-time updates
+    // Subscribe to threads and messages for real-time updates
     const channel = supabase
       .channel("threads-updates")
       .on(
@@ -109,11 +133,42 @@ export const useThreads = () => {
         {
           event: "*",
           schema: "public",
+          table: "threads",
+        },
+        (payload) => {
+          const thread = payload.new as any;
+          // Only refetch if this thread belongs to the user
+          if (thread && (thread.created_by === user.id || thread.other_user_id === user.id)) {
+            console.log('[useThreads] 📬 Thread change:', payload.eventType);
+            fetchThreads();
+          }
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "messages",
+        },
+        () => {
+          console.log('[useThreads] 📨 New message received, refetching threads');
+          fetchThreads();
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
           table: "messages",
         },
         (payload) => {
-          console.log('[useThreads] 📬 Realtime message change:', payload.eventType, payload.new);
-          fetchThreads();
+          // Only refetch if read status changed
+          if (payload.old && (payload.old as any).is_read !== (payload.new as any).is_read) {
+            console.log('[useThreads] 📖 Message read status changed');
+            fetchThreads();
+          }
         }
       )
       .subscribe((status) => {

@@ -61,7 +61,7 @@ export const useMessages = (threadId: string) => {
 
     fetchMessages();
 
-    // Subscribe to new messages
+    // Subscribe to new and updated messages
     const channel = supabase
       .channel(`messages-${threadId}`)
       .on(
@@ -91,6 +91,36 @@ export const useMessages = (threadId: string) => {
                 }
               });
           }
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "messages",
+          filter: `thread_id=eq.${threadId}`,
+        },
+        (payload) => {
+          const updatedMessage = payload.new as Message;
+          console.log('[useMessages] 📝 Message updated:', updatedMessage.id);
+          setMessages((prev) => 
+            prev.map((msg) => msg.id === updatedMessage.id ? updatedMessage : msg)
+          );
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "DELETE",
+          schema: "public",
+          table: "messages",
+          filter: `thread_id=eq.${threadId}`,
+        },
+        (payload) => {
+          const deletedMessage = payload.old as Message;
+          console.log('[useMessages] 🗑️ Message deleted:', deletedMessage.id);
+          setMessages((prev) => prev.filter((msg) => msg.id !== deletedMessage.id));
         }
       )
       .subscribe((status) => {
