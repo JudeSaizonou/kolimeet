@@ -1,23 +1,3 @@
-/**
- * IMPORTANT: Supabase OAuth Configuration
- * 
- * For Google OAuth to work properly, ensure the following are configured:
- * 
- * 1. Supabase Dashboard → Authentication → URL Configuration:
- *    - Site URL: https://kolimeet.lovable.app
- *    - Additional Redirect URLs:
- *      • http://localhost:8080/auth/callback
- *      • https://kolimeet.lovable.app/auth/callback
- * 
- * 2. Google Cloud Console → OAuth Client:
- *    - Authorized JavaScript origins:
- *      • http://localhost:8080
- *      • https://kolimeet.lovable.app
- *    - Authorized redirect URIs:
- *      • http://localhost:8080/auth/callback
- *      • https://kolimeet.lovable.app/auth/callback
- */
-
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { User, Session } from "@supabase/supabase-js";
@@ -78,7 +58,7 @@ export const useAuth = () => {
         navigate("/onboarding");
       }
     } catch (error) {
-      console.error("Error checking onboarding:", error);
+      // Silently handle error
     }
   };
 
@@ -138,21 +118,18 @@ export const useAuth = () => {
 
   const signInWithGoogle = async () => {
     try {
-      // Determine redirect URL from environment variables (never use window.location.origin)
-      const redirectTo =
-        import.meta.env.VITE_OAUTH_REDIRECT_OVERRIDE?.trim() ||
-        (import.meta.env.DEV
-          ? import.meta.env.VITE_OAUTH_REDIRECT_DEV
-          : import.meta.env.VITE_OAUTH_REDIRECT_PROD);
-
-      console.log("🔐 Google OAuth Configuration:");
-      console.log("  - Environment:", import.meta.env.DEV ? "DEVELOPMENT" : "PRODUCTION");
-      console.log("  - Redirect URL:", redirectTo);
-      console.log("  - Override active:", !!import.meta.env.VITE_OAUTH_REDIRECT_OVERRIDE?.trim());
+      const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
       
-      if (!redirectTo) {
-        throw new Error("OAuth redirect URL not configured. Check environment variables.");
+      if (isLocalhost) {
+        toast({
+          title: "Non disponible en local",
+          description: "L'authentification Google fonctionne uniquement en production. Utilisez email/mot de passe pour tester localement.",
+          variant: "default",
+        });
+        return;
       }
+
+      const redirectTo = 'https://kolimeet.lovable.app/auth/callback';
 
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
@@ -161,16 +138,12 @@ export const useAuth = () => {
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
-          }
+          },
         },
       });
 
-      if (error) {
-        console.error("❌ Google OAuth error:", error);
-        throw error;
-      }
+      if (error) throw error;
     } catch (error: any) {
-      console.error("❌ Sign in with Google failed:", error);
       toast({
         title: "Erreur de connexion",
         description: error.message || "Impossible de se connecter avec Google",
@@ -199,13 +172,6 @@ export const useAuth = () => {
     }
   };
 
-  const getOAuthRedirectUrl = () => {
-    return import.meta.env.VITE_OAUTH_REDIRECT_OVERRIDE?.trim() ||
-      (import.meta.env.DEV
-        ? import.meta.env.VITE_OAUTH_REDIRECT_DEV
-        : import.meta.env.VITE_OAUTH_REDIRECT_PROD);
-  };
-
   return {
     user,
     session,
@@ -214,6 +180,5 @@ export const useAuth = () => {
     signUpWithEmail,
     signInWithGoogle,
     signOut,
-    getOAuthRedirectUrl,
   };
 };
