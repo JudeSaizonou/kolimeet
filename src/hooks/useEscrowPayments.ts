@@ -190,24 +190,29 @@ export const useEscrowPayments = () => {
   const confirmDeliveryAndReleaseFunds = async (confirmation: DeliveryConfirmation) => {
     setProcessing(true);
     try {
-      // Appeler la fonction SQL pour confirmer la livraison
-      const { data, error } = await supabase.rpc('confirm_delivery_and_release_funds', {
-        p_reservation_id: confirmation.reservation_id,
-        p_confirmation_code: confirmation.confirmation_code
-      });
+      // TODO: Database function not yet implemented
+      // Mock response for development
+      if (import.meta.env.DEV) {
+        console.log('🔧 MODE DEV: Simulation de confirmation de livraison', confirmation);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        toast({
+          title: 'Livraison confirmée (Dev)',
+          description: '🔧 En production, les fonds seraient libérés au voyageur',
+        });
 
-      if (error) throw error;
-
-      if (!data.success) {
-        throw new Error(data.error);
+        return { success: true, traveler_amount: '0.00' };
       }
 
-      toast({
-        title: 'Livraison confirmée',
-        description: `Les fonds (${data.traveler_amount}€) ont été libérés au voyageur`,
-      });
+      // Production: Uncomment when database function is created
+      // const { data, error } = await supabase.rpc('confirm_delivery_and_release_funds', {
+      //   p_reservation_id: confirmation.reservation_id,
+      //   p_confirmation_code: confirmation.confirmation_code
+      // });
+      // if (error) throw error;
+      // if (!data.success) throw new Error(data.error);
 
-      return data;
+      throw new Error('Fonction non disponible en production');
     } catch (error: any) {
       toast({
         title: 'Erreur de confirmation',
@@ -224,23 +229,29 @@ export const useEscrowPayments = () => {
   const requestRefund = async (reservationId: string, reason: string = 'Annulation utilisateur') => {
     setProcessing(true);
     try {
-      const { data, error } = await supabase.rpc('refund_reservation', {
-        p_reservation_id: reservationId,
-        p_reason: reason
-      });
+      // TODO: Database function not yet implemented
+      // Mock response for development
+      if (import.meta.env.DEV) {
+        console.log('🔧 MODE DEV: Simulation de remboursement', { reservationId, reason });
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        toast({
+          title: 'Remboursement demandé (Dev)',
+          description: '🔧 En production, le remboursement serait traité sous 3-5 jours',
+        });
 
-      if (error) throw error;
-
-      if (!data.success) {
-        throw new Error(data.error);
+        return { success: true };
       }
 
-      toast({
-        title: 'Remboursement demandé',
-        description: 'Votre remboursement sera traité sous 3-5 jours ouvrés',
-      });
+      // Production: Uncomment when database function is created
+      // const { data, error } = await supabase.rpc('refund_reservation', {
+      //   p_reservation_id: reservationId,
+      //   p_reason: reason
+      // });
+      // if (error) throw error;
+      // if (!data.success) throw new Error(data.error);
 
-      return data;
+      throw new Error('Fonction non disponible en production');
     } catch (error: any) {
       toast({
         title: 'Erreur de remboursement',
@@ -289,35 +300,31 @@ export const useEscrowPayments = () => {
   // Obtenir les stats de gains de la plateforme (admin seulement)
   const getPlatformEarnings = async (startDate?: string, endDate?: string) => {
     try {
-      let query = supabase
-        .from('platform_earnings')
-        .select('*')
-        .eq('status', 'collected');
-
-      if (startDate) {
-        query = query.gte('earned_at', startDate);
+      // TODO: Table platform_earnings not yet created
+      // Mock response for development
+      if (import.meta.env.DEV) {
+        console.log('🔧 MODE DEV: Simulation des revenus de la plateforme', { startDate, endDate });
+        return {
+          earnings: [],
+          totalAmount: 0,
+          count: 0
+        };
       }
-      if (endDate) {
-        query = query.lte('earned_at', endDate);
-      }
 
-      const { data, error } = await query.order('earned_at', { ascending: false });
+      // Production: Uncomment when table is created
+      // let query = supabase
+      //   .from('platform_earnings')
+      //   .select('*')
+      //   .eq('status', 'collected');
+      // if (startDate) query = query.gte('earned_at', startDate);
+      // if (endDate) query = query.lte('earned_at', endDate);
+      // const { data, error } = await query.order('earned_at', { ascending: false });
+      // if (error) throw error;
+      // const totalEarnings = data.reduce((sum, earning) => sum + Number(earning.commission_amount), 0);
 
-      if (error) throw error;
-
-      const totalEarnings = data.reduce((sum, earning) => sum + Number(earning.commission_amount), 0);
-
-      return {
-        earnings: data,
-        totalAmount: totalEarnings,
-        count: data.length
-      };
+      return { earnings: [], totalAmount: 0, count: 0 };
     } catch (error: any) {
-      toast({
-        title: 'Erreur',
-        description: 'Impossible de charger les statistiques',
-        variant: 'destructive',
-      });
+      console.error('Error loading platform earnings:', error);
       return { earnings: [], totalAmount: 0, count: 0 };
     }
   };

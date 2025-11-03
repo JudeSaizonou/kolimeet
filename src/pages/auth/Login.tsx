@@ -203,7 +203,7 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [buttonPosition, setButtonPosition] = useState({ x: 0, y: 0 });
   const [isButtonRunning, setIsButtonRunning] = useState(false);
-  const { signInWithEmail, signInWithGoogle, user } = useAuth();
+  const { signInWithEmail, signInWithGoogle, user, getOAuthRedirectUrl } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -285,6 +285,12 @@ const Login = () => {
         <p className="text-center text-muted-foreground mb-6">
           Connectez-vous à votre compte
         </p>
+
+        {import.meta.env.DEV && (
+          <div className="mb-4 p-2 bg-muted/50 rounded text-xs text-muted-foreground">
+            <strong>Dev Mode:</strong> OAuth redirect → {getOAuthRedirectUrl()}
+          </div>
+        )}
 
         <div className="space-y-3">
           <Button
