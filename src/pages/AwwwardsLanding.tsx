@@ -13,6 +13,7 @@ import {
   GlassText,
 } from '@/components/LiquidGlass';
 import { Package, Users, Shield, TrendingUp } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 
 /**
  * Effet de déformation en vague qui suit la souris
@@ -228,6 +229,7 @@ function HeroSection() {
   const ref = useRef<HTMLElement>(null);
   const navigate = useNavigate();
   const { progress } = useScrollSync(ref, { easing: 'easeInOut', debug: true });
+  const { user } = useAuth();
 
   console.log('🎯 HERO SCROLL:', {
     progress: progress.toFixed(3),
@@ -364,17 +366,19 @@ function HeroSection() {
             >
               Explorer les annonces
             </GlassButton>
-            <GlassButton
-              intensity="medium"
-              variant="default"
-              liquidDistortion={false}
-              glowBorder={true}
-              size="lg"
-              buttonVariant="secondary"
-              onClick={() => navigate('/auth/register')}
-            >
-              Créer un compte
-            </GlassButton>
+            {!user && (
+              <GlassButton
+                intensity="medium"
+                variant="default"
+                liquidDistortion={false}
+                glowBorder={true}
+                size="lg"
+                buttonVariant="secondary"
+                onClick={() => navigate('/auth/register')}
+              >
+                Créer un compte
+              </GlassButton>
+            )}
           </div>
         </Reveal>
 
@@ -745,6 +749,8 @@ function StatsSection() {
 }
 
 function EditorialSection() {
+  const { user } = useAuth();
+  
   return (
     <ScrollSection intent="content" maxWidth="lg" className="relative">
       {/* Glass background avec grid pattern */}
@@ -845,21 +851,23 @@ function EditorialSection() {
 
         <Spacer size={17} />
 
-        <Reveal variant="fadeUp">
-          <div className="text-center">
-            <GlassButton
-              intensity="medium"
-              variant="default"
-              liquidDistortion={false}
-              glowBorder={true}
-              size="xl"
-              buttonVariant="primary"
-              onClick={() => window.location.href = '/auth/register'}
-            >
-              S'inscrire gratuitement
-            </GlassButton>
-          </div>
-        </Reveal>
+        {!user && (
+          <Reveal variant="fadeUp">
+            <div className="text-center">
+              <GlassButton
+                intensity="medium"
+                variant="default"
+                liquidDistortion={false}
+                glowBorder={true}
+                size="xl"
+                buttonVariant="primary"
+                onClick={() => window.location.href = '/auth/register'}
+              >
+                S'inscrire gratuitement
+              </GlassButton>
+            </div>
+          </Reveal>
+        )}
       </div>
     </ScrollSection>
   );
