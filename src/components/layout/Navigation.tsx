@@ -125,9 +125,6 @@ const Navigation = () => {
                   <p className="text-xs text-muted-foreground">
                     {user.email}
                   </p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Admin: {adminLoading ? "⏳ Checking..." : isAdmin ? "✅ Yes" : "❌ No"}
-                  </p>
                 </div>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
