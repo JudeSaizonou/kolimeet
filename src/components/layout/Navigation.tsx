@@ -1,4 +1,4 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Package, User, LogOut, FileText, Plane, MessageSquare, Shield, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -20,10 +20,6 @@ const Navigation = () => {
   const { user, signOut } = useAuth();
   const { isAdmin, loading: adminLoading } = useAdmin();
   const [profile, setProfile] = useState<any>(null);
-  const location = useLocation();
-  const isHomePage = location.pathname === "/";
-  const isAuthPage = location.pathname.startsWith("/auth/");
-  const isTransparentNav = isHomePage || isAuthPage;
 
   useEffect(() => {
     if (user) {
@@ -44,75 +40,124 @@ const Navigation = () => {
   };
 
   return (
-    <header className={cn(
-      "sticky top-0 z-50 w-full border-b",
-      isTransparentNav ? "bg-black/30 backdrop-blur-sm border-white/20" : "bg-background"
-    )}>
-      <nav className="container mx-auto flex h-16 items-center justify-between px-4">
-        <Link to="/" className="flex items-center gap-2">
-          <Package className={cn("h-6 w-6", isTransparentNav ? "text-white" : "text-primary")} />
-          <span className={cn("text-xl font-bold", isTransparentNav ? "text-white" : "text-foreground")}>
+    <header className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-[1200px]">
+      <nav className={cn(
+        "flex items-center justify-between",
+        "px-6 py-4 gap-2.5",
+        "bg-black/20 backdrop-blur-md",
+        "rounded-full",
+        "border border-white/10",
+        // Responsive padding
+        "md:px-12 md:py-6"
+      )}>
+        {/* Logo */}
+        <Link to="/" className="flex items-center gap-2 flex-shrink-0">
+          <Package className="h-6 w-6 text-white" />
+          <span className="text-xl font-bold text-[#d6d6d6] whitespace-nowrap">
             kilomeet
           </span>
         </Link>
         
-        <div className="hidden md:flex items-center gap-4">
-          <Link to="/explorer">
-            <Button 
-              variant="ghost" 
-              className={cn(
-                "font-medium",
-                isTransparentNav && "text-white hover:bg-white/20 hover:text-white"
-              )}
-            >
-              Explorer
-            </Button>
+        {/* Desktop Navigation Links */}
+        <div className="hidden md:flex items-center gap-6 flex-1 justify-center">
+          <a 
+            href="https://kolimeet.framer.ai/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[#d6d6d6] hover:text-white transition-all duration-200 text-sm font-medium whitespace-nowrap"
+          >
+            Accueil
+          </a>
+          
+          <a 
+            href="https://kolimeet.framer.ai/services"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[#d6d6d6] hover:text-white transition-all duration-200 text-sm font-medium whitespace-nowrap"
+          >
+            Nos services
+          </a>
+          
+          <a 
+            href="https://kolimeet.framer.ai/about-us"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[#d6d6d6] hover:text-white transition-all duration-200 text-sm font-medium whitespace-nowrap"
+          >
+            À propos de nous
+          </a>
+          
+          <a 
+            href="https://kolimeet.framer.ai/blog"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[#d6d6d6] hover:text-white transition-all duration-200 text-sm font-medium whitespace-nowrap"
+          >
+            Blog
+          </a>
+          
+          <Link 
+            to="/explorer"
+            className="text-[#d6d6d6] hover:text-white transition-all duration-200 text-sm font-medium whitespace-nowrap"
+          >
+            Explorer
           </Link>
-
+          
           {user && (
             <>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button>
-                    Publier
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuItem asChild>
-                    <Link to="/publier/trajet" className="flex items-center gap-2 cursor-pointer">
-                      <Plane className="h-4 w-4" />
-                      Publier un trajet
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to="/publier/colis" className="flex items-center gap-2 cursor-pointer">
-                      <Package className="h-4 w-4" />
-                      Publier un colis
-                    </Link>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-
-              <Link to="/messages">
-                <Button 
-                  variant="ghost" 
-                  size="icon"
-                  className={cn(isTransparentNav && "text-white hover:bg-white/20 hover:text-white")}
-                >
-                  <MessageSquare className="h-5 w-5" />
-                </Button>
+              <Link 
+                to="/mes-annonces"
+                className="text-[#d6d6d6] hover:text-white transition-all duration-200 text-sm font-medium whitespace-nowrap"
+              >
+                Mes annonces
+              </Link>
+              <Link 
+                to="/messages"
+                className="text-[#d6d6d6] hover:text-white transition-all duration-200 text-sm font-medium whitespace-nowrap"
+              >
+                Messages
               </Link>
             </>
+          )}
+        </div>
+
+        {/* Desktop Actions */}
+        <div className="hidden md:flex items-center gap-4">
+          {user && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="ghost"
+                  className="text-[#d6d6d6] hover:text-white hover:bg-white/10 transition-all duration-200"
+                >
+                  Publier
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuItem asChild>
+                  <Link to="/publier/trajet" className="flex items-center gap-2 cursor-pointer">
+                    <Plane className="h-4 w-4" />
+                    Publier un trajet
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/publier/colis" className="flex items-center gap-2 cursor-pointer">
+                    <Package className="h-4 w-4" />
+                    Publier un colis
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
 
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-full">
-                  <Avatar className="h-9 w-9 border-2 border-primary">
+                <button className="flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-transparent rounded-full">
+                  <Avatar className="h-9 w-9 border-2 border-white/30">
                     <AvatarImage src={profile?.avatar_url} alt="Avatar" />
-                    <AvatarFallback className="bg-primary/10">
-                      <User className="h-5 w-5 text-primary" />
+                    <AvatarFallback className="bg-white/10">
+                      <User className="h-5 w-5 text-white" />
                     </AvatarFallback>
                   </Avatar>
                 </button>
@@ -189,13 +234,17 @@ const Navigation = () => {
             </DropdownMenu>
           ) : (
             <Link to="/auth/login">
-              <Button className="font-medium">
-                Connexion
+              <Button 
+                variant="outline"
+                className="px-6 py-2.5 bg-transparent border border-white/50 rounded-full text-white text-sm font-medium hover:bg-white/10 hover:border-white/80 transition-all duration-300 whitespace-nowrap"
+              >
+                Créer un compte
               </Button>
             </Link>
           )}
         </div>
 
+        {/* Mobile Menu */}
         <MobileMenu 
           user={user} 
           profile={profile} 

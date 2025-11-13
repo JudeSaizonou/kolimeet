@@ -238,7 +238,7 @@ function HeroSection() {
   });
 
   return (
-    <ScrollSection ref={ref} intent="hero" className="relative overflow-hidden bg-transparent -mt-20">
+    <ScrollSection ref={ref} intent="hero" className="relative overflow-hidden bg-transparent -mt-20 md:-mt-28">
       {/* Image de fond pour toute la section - couvre tout incluant les paddings */}
       <div 
         className="absolute -top-20 left-0 right-0 bottom-0 w-full"

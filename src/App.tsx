@@ -52,7 +52,7 @@ const App = () => (
           <Navigation />
           <OfflineBanner />
           <PWAInstallBanner />
-          <main className="flex-1">
+          <main className="flex-1 pt-24 md:pt-28">
             <div className="container mx-auto px-4 py-4">
               <SuspensionBanner />
             </div>
