@@ -131,6 +131,8 @@ const MessageThread = () => {
                 content={message.content}
                 createdAt={message.created_at}
                 isOwn={message.sender_id === user?.id}
+                deliveredAt={message.delivered_at}
+                readAt={message.read_at}
               />
             ))}
             

@@ -1,6 +1,6 @@
 -- Table pour stocker qui est en train d'écrire
 CREATE TABLE IF NOT EXISTS typing_status (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   thread_id UUID NOT NULL REFERENCES threads(id) ON DELETE CASCADE,
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   is_typing BOOLEAN DEFAULT false,

@@ -3,19 +3,43 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { sanitizeMessage } from "@/lib/utils/sanitizeMessage";
 import { motion } from "framer-motion";
+import { Check, CheckCheck } from "lucide-react";
 
 interface MessageBubbleProps {
   content: string;
   createdAt: string;
   isOwn: boolean;
+  deliveredAt?: string | null;
+  readAt?: string | null;
 }
 
 export const MessageBubble = ({
   content,
   createdAt,
   isOwn,
+  deliveredAt,
+  readAt,
 }: MessageBubbleProps) => {
   const sanitizedContent = sanitizeMessage(content);
+  
+  // Déterminer le statut de lecture
+  const getReadStatus = () => {
+    if (!isOwn) return null; // Pas de read receipts pour les messages reçus
+    
+    if (readAt) {
+      return (
+        <CheckCheck className="w-3 h-3 inline-block ml-1 text-blue-400" />
+      );
+    } else if (deliveredAt) {
+      return (
+        <CheckCheck className="w-3 h-3 inline-block ml-1 opacity-70" />
+      );
+    } else {
+      return (
+        <Check className="w-3 h-3 inline-block ml-1 opacity-70" />
+      );
+    }
+  };
   
   return (
     <motion.div
@@ -43,11 +67,12 @@ export const MessageBubble = ({
         <p className="whitespace-pre-wrap break-words">{sanitizedContent}</p>
         <span
           className={cn(
-            "text-xs mt-1 block",
+            "text-xs mt-1 block flex items-center",
             isOwn ? "text-primary-foreground/70" : "text-muted-foreground"
           )}
         >
           {format(new Date(createdAt), "HH:mm", { locale: fr })}
+          {getReadStatus()}
         </span>
       </div>
     </motion.div>

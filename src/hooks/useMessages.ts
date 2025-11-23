@@ -12,6 +12,8 @@ interface Message {
   content: string;
   created_at: string;
   is_read: boolean;
+  delivered_at?: string | null;
+  read_at?: string | null;
 }
 
 export const useMessages = (threadId: string) => {
@@ -39,13 +41,14 @@ export const useMessages = (threadId: string) => {
         console.log('[useMessages] Fetched messages:', data?.length, 'for thread:', threadId);
         setMessages(data || []);
 
-        // Mark messages as read
-        const { error: markError } = await supabase
-          .from("messages")
-          .update({ is_read: true })
-          .eq("thread_id", threadId)
-          .neq("sender_id", user.id)
-          .eq("is_read", false);
+        // Mark messages as read using SQL function
+        const { error: markError } = await supabase.rpc(
+          'mark_thread_messages_as_read',
+          {
+            p_thread_id: threadId,
+            p_user_id: user.id
+          }
+        );
 
         if (markError) {
           console.error('[useMessages] ❌ Failed to mark messages as read:', markError);
@@ -80,9 +83,7 @@ export const useMessages = (threadId: string) => {
           // Mark as read if it's not from current user
           if (newMessage.sender_id !== user?.id) {
             supabase
-              .from("messages")
-              .update({ is_read: true })
-              .eq("id", newMessage.id)
+              .rpc('mark_message_as_read', { message_id: newMessage.id })
               .then(({ error }) => {
                 if (error) {
                   console.error('[useMessages] ❌ Failed to mark new message as read:', error);
@@ -149,6 +150,7 @@ export const useMessages = (threadId: string) => {
           thread_id: validated.thread_id,
           sender_id: user.id,
           content: validated.content,
+          delivered_at: new Date().toISOString(),
         });
 
         if (error) throw error;
