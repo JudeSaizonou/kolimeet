@@ -1,7 +1,8 @@
--- Grant admin role to the first user
-INSERT INTO user_roles (user_id, role)
-VALUES ('d7a596bc-df77-4ad3-a095-23515cea42d2', 'admin')
-ON CONFLICT (user_id, role) DO NOTHING;
+-- Grant admin role to the first user (optional - skip if user doesn't exist yet)
+-- This will be done manually after first user signup
+-- INSERT INTO user_roles (user_id, role)
+-- VALUES ('d7a596bc-df77-4ad3-a095-23515cea42d2', 'admin')
+-- ON CONFLICT (user_id, role) DO NOTHING;
 
 -- Drop existing foreign keys and recreate with CASCADE
 ALTER TABLE parcels DROP CONSTRAINT IF EXISTS parcels_user_id_fkey;
