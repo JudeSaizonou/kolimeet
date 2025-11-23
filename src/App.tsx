@@ -57,7 +57,7 @@ const App = () => (
               <SuspensionBanner />
             </div>
             <Routes>
-        <Route path="/" element={<AwwwardsLanding />} />
+        <Route path="/" element={<Explorer />} />
         <Route path="/home" element={<Home />} />
         <Route path="/explorer" element={<Explorer />} />
         <Route path="/trajets/:id" element={<TripDetail />} />

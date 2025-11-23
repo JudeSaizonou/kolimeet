@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Package, User, LogOut, FileText, Plane, MessageSquare, Shield, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -20,6 +20,7 @@ const Navigation = () => {
   const { user, signOut } = useAuth();
   const { isAdmin, loading: adminLoading } = useAdmin();
   const [profile, setProfile] = useState<any>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (user) {
@@ -44,24 +45,34 @@ const Navigation = () => {
       <nav className={cn(
         "flex items-center justify-between",
         "px-6 py-4 gap-2.5",
-        "bg-black/20 backdrop-blur-md",
+        "bg-black/50 backdrop-blur-md",
         "rounded-full",
-        "border border-white/10",
+        "border border-white/20",
+        "shadow-lg shadow-black/10",
         // Responsive padding
         "md:px-12 md:py-6"
       )}>
         {/* Logo */}
-        <a 
-          href="https://kolimeet.framer.ai/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-2 flex-shrink-0"
-        >
-          <Package className="h-6 w-6 text-white" />
-          <span className="text-xl font-bold text-[#d6d6d6] whitespace-nowrap">
-            kilomeet
-          </span>
-        </a>
+        {user ? (
+          <Link to="/explorer" className="flex items-center gap-2 flex-shrink-0">
+            <Package className="h-6 w-6 text-white" />
+            <span className="text-xl font-bold text-[#d6d6d6] whitespace-nowrap">
+              kilomeet
+            </span>
+          </Link>
+        ) : (
+          <a 
+            href="https://kolimeet.framer.ai/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 flex-shrink-0"
+          >
+            <Package className="h-6 w-6 text-white" />
+            <span className="text-xl font-bold text-[#d6d6d6] whitespace-nowrap">
+              kilomeet
+            </span>
+          </a>
+        )}
         
         {/* Desktop Navigation Links */}
         <div className="hidden md:flex items-center gap-6 flex-1 justify-center">
