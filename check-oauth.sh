@@ -57,7 +57,7 @@ echo "Dans 'Authorized redirect URIs', ajoutez ces 3 URLs:"
 echo ""
 echo -e "${YELLOW}1.${NC} https://odzxqpaovgxcwqilildp.supabase.co/auth/v1/callback"
 echo -e "${YELLOW}2.${NC} http://localhost:8080/auth/callback"
-echo -e "${YELLOW}3.${NC} https://kolimeet.lovable.app/auth/callback"
+echo -e "${YELLOW}3.${NC} https://kolimeet.vercel.app/auth/callback"
 echo ""
 
 # Checklist

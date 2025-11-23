@@ -1,18 +1,17 @@
-# Welcome to your Lovable project
+# Kilomeet - Plateforme de covoiturage et transport de colis
 
 ## Project info
 
-**URL**: https://lovable.dev/projects/5ad7f558-c102-4705-8ebd-1fb10926b749
+**URL Production**: https://kolimeet.vercel.app
+**Backend**: Supabase (odzxqpaovgxcwqilildp)
 
 ## How can I edit this code?
 
 There are several ways of editing your application.
 
-**Use Lovable**
+**Use your local IDE**
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/5ad7f558-c102-4705-8ebd-1fb10926b749) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
+Clone this repo and push changes directly to GitHub. Vercel déploiera automatiquement vos changements.
 
 **Use your preferred IDE**
 
@@ -62,12 +61,22 @@ This project is built with:
 
 ## How can I deploy this project?
 
-Simply open [Lovable](https://lovable.dev/projects/5ad7f558-c102-4705-8ebd-1fb10926b749) and click on Share -> Publish.
+Le projet est automatiquement déployé sur Vercel à chaque push sur la branche `main`.
 
-## Can I connect a custom domain to my Lovable project?
+Pour déployer manuellement:
+```bash
+./deploy-vercel.sh
+```
 
-Yes, you can!
+Ou via le dashboard Vercel: https://vercel.com/dashboard
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+Consultez `DEPLOY_VERCEL.md` pour le guide complet.
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+## Can I connect a custom domain?
+
+Oui ! Dans Vercel Dashboard:
+1. Allez dans Settings → Domains
+2. Ajoutez votre domaine custom
+3. Configurez les DNS selon les instructions
+
+Plus d'infos: https://vercel.com/docs/concepts/projects/domains
