@@ -59,7 +59,6 @@ const App = () => (
             <Routes>
         <Route path="/" element={<AwwwardsLanding />} />
         <Route path="/home" element={<Home />} />
-        <Route path="/awwwards" element={<AwwwardsLanding />} />
         <Route path="/explorer" element={<Explorer />} />
         <Route path="/trajets/:id" element={<TripDetail />} />
         <Route path="/colis/:id" element={<ParcelDetail />} />

@@ -51,12 +51,17 @@ const Navigation = () => {
         "md:px-12 md:py-6"
       )}>
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2 flex-shrink-0">
+        <a 
+          href="https://kolimeet.framer.ai/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-2 flex-shrink-0"
+        >
           <Package className="h-6 w-6 text-white" />
           <span className="text-xl font-bold text-[#d6d6d6] whitespace-nowrap">
             kilomeet
           </span>
-        </Link>
+        </a>
         
         {/* Desktop Navigation Links */}
         <div className="hidden md:flex items-center gap-6 flex-1 justify-center">
