@@ -4,16 +4,26 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
-import { Upload, User, Star } from "lucide-react";
+import { Upload, User, Star, LogOut } from "lucide-react";
 import { PhoneVerification } from "@/components/profile/PhoneVerification";
+import { useNavigate } from "react-router-dom";
+import { countries, citiesByCountry } from "@/lib/data/countries";
 
 const Profile = () => {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState("");
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     full_name: "",
     country: "",
@@ -22,6 +32,12 @@ const Profile = () => {
   });
   const [phoneVerified, setPhoneVerified] = useState(false);
   const [rating, setRating] = useState({ avg: 0, count: 0 });
+  const [selectedCountry, setSelectedCountry] = useState("");
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    navigate("/");
+  };
 
   useEffect(() => {
     loadProfile();
@@ -45,6 +61,7 @@ const Profile = () => {
           city: profile.city || "",
           phone_e164: profile.phone_e164 || "",
         });
+        setSelectedCountry(profile.country || "");
         setAvatarUrl(profile.avatar_url || "");
         setPhoneVerified(profile.phone_verified || false);
         setRating({
@@ -243,30 +260,63 @@ const Profile = () => {
                 <Label htmlFor="country">
                   Pays <span className="text-destructive">*</span>
                 </Label>
-                <Input
-                  id="country"
-                  type="text"
+                <Select
                   value={formData.country}
-                  onChange={(e) =>
-                    setFormData({ ...formData, country: e.target.value })
-                  }
+                  onValueChange={(value) => {
+                    setFormData({ ...formData, country: value, city: "" });
+                    setSelectedCountry(value);
+                  }}
                   required
-                />
+                >
+                  <SelectTrigger id="country">
+                    <SelectValue placeholder="Sélectionnez un pays" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {countries.map((country) => (
+                      <SelectItem key={country} value={country}>
+                        {country}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="city">
                   Ville <span className="text-destructive">*</span>
                 </Label>
-                <Input
-                  id="city"
-                  type="text"
-                  value={formData.city}
-                  onChange={(e) =>
-                    setFormData({ ...formData, city: e.target.value })
-                  }
-                  required
-                />
+                {selectedCountry && citiesByCountry[selectedCountry] ? (
+                  <Select
+                    value={formData.city}
+                    onValueChange={(value) =>
+                      setFormData({ ...formData, city: value })
+                    }
+                    required
+                  >
+                    <SelectTrigger id="city">
+                      <SelectValue placeholder="Sélectionnez une ville" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {citiesByCountry[selectedCountry].map((city) => (
+                        <SelectItem key={city} value={city}>
+                          {city}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <Input
+                    id="city"
+                    type="text"
+                    value={formData.city}
+                    onChange={(e) =>
+                      setFormData({ ...formData, city: e.target.value })
+                    }
+                    placeholder={selectedCountry ? "Entrez votre ville" : "Sélectionnez d'abord un pays"}
+                    disabled={!selectedCountry}
+                    required
+                  />
+                )}
               </div>
 
               <div className="space-y-2">
@@ -291,6 +341,17 @@ const Profile = () => {
                 disabled={loading}
               >
                 {loading ? "Enregistrement..." : "Enregistrer les modifications"}
+              </Button>
+
+              {/* Bouton Déconnexion */}
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full font-semibold text-destructive border-destructive hover:bg-destructive hover:text-destructive-foreground"
+                onClick={handleSignOut}
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Déconnexion
               </Button>
             </form>
           </Card>

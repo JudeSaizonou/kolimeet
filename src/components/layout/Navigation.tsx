@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Package, User, LogOut, FileText, Plane, MessageSquare, Shield, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -21,6 +21,11 @@ const Navigation = () => {
   const { isAdmin, loading: adminLoading } = useAdmin();
   const [profile, setProfile] = useState<any>(null);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Masquer la navbar sur mobile quand on est dans une conversation
+  const isInConversation = location.pathname.startsWith('/messages/') && location.pathname !== '/messages';
+  const shouldHideOnMobile = isInConversation;
 
   useEffect(() => {
     if (user) {
@@ -41,7 +46,10 @@ const Navigation = () => {
   };
 
   return (
-    <header className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-[1200px]">
+    <header className={cn(
+      "fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-[1200px]",
+      shouldHideOnMobile && "hidden md:block"
+    )}>
       <nav className={cn(
         "flex items-center justify-between",
         "px-6 py-4 gap-2.5",
@@ -75,46 +83,50 @@ const Navigation = () => {
         )}
         
         {/* Desktop Navigation Links */}
-        <div className="hidden md:flex items-center gap-6 flex-1 justify-center">
+        <div className="hidden md:flex items-center gap-[30px] flex-1 justify-center" style={{ fontFamily: 'Figtree' }}>
           <a 
             href="https://kolimeet.framer.ai/"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[#d6d6d6] hover:text-white transition-all duration-200 text-sm font-medium whitespace-nowrap"
+            className="text-[#d6d6d6] hover:text-white transition-all duration-200 text-base font-medium whitespace-nowrap"
           >
             Accueil
           </a>
           
-          <a 
-            href="https://kolimeet.framer.ai/services"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[#d6d6d6] hover:text-white transition-all duration-200 text-sm font-medium whitespace-nowrap"
-          >
-            Nos services
-          </a>
-          
-          <a 
-            href="https://kolimeet.framer.ai/about-us"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[#d6d6d6] hover:text-white transition-all duration-200 text-sm font-medium whitespace-nowrap"
-          >
-            À propos de nous
-          </a>
+          {!user && (
+            <>
+              <a 
+                href="https://kolimeet.framer.ai/services"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#d6d6d6] hover:text-white transition-all duration-200 text-base font-medium whitespace-nowrap"
+              >
+                Nos services
+              </a>
+              
+              <a 
+                href="https://kolimeet.framer.ai/about-us"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#d6d6d6] hover:text-white transition-all duration-200 text-base font-medium whitespace-nowrap"
+              >
+                À propos de nous
+              </a>
+            </>
+          )}
           
           <a 
             href="https://kolimeet.framer.ai/blog"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[#d6d6d6] hover:text-white transition-all duration-200 text-sm font-medium whitespace-nowrap"
+            className="text-[#d6d6d6] hover:text-white transition-all duration-200 text-base font-medium whitespace-nowrap"
           >
             Blog
           </a>
           
           <Link 
             to="/explorer"
-            className="text-[#d6d6d6] hover:text-white transition-all duration-200 text-sm font-medium whitespace-nowrap"
+            className="text-[#d6d6d6] hover:text-white transition-all duration-200 text-base font-medium whitespace-nowrap"
           >
             Explorer
           </Link>
@@ -123,13 +135,13 @@ const Navigation = () => {
             <>
               <Link 
                 to="/mes-annonces"
-                className="text-[#d6d6d6] hover:text-white transition-all duration-200 text-sm font-medium whitespace-nowrap"
+                className="text-[#d6d6d6] hover:text-white transition-all duration-200 text-base font-medium whitespace-nowrap"
               >
                 Mes annonces
               </Link>
               <Link 
                 to="/messages"
-                className="text-[#d6d6d6] hover:text-white transition-all duration-200 text-sm font-medium whitespace-nowrap"
+                className="text-[#d6d6d6] hover:text-white transition-all duration-200 text-base font-medium whitespace-nowrap"
               >
                 Messages
               </Link>
@@ -166,9 +178,9 @@ const Navigation = () => {
             </DropdownMenu>
           )}
 
-          {user ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              {user ? (
                 <button className="flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-transparent rounded-full">
                   <Avatar className="h-9 w-9 border-2 border-white/30">
                     <AvatarImage src={profile?.avatar_url} alt="Avatar" />
@@ -177,87 +189,102 @@ const Navigation = () => {
                     </AvatarFallback>
                   </Avatar>
                 </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <div className="px-2 py-1.5">
-                  <p className="text-sm font-medium text-foreground">
-                    {profile?.full_name || "Utilisateur"}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {user.email}
-                  </p>
-                </div>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link
-                    to="/profil"
-                    className="flex items-center gap-2 cursor-pointer"
-                  >
-                    <User className="h-4 w-4" />
-                    Mon profil
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link
-                    to="/mes-annonces"
-                    className="flex items-center gap-2 cursor-pointer"
-                  >
-                    <FileText className="h-4 w-4" />
-                    Mes annonces
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link
-                    to="/mes-reservations"
-                    className="flex items-center gap-2 cursor-pointer"
-                  >
-                    <CreditCard className="h-4 w-4" />
-                    Mes réservations
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link
-                    to="/messages"
-                    className="flex items-center gap-2 cursor-pointer"
-                  >
-                    <MessageSquare className="h-4 w-4" />
-                    Messagerie
-                  </Link>
-                </DropdownMenuItem>
-                {isAdmin && (
-                  <>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild>
-                      <Link
-                        to="/admin"
-                        className="flex items-center gap-2 cursor-pointer text-primary"
-                      >
-                        <Shield className="h-4 w-4" />
-                        Administration
-                      </Link>
-                    </DropdownMenuItem>
-                  </>
-                )}
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={signOut}
-                  className="flex items-center gap-2 cursor-pointer text-destructive focus:text-destructive"
+              ) : (
+                <Button 
+                  variant="outline"
+                  className="px-6 py-2.5 bg-transparent border border-white/50 rounded-full text-white text-sm font-medium hover:bg-white/10 hover:border-white/80 transition-all duration-300 whitespace-nowrap"
                 >
-                  <LogOut className="h-4 w-4" />
-                  Déconnexion
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-            <Link to="/auth/login">
-              <Button 
-                variant="outline"
-                className="px-6 py-2.5 bg-transparent border border-white/50 rounded-full text-white text-sm font-medium hover:bg-white/10 hover:border-white/80 transition-all duration-300 whitespace-nowrap"
-              >
-                Créer un compte
-              </Button>
-            </Link>
-          )}
+                  Mon profil
+                </Button>
+              )}
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              {user ? (
+                <>
+                  <div className="px-2 py-1.5">
+                    <p className="text-sm font-medium text-foreground">
+                      {profile?.full_name || "Utilisateur"}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {user.email}
+                    </p>
+                  </div>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link
+                      to="/profil"
+                      className="flex items-center gap-2 cursor-pointer"
+                    >
+                      <User className="h-4 w-4" />
+                      Mon profil
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link
+                      to="/mes-annonces"
+                      className="flex items-center gap-2 cursor-pointer"
+                    >
+                      <FileText className="h-4 w-4" />
+                      Mes annonces
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link
+                      to="/mes-reservations"
+                      className="flex items-center gap-2 cursor-pointer"
+                    >
+                      <CreditCard className="h-4 w-4" />
+                      Mes réservations
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link
+                      to="/messages"
+                      className="flex items-center gap-2 cursor-pointer"
+                    >
+                      <MessageSquare className="h-4 w-4" />
+                      Messagerie
+                    </Link>
+                  </DropdownMenuItem>
+                  {isAdmin && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem asChild>
+                        <Link
+                          to="/admin"
+                          className="flex items-center gap-2 cursor-pointer text-primary"
+                        >
+                          <Shield className="h-4 w-4" />
+                          Administration
+                        </Link>
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                </>
+              ) : (
+                <>
+                  <DropdownMenuItem asChild>
+                    <Link
+                      to="/auth/login"
+                      className="flex items-center gap-2 cursor-pointer"
+                    >
+                      <User className="h-4 w-4" />
+                      Connexion
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link
+                      to="/auth/register"
+                      className="flex items-center gap-2 cursor-pointer"
+                    >
+                      <User className="h-4 w-4" />
+                      Créer un compte
+                    </Link>
+                  </DropdownMenuItem>
+                </>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         {/* Mobile Menu */}

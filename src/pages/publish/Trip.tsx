@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Combobox } from "@/components/ui/combobox";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { createTripSchema, CreateTripInput } from "@/lib/validations/trips";
@@ -17,6 +18,7 @@ import { useTrips } from "@/hooks/useTrips";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { countries, citiesByCountry } from "@/lib/data/countries";
 
 const PublishTrip = () => {
   const { id } = useParams();
@@ -123,7 +125,17 @@ const PublishTrip = () => {
                       <FormItem>
                         <FormLabel>Pays de départ</FormLabel>
                         <FormControl>
-                          <Input placeholder="France" {...field} />
+                          <Combobox
+                            options={countries}
+                            value={field.value}
+                            onValueChange={(value) => {
+                              field.onChange(value);
+                              form.setValue("from_city", "");
+                            }}
+                            placeholder="France"
+                            searchPlaceholder="Rechercher un pays..."
+                            emptyText="Aucun pays trouvé."
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -136,7 +148,18 @@ const PublishTrip = () => {
                       <FormItem>
                         <FormLabel>Ville de départ</FormLabel>
                         <FormControl>
-                          <Input placeholder="Paris" {...field} />
+                          {form.watch("from_country") && citiesByCountry[form.watch("from_country")] ? (
+                            <Combobox
+                              options={citiesByCountry[form.watch("from_country")]}
+                              value={field.value}
+                              onValueChange={field.onChange}
+                              placeholder="Paris"
+                              searchPlaceholder="Rechercher une ville..."
+                              emptyText="Aucune ville trouvée."
+                            />
+                          ) : (
+                            <Input placeholder="Paris" {...field} />
+                          )}
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -152,7 +175,17 @@ const PublishTrip = () => {
                       <FormItem>
                         <FormLabel>Pays d'arrivée</FormLabel>
                         <FormControl>
-                          <Input placeholder="Bénin" {...field} />
+                          <Combobox
+                            options={countries}
+                            value={field.value}
+                            onValueChange={(value) => {
+                              field.onChange(value);
+                              form.setValue("to_city", "");
+                            }}
+                            placeholder="Bénin"
+                            searchPlaceholder="Rechercher un pays..."
+                            emptyText="Aucun pays trouvé."
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -165,7 +198,18 @@ const PublishTrip = () => {
                       <FormItem>
                         <FormLabel>Ville d'arrivée</FormLabel>
                         <FormControl>
-                          <Input placeholder="Cotonou" {...field} />
+                          {form.watch("to_country") && citiesByCountry[form.watch("to_country")] ? (
+                            <Combobox
+                              options={citiesByCountry[form.watch("to_country")]}
+                              value={field.value}
+                              onValueChange={field.onChange}
+                              placeholder="Cotonou"
+                              searchPlaceholder="Rechercher une ville..."
+                              emptyText="Aucune ville trouvée."
+                            />
+                          ) : (
+                            <Input placeholder="Cotonou" {...field} />
+                          )}
                         </FormControl>
                         <FormMessage />
                       </FormItem>

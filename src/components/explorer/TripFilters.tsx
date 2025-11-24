@@ -2,10 +2,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Combobox } from "@/components/ui/combobox";
 import { TripFilters } from "@/hooks/useExplorer";
 import { GlassCard } from "@/components/LiquidGlass";
 import { MapPin, Calendar, Package, RotateCcw, ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
+import { countries, citiesByCountry } from "@/lib/data/countries";
 
 interface TripFiltersProps {
   filters: TripFilters;
@@ -33,12 +35,14 @@ export const TripFiltersComponent = ({ filters, onChange, onReset }: TripFilters
             <MapPin className="h-4 w-4 text-primary" />
             Départ
           </Label>
-          <Input
-            id="fromCountry"
-            placeholder="Pays de départ"
+          <Combobox
+            options={countries}
             value={filters.fromCountry || ""}
-            onChange={(e) => onChange({ ...filters, fromCountry: e.target.value })}
-            className="h-10 border-border/50 focus:ring-2 focus:ring-primary transition-all"
+            onValueChange={(value) => onChange({ ...filters, fromCountry: value, fromCity: "" })}
+            placeholder="Pays de départ"
+            searchPlaceholder="Rechercher un pays..."
+            emptyText="Aucun pays trouvé."
+            className="h-10"
           />
         </div>
 
@@ -47,12 +51,14 @@ export const TripFiltersComponent = ({ filters, onChange, onReset }: TripFilters
             <MapPin className="h-4 w-4 text-primary" />
             Arrivée
           </Label>
-          <Input
-            id="toCountry"
-            placeholder="Pays d'arrivée"
+          <Combobox
+            options={countries}
             value={filters.toCountry || ""}
-            onChange={(e) => onChange({ ...filters, toCountry: e.target.value })}
-            className="h-10 border-border/50 focus:ring-2 focus:ring-primary transition-all"
+            onValueChange={(value) => onChange({ ...filters, toCountry: value, toCity: "" })}
+            placeholder="Pays d'arrivée"
+            searchPlaceholder="Rechercher un pays..."
+            emptyText="Aucun pays trouvé."
+            className="h-10"
           />
         </div>
 
@@ -95,13 +101,25 @@ export const TripFiltersComponent = ({ filters, onChange, onReset }: TripFilters
               <MapPin className="h-4 w-4 text-accent" />
               Ville de départ
             </Label>
-            <Input
-              id="fromCity"
-              placeholder="Ex: Paris"
-              value={filters.fromCity || ""}
-              onChange={(e) => onChange({ ...filters, fromCity: e.target.value })}
-              className="h-10 border-border/50 focus:ring-2 focus:ring-primary transition-all"
-            />
+            {filters.fromCountry && citiesByCountry[filters.fromCountry] ? (
+              <Combobox
+                options={citiesByCountry[filters.fromCountry]}
+                value={filters.fromCity || ""}
+                onValueChange={(value) => onChange({ ...filters, fromCity: value })}
+                placeholder="Ville de départ"
+                searchPlaceholder="Rechercher une ville..."
+                emptyText="Aucune ville trouvée."
+                className="h-10"
+              />
+            ) : (
+              <Input
+                id="fromCity"
+                placeholder="Ex: Paris"
+                value={filters.fromCity || ""}
+                onChange={(e) => onChange({ ...filters, fromCity: e.target.value })}
+                className="h-10 border-border/50 focus:ring-2 focus:ring-primary transition-all"
+              />
+            )}
           </div>
 
           <div className="space-y-2">
@@ -109,13 +127,25 @@ export const TripFiltersComponent = ({ filters, onChange, onReset }: TripFilters
               <MapPin className="h-4 w-4 text-accent" />
               Ville d'arrivée
             </Label>
-            <Input
-              id="toCity"
-              placeholder="Ex: Cotonou"
-              value={filters.toCity || ""}
-              onChange={(e) => onChange({ ...filters, toCity: e.target.value })}
-              className="h-10 border-border/50 focus:ring-2 focus:ring-primary transition-all"
-            />
+            {filters.toCountry && citiesByCountry[filters.toCountry] ? (
+              <Combobox
+                options={citiesByCountry[filters.toCountry]}
+                value={filters.toCity || ""}
+                onValueChange={(value) => onChange({ ...filters, toCity: value })}
+                placeholder="Ville d'arrivée"
+                searchPlaceholder="Rechercher une ville..."
+                emptyText="Aucune ville trouvée."
+                className="h-10"
+              />
+            ) : (
+              <Input
+                id="toCity"
+                placeholder="Ex: Cotonou"
+                value={filters.toCity || ""}
+                onChange={(e) => onChange({ ...filters, toCity: e.target.value })}
+                className="h-10 border-border/50 focus:ring-2 focus:ring-primary transition-all"
+              />
+            )}
           </div>
 
           <div className="space-y-2">

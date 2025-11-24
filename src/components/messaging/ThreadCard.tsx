@@ -18,6 +18,7 @@ interface ThreadCardProps {
   lastMessageAt: string;
   unreadCount: number;
   currentUserId: string;
+  isActive?: boolean;
 }
 
 export const ThreadCard = ({
@@ -27,12 +28,17 @@ export const ThreadCard = ({
   lastMessageAt,
   unreadCount,
   currentUserId,
+  isActive = false,
 }: ThreadCardProps) => {
   const navigate = useNavigate();
 
   return (
     <Card
-      className="cursor-pointer hover:bg-muted/50 transition-colors"
+      className={`cursor-pointer transition-all ${
+        isActive 
+          ? 'bg-primary/5 border-primary/50 shadow-sm' 
+          : 'hover:bg-muted/50'
+      }`}
       onClick={() => navigate(`/messages/${id}`)}
     >
       <CardContent className="p-4">

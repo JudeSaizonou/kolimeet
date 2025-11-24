@@ -131,3 +131,35 @@ All colors MUST be HSL.
   animation-delay: 4s;
 }
 
+/* Safe area pour iOS - encoches et barres */
+@supports (padding: env(safe-area-inset-bottom)) {
+  .safe-bottom {
+    padding-bottom: calc(0.75rem + env(safe-area-inset-bottom));
+  }
+}
+
+/* Optimisations messagerie mobile */
+@layer utilities {
+  .overscroll-contain {
+    overscroll-behavior: contain;
+  }
+  
+  /* Scroll smooth performant */
+  .scroll-smooth-gpu {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    transform: translateZ(0);
+    will-change: scroll-position;
+  }
+  
+  /* Hauteur plein écran moins header/padding */
+  .messaging-height {
+    height: calc(100vh - 7rem);
+  }
+  
+  @media (min-width: 768px) {
+    .messaging-height {
+      height: calc(100vh - 8rem);
+    }
+  }
+}

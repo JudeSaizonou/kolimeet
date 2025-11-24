@@ -43,31 +43,34 @@ export const MessageBubble = ({
   
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20, scale: 0.8 }}
+      initial={{ opacity: 0, y: 10, scale: 0.95 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ 
         type: "spring",
-        stiffness: 500,
-        damping: 30,
-        mass: 1
+        stiffness: 400,
+        damping: 25,
+        mass: 0.8
       }}
       className={cn(
-        "flex w-full mb-4",
+        "flex w-full mb-3 md:mb-4",
         isOwn ? "justify-end" : "justify-start"
       )}
     >
       <div
         className={cn(
-          "max-w-[70%] rounded-lg px-4 py-2",
+          "max-w-[85%] md:max-w-[70%] rounded-2xl px-3 py-2 md:px-4 md:py-2.5",
+          "break-words shadow-sm",
           isOwn
-            ? "bg-primary text-primary-foreground"
-            : "bg-muted text-foreground"
+            ? "bg-primary text-primary-foreground rounded-br-md"
+            : "bg-muted text-foreground rounded-bl-md"
         )}
       >
-        <p className="whitespace-pre-wrap break-words">{sanitizedContent}</p>
+        <p className="whitespace-pre-wrap break-words text-[15px] md:text-sm leading-relaxed">
+          {sanitizedContent}
+        </p>
         <span
           className={cn(
-            "text-xs mt-1 block flex items-center",
+            "text-[11px] md:text-xs mt-1.5 flex items-center gap-1 justify-end",
             isOwn ? "text-primary-foreground/70" : "text-muted-foreground"
           )}
         >

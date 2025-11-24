@@ -67,29 +67,34 @@ export const MessageInput = ({ onSend, onTyping, disabled }: MessageInputProps) 
   };
 
   return (
-    <form onSubmit={handleSubmit} className="border-t bg-background p-4">
-      <div className="flex gap-2">
+    <form onSubmit={handleSubmit} className="bg-background p-3 md:p-4 safe-bottom">
+      <div className="flex gap-2 items-end">
         <Textarea
           value={content}
           onChange={(e) => handleContentChange(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Votre message..."
           disabled={disabled}
-          className="min-h-[60px] resize-none"
+          className="min-h-[44px] max-h-[120px] resize-none text-base md:text-sm flex-1"
           maxLength={2000}
+          rows={1}
+          aria-label="Champ de message"
         />
         <Button
           type="submit"
           size="icon"
           disabled={!content.trim() || disabled}
-          className="h-[60px] w-[60px] shrink-0"
+          className="h-11 w-11 md:h-12 md:w-12 shrink-0"
+          aria-label="Envoyer le message"
         >
           <Send className="h-5 w-5" />
         </Button>
       </div>
-      <p className="text-xs text-muted-foreground mt-1">
-        {content.length}/2000 caractères
-      </p>
+      {content.length > 1800 && (
+        <p className="text-xs text-muted-foreground mt-2 ml-1">
+          {content.length}/2000 caractères
+        </p>
+      )}
     </form>
   );
 };

@@ -69,45 +69,40 @@ const MessageThread = () => {
 
   if (loading || !thread || !otherUser) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <Skeleton className="h-96" />
+      <div className="w-full h-full flex items-center justify-center p-8">
+        <Skeleton className="w-full h-96 max-w-4xl" />
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col container mx-auto px-4 py-4 max-w-4xl">
-      {/* Safety Warning Banner */}
-      <Alert className="mb-4 border-yellow-500 bg-yellow-50 dark:bg-yellow-950/20">
-        <AlertTriangle className="h-4 w-4 text-yellow-600" />
-        <AlertDescription className="text-sm text-yellow-800 dark:text-yellow-200">
-          <strong>⚠️ Restez en sécurité !</strong> Gardez toutes vos communications sur kilomeet. 
-          Ne partagez jamais votre numéro de téléphone ou email avant de rencontrer la personne.
-        </AlertDescription>
-      </Alert>
-
-      {/* Header */}
-      <div className="border-b pb-4 mb-4">
-        <div className="flex items-center gap-4">
+    <div className="md:relative md:flex md:flex-col md:h-auto fixed inset-0 top-0 flex flex-col bg-background md:bg-transparent md:top-auto">
+      {/* Header fixe - Mobile-first, normal sur desktop */}
+      <header className="sticky top-0 z-50 bg-background border-b md:relative md:z-auto">
+        <div className="flex items-center gap-3 px-4 py-3 md:px-6 md:py-4">
           <Button
             variant="ghost"
             size="icon"
             onClick={() => navigate("/messages")}
+            className="h-11 w-11 shrink-0 md:hidden"
+            aria-label="Retour aux messages"
           >
             <ArrowLeft className="h-5 w-5" />
           </Button>
 
-          <Avatar className="h-10 w-10">
-            <AvatarImage src={otherUser.avatar_url} />
-            <AvatarFallback>{otherUser.full_name[0]}</AvatarFallback>
+          <Avatar className="h-10 w-10 shrink-0">
+            <AvatarImage src={otherUser.avatar_url} alt={otherUser.full_name} />
+            <AvatarFallback className="text-sm">{otherUser.full_name[0]}</AvatarFallback>
           </Avatar>
 
-          <div className="flex-1">
-            <h2 className="font-semibold">{otherUser.full_name}</h2>
+          <div className="flex-1 min-w-0">
+            <h1 className="font-semibold text-base md:text-lg truncate">
+              {otherUser.full_name}
+            </h1>
             <Button
               variant="link"
               size="sm"
-              className="h-auto p-0 text-xs"
+              className="h-auto p-0 text-xs text-muted-foreground hover:text-primary"
               onClick={() => navigate(getRelatedLink()!)}
             >
               Voir l'annonce
@@ -115,13 +110,30 @@ const MessageThread = () => {
             </Button>
           </div>
         </div>
-      </div>
 
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-4 py-2">
+        {/* Safety Warning - Collapsible sur mobile */}
+        <Alert className="mx-4 mb-3 border-yellow-500 bg-yellow-50 dark:bg-yellow-950/20 md:mx-6">
+          <AlertTriangle className="h-4 w-4 text-yellow-600 shrink-0" />
+          <AlertDescription className="text-xs md:text-sm text-yellow-800 dark:text-yellow-200">
+            <strong className="font-semibold">⚠️ Sécurité :</strong>
+            <span className="hidden md:inline"> Gardez toutes vos communications sur kilomeet. Ne partagez jamais votre numéro ou email avant de rencontrer la personne.</span>
+            <span className="md:hidden"> Restez sur kilomeet, ne partagez pas vos coordonnées.</span>
+          </AlertDescription>
+        </Alert>
+      </header>
+
+      {/* Messages scrollables - Full-screen mobile, auto desktop */}
+      <div className="flex-1 overflow-y-auto overscroll-contain px-4 py-4 md:px-6 md:max-h-[calc(100vh-20rem)]">
         {messages.length === 0 ? (
-          <div className="text-center py-12 text-muted-foreground">
-            Aucun message pour le moment
+          <div className="flex items-center justify-center h-full">
+            <div className="text-center space-y-2">
+              <p className="text-muted-foreground text-sm md:text-base">
+                Aucun message pour le moment
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Envoyez votre premier message 👋
+              </p>
+            </div>
           </div>
         ) : (
           <>
@@ -148,12 +160,14 @@ const MessageThread = () => {
         )}
       </div>
 
-      {/* Input */}
-      <MessageInput 
-        onSend={sendMessage} 
-        onTyping={setTyping}
-        disabled={sending} 
-      />
+      {/* Input fixe mobile, normal desktop */}
+      <div className="sticky bottom-0 bg-background border-t safe-bottom md:relative md:bottom-auto">
+        <MessageInput 
+          onSend={sendMessage} 
+          onTyping={setTyping}
+          disabled={sending} 
+        />
+      </div>
     </div>
   );
 };
