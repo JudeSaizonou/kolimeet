@@ -127,19 +127,19 @@ const MyListings = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background py-8 px-4">
+    <div className="min-h-screen bg-background py-4 md:py-8 px-3 md:px-4">
       <div className="max-w-6xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Mes annonces</h1>
-          <p className="text-muted-foreground">
+        <div className="mb-6 md:mb-8">
+          <h1 className="text-2xl md:text-3xl font-bold mb-1 md:mb-2">Mes annonces</h1>
+          <p className="text-sm md:text-base text-muted-foreground">
             Gérez vos trajets et vos colis
           </p>
         </div>
 
         <Tabs defaultValue="trips" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-8">
-            <TabsTrigger value="trips">Mes trajets ({trips.length})</TabsTrigger>
-            <TabsTrigger value="parcels">Mes colis ({parcels.length})</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 mb-5 md:mb-6 h-11 md:h-12">
+            <TabsTrigger value="trips" className="text-sm md:text-base font-medium">Trajets ({trips.length})</TabsTrigger>
+            <TabsTrigger value="parcels" className="text-sm md:text-base font-medium">Colis ({parcels.length})</TabsTrigger>
           </TabsList>
 
           <TabsContent value="trips" className="space-y-4">
@@ -156,86 +156,93 @@ const MyListings = () => {
               />
             ) : (
               trips.map((trip) => (
-                <Card key={trip.id}>
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div className="space-y-1">
-                        <CardTitle className="flex items-center gap-2">
-                          <MapPin className="h-5 w-5 text-primary" />
-                          {trip.from_city}, {trip.from_country} → {trip.to_city}, {trip.to_country}
-                        </CardTitle>
-                        <CardDescription className="flex items-center gap-2">
-                          <Calendar className="h-4 w-4" />
-                          {format(new Date(trip.date_departure), "PPP", { locale: fr })}
-                        </CardDescription>
+                <Card key={trip.id} className="overflow-hidden hover:shadow-md transition-shadow">
+                  <div className="bg-gradient-to-r from-primary/5 to-background p-3 md:p-4 border-b">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="space-y-1 flex-1 min-w-0">
+                        <div className="flex items-center gap-2 text-sm md:text-base font-semibold">
+                          <MapPin className="h-4 w-4 text-primary shrink-0" />
+                          <span className="truncate">{trip.from_city} → {trip.to_city}</span>
+                        </div>
+                        <div className="flex items-center gap-1.5 text-xs md:text-sm text-muted-foreground">
+                          <Calendar className="h-3.5 w-3.5" />
+                          <span>{format(new Date(trip.date_departure), "d MMM yyyy", { locale: fr })}</span>
+                        </div>
                       </div>
-                      <Badge variant={trip.status === "open" ? "default" : "secondary"}>
+                      <Badge variant={trip.status === "open" ? "default" : "secondary"} className="text-xs shrink-0">
                         {trip.status === "open" ? "Ouvert" : "Fermé"}
                       </Badge>
                     </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <div className="space-y-2 flex-1">
-                          <div className="flex items-center gap-2 text-sm">
-                            <Package className="h-4 w-4 text-muted-foreground" />
-                            <span className="font-medium">{trip.capacity_available_kg}kg / {trip.capacity_kg}kg</span>
+                  </div>
+                  <CardContent className="p-3 md:p-4">
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="space-y-1.5 flex-1">
+                          <div className="flex items-center gap-2 text-xs md:text-sm">
+                            <div className="p-1 rounded bg-primary/10">
+                              <Package className="h-3.5 w-3.5 text-primary" />
+                            </div>
+                            <span className="font-semibold">{trip.capacity_available_kg}kg</span>
+                            <span className="text-muted-foreground">/ {trip.capacity_kg}kg</span>
                           </div>
                           {trip.price_expect && (
-                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                              <DollarSign className="h-4 w-4" />
-                              <span>{trip.price_expect}€</span>
+                            <div className="flex items-center gap-1.5 text-xs md:text-sm text-muted-foreground">
+                              <DollarSign className="h-3.5 w-3.5" />
+                              <span className="font-medium">{trip.price_expect}€</span>
                             </div>
                           )}
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1.5">
                           <Button
                             variant="outline"
                             size="icon"
+                            className="h-8 w-8 md:h-9 md:w-9"
                             onClick={() => handleUpdateCapacity(trip.id, trip.capacity_available_kg - 5, trip.capacity_kg)}
                           >
-                            <Minus className="h-4 w-4" />
+                            <Minus className="h-3.5 w-3.5" />
                           </Button>
                           <Button
                             variant="outline"
                             size="icon"
+                            className="h-8 w-8 md:h-9 md:w-9"
                             onClick={() => handleUpdateCapacity(trip.id, trip.capacity_available_kg + 5, trip.capacity_kg)}
                           >
-                            <Plus className="h-4 w-4" />
+                            <Plus className="h-3.5 w-3.5" />
                           </Button>
                         </div>
                       </div>
-                      <div className="flex gap-2 flex-wrap">
+                      <div className="flex gap-1.5 md:gap-2 flex-wrap">
                         <Button
                           variant="outline"
                           size="sm"
+                          className="h-8 md:h-9 text-xs md:text-sm"
                           onClick={() => handleToggleTripStatus(trip.id, trip.status)}
                         >
                           {trip.status === "open" ? (
                             <>
-                              <Lock className="h-4 w-4 mr-1" />
+                              <Lock className="h-3.5 w-3.5 mr-1" />
                               Fermer
                             </>
                           ) : (
                             <>
-                              <LockOpen className="h-4 w-4 mr-1" />
+                              <LockOpen className="h-3.5 w-3.5 mr-1" />
                               Ouvrir
                             </>
                           )}
                         </Button>
                         <Button 
                           variant="outline" 
-                          size="sm" 
+                          size="sm"
+                          className="h-8 md:h-9 text-xs md:text-sm" 
                           onClick={() => navigate(`/publier/trajet/${trip.id}`)}
                         >
-                          <Edit className="h-4 w-4 mr-1" />
+                          <Edit className="h-3.5 w-3.5 mr-1" />
                           Modifier
                         </Button>
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
-                            <Button variant="destructive" size="sm">
-                              <Trash2 className="h-4 w-4 mr-1" />
+                            <Button variant="destructive" size="sm" className="h-8 md:h-9 text-xs md:text-sm">
+                              <Trash2 className="h-3.5 w-3.5 mr-1" />
                               Supprimer
                             </Button>
                           </AlertDialogTrigger>
@@ -276,47 +283,52 @@ const MyListings = () => {
               />
             ) : (
               parcels.map((parcel) => (
-                <Card key={parcel.id}>
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div className="space-y-1">
-                        <CardTitle className="flex items-center gap-2">
-                          <Package className="h-5 w-5 text-primary" />
-                          {parcel.from_city}, {parcel.from_country} → {parcel.to_city}, {parcel.to_country}
-                        </CardTitle>
-                        <CardDescription className="flex items-center gap-2">
-                          <Calendar className="h-4 w-4" />
-                          Avant le {format(new Date(parcel.deadline), "PPP", { locale: fr })}
-                        </CardDescription>
+                <Card key={parcel.id} className="overflow-hidden hover:shadow-md transition-shadow">
+                  <div className="bg-gradient-to-r from-primary/5 to-background p-3 md:p-4 border-b">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="space-y-1 flex-1 min-w-0">
+                        <div className="flex items-center gap-2 text-sm md:text-base font-semibold">
+                          <Package className="h-4 w-4 text-primary shrink-0" />
+                          <span className="truncate">{parcel.from_city} → {parcel.to_city}</span>
+                        </div>
+                        <div className="flex items-center gap-1.5 text-xs md:text-sm text-muted-foreground">
+                          <Calendar className="h-3.5 w-3.5" />
+                          <span>Avant le {format(new Date(parcel.deadline), "d MMM yyyy", { locale: fr })}</span>
+                        </div>
                       </div>
-                      <Badge variant={parcel.status === "open" ? "default" : "secondary"}>
+                      <Badge variant={parcel.status === "open" ? "default" : "secondary"} className="text-xs shrink-0">
                         {parcel.status === "open" ? "Ouvert" : "Fermé"}
                       </Badge>
                     </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center justify-between">
-                      <div className="flex gap-4 text-sm text-muted-foreground">
-                        <span className="capitalize">{parcel.type}</span>
-                        <span>•</span>
-                        <span>{parcel.weight_kg} kg</span>
-                        <span>•</span>
-                        <span>Taille {parcel.size}</span>
+                  </div>
+                  <CardContent className="p-3 md:p-4">
+                    <div className="space-y-3">
+                      <div className="flex gap-2 md:gap-3 text-xs md:text-sm">
+                        <span className="px-2 py-1 rounded-md bg-blue-500/10 text-blue-700 dark:text-blue-300 font-medium capitalize">
+                          {parcel.type}
+                        </span>
+                        <span className="px-2 py-1 rounded-md bg-purple-500/10 text-purple-700 dark:text-purple-300 font-medium">
+                          {parcel.weight_kg}kg
+                        </span>
+                        <span className="px-2 py-1 rounded-md bg-orange-500/10 text-orange-700 dark:text-orange-300 font-medium">
+                          {parcel.size}
+                        </span>
                       </div>
-                      <div className="flex gap-2">
+                      <div className="flex gap-1.5 md:gap-2 flex-wrap">
                         <Button
                           variant="outline"
                           size="sm"
+                          className="h-8 md:h-9 text-xs md:text-sm"
                           onClick={() => handleToggleParcelStatus(parcel.id, parcel.status)}
                         >
                           {parcel.status === "open" ? (
                             <>
-                              <Lock className="h-4 w-4 mr-1" />
+                              <Lock className="h-3.5 w-3.5 mr-1" />
                               Fermer
                             </>
                           ) : (
                             <>
-                              <LockOpen className="h-4 w-4 mr-1" />
+                              <LockOpen className="h-3.5 w-3.5 mr-1" />
                               Ouvrir
                             </>
                           )}
@@ -324,15 +336,16 @@ const MyListings = () => {
                         <Button 
                           variant="outline" 
                           size="sm"
+                          className="h-8 md:h-9 text-xs md:text-sm"
                           onClick={() => navigate(`/publier/colis/${parcel.id}`)}
                         >
-                          <Edit className="h-4 w-4 mr-1" />
+                          <Edit className="h-3.5 w-3.5 mr-1" />
                           Modifier
                         </Button>
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
-                            <Button variant="destructive" size="sm">
-                              <Trash2 className="h-4 w-4 mr-1" />
+                            <Button variant="destructive" size="sm" className="h-8 md:h-9 text-xs md:text-sm">
+                              <Trash2 className="h-3.5 w-3.5 mr-1" />
                               Supprimer
                             </Button>
                           </AlertDialogTrigger>

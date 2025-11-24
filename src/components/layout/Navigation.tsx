@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/useAuth";
 import { useAdmin } from "@/hooks/useAdmin";
+import { useUnreadCount } from "@/hooks/useUnreadCount";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { MobileMenu } from "./MobileMenu";
@@ -19,6 +20,7 @@ import { cn } from "@/lib/utils";
 const Navigation = () => {
   const { user, signOut } = useAuth();
   const { isAdmin, loading: adminLoading } = useAdmin();
+  const { unreadCount } = useUnreadCount();
   const [profile, setProfile] = useState<any>(null);
   const navigate = useNavigate();
   const location = useLocation();
@@ -134,16 +136,21 @@ const Navigation = () => {
           {user && (
             <>
               <Link 
-                to="/mes-annonces"
+                to="/explorer"
                 className="text-[#d6d6d6] hover:text-white transition-all duration-200 text-base font-medium whitespace-nowrap"
               >
-                Mes annonces
+                Explorer
               </Link>
               <Link 
                 to="/messages"
-                className="text-[#d6d6d6] hover:text-white transition-all duration-200 text-base font-medium whitespace-nowrap"
+                className="text-[#d6d6d6] hover:text-white transition-all duration-200 text-base font-medium whitespace-nowrap relative"
               >
-                Messages
+                Messagerie
+                {unreadCount > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </span>
+                )}
               </Link>
             </>
           )}
@@ -243,7 +250,12 @@ const Navigation = () => {
                       className="flex items-center gap-2 cursor-pointer"
                     >
                       <MessageSquare className="h-4 w-4" />
-                      Messagerie
+                      <span>Messagerie</span>
+                      {unreadCount > 0 && (
+                        <span className="ml-auto bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center shrink-0">
+                          {unreadCount > 9 ? '9+' : unreadCount}
+                        </span>
+                      )}
                     </Link>
                   </DropdownMenuItem>
                   {isAdmin && (

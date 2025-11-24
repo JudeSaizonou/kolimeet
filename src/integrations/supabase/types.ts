@@ -454,6 +454,18 @@ export type Database = {
         Returns: boolean
       }
       is_user_admin: { Args: { user_uuid: string }; Returns: boolean }
+      mark_message_as_read: {
+        Args: { message_id: string }
+        Returns: void
+      }
+      mark_thread_messages_as_read: {
+        Args: { p_thread_id: string; p_user_id: string }
+        Returns: void
+      }
+      get_unread_count_by_thread: {
+        Args: { p_user_id: string }
+        Returns: { thread_id: string; unread_count: number }[]
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"

@@ -80,7 +80,7 @@ export const useMessages = (threadId: string) => {
           console.log('[useMessages] 📨 New message received:', newMessage.id, 'from:', newMessage.sender_id);
           setMessages((prev) => [...prev, newMessage]);
 
-          // Mark as read if it's not from current user
+          // Mark as read if it's not from current user and we're in this conversation
           if (newMessage.sender_id !== user?.id) {
             supabase
               .rpc('mark_message_as_read', { message_id: newMessage.id })
@@ -89,6 +89,14 @@ export const useMessages = (threadId: string) => {
                   console.error('[useMessages] ❌ Failed to mark new message as read:', error);
                 } else {
                   console.log('[useMessages] ✅ Auto-marked new message as read:', newMessage.id);
+                  // Update local state
+                  setMessages((prev) => 
+                    prev.map((msg) => 
+                      msg.id === newMessage.id 
+                        ? { ...msg, read_at: new Date().toISOString() } 
+                        : msg
+                    )
+                  );
                 }
               });
           }

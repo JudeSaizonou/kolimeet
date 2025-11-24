@@ -81,7 +81,7 @@ export const useThreads = () => {
               .from("messages")
               .select("*", { count: "exact", head: true })
               .eq("thread_id", threadId)
-              .eq("is_read", false)
+              .is("read_at", null)
               .neq("sender_id", user.id);
             return { thread_id: threadId, count: count || 0 };
           })
@@ -127,7 +127,7 @@ export const useThreads = () => {
 
     // Subscribe to threads and messages for real-time updates
     const channel = supabase
-      .channel("threads-updates")
+      .channel(`threads-updates-${user.id}`)
       .on(
         "postgres_changes",
         {
@@ -136,10 +136,17 @@ export const useThreads = () => {
           table: "threads",
         },
         (payload) => {
+          console.log('[useThreads] 📬 Thread event:', payload.eventType, payload);
           const thread = payload.new as any;
-          // Only refetch if this thread belongs to the user
-          if (thread && (thread.created_by === user.id || thread.other_user_id === user.id)) {
-            console.log('[useThreads] 📬 Thread change:', payload.eventType);
+          const oldThread = payload.old as any;
+          
+          // Check if this thread belongs to the user
+          const belongsToUser = 
+            (thread && (thread.created_by === user.id || thread.other_user_id === user.id)) ||
+            (oldThread && (oldThread.created_by === user.id || oldThread.other_user_id === user.id));
+          
+          if (belongsToUser) {
+            console.log('[useThreads] ✅ Thread belongs to user, refetching');
             fetchThreads();
           }
         }
@@ -151,9 +158,21 @@ export const useThreads = () => {
           schema: "public",
           table: "messages",
         },
-        () => {
-          console.log('[useThreads] 📨 New message received, refetching threads');
-          fetchThreads();
+        async (payload) => {
+          const newMessage = payload.new as any;
+          console.log('[useThreads] 📨 New message INSERT:', newMessage.thread_id);
+          
+          // Check if this message belongs to one of user's threads
+          const { data: threadData } = await supabase
+            .from("threads")
+            .select("id, created_by, other_user_id")
+            .eq("id", newMessage.thread_id)
+            .single();
+          
+          if (threadData && (threadData.created_by === user.id || threadData.other_user_id === user.id)) {
+            console.log('[useThreads] ✅ Message belongs to user thread, refetching');
+            fetchThreads();
+          }
         }
       )
       .on(
@@ -163,11 +182,25 @@ export const useThreads = () => {
           schema: "public",
           table: "messages",
         },
-        (payload) => {
-          // Only refetch if read status changed
-          if (payload.old && (payload.old as any).is_read !== (payload.new as any).is_read) {
-            console.log('[useThreads] 📖 Message read status changed');
-            fetchThreads();
+        async (payload) => {
+          const oldMessage = payload.old as any;
+          const newMessage = payload.new as any;
+          
+          // Only refetch if read status changed (read_at)
+          if (oldMessage.read_at !== newMessage.read_at) {
+            console.log('[useThreads] 📖 Message read status changed:', newMessage.thread_id);
+            
+            // Check if this message belongs to one of user's threads
+            const { data: threadData } = await supabase
+              .from("threads")
+              .select("id, created_by, other_user_id")
+              .eq("id", newMessage.thread_id)
+              .single();
+            
+            if (threadData && (threadData.created_by === user.id || threadData.other_user_id === user.id)) {
+              console.log('[useThreads] ✅ Read status change belongs to user thread, refetching');
+              fetchThreads();
+            }
           }
         }
       )
@@ -176,6 +209,7 @@ export const useThreads = () => {
       });
 
     return () => {
+      console.log('[useThreads] 🔌 Unsubscribing from channel');
       supabase.removeChannel(channel);
     };
   }, [user]);

@@ -119,101 +119,111 @@ const TripDetail = () => {
 
   return (
     <>
-      <div className="container mx-auto px-4 py-8">
-        <Card className="mb-6">
-          <CardHeader>
-            <div className="flex items-start justify-between">
+      <div className="container mx-auto px-3 md:px-4 py-4 md:py-8">
+        <Card className="mb-4 md:mb-6 overflow-hidden">
+          <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-background p-4 md:p-6 border-b">
+            <div className="flex items-start justify-between gap-3">
               <div className="space-y-2 flex-1">
-                <div className="flex items-center gap-2 text-lg font-semibold">
-                  <span>{trip.from_city}, {trip.from_country}</span>
-                  <ArrowRight className="h-5 w-5 text-muted-foreground" />
-                  <span>{trip.to_city}, {trip.to_country}</span>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <div className="flex items-center gap-2 text-base md:text-xl font-bold">
+                    <span className="text-foreground">{trip.from_city}</span>
+                    <ArrowRight className="h-4 md:h-5 w-4 md:w-5 text-primary" />
+                    <span className="text-foreground">{trip.to_city}</span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Calendar className="h-4 w-4" />
-                  <span>Départ : {format(new Date(trip.date_departure), "d MMMM yyyy", { locale: fr })}</span>
+                <div className="flex items-center gap-1.5 text-xs md:text-sm text-muted-foreground">
+                  <Calendar className="h-3.5 md:h-4 w-3.5 md:w-4" />
+                  <span>{format(new Date(trip.date_departure), "d MMMM yyyy", { locale: fr })}</span>
                 </div>
               </div>
-              <Badge variant={trip.status === "open" ? "default" : "secondary"}>
+              <Badge 
+                variant={trip.status === "open" ? "default" : "secondary"} 
+                className="text-xs shrink-0"
+              >
                 {trip.status === "open" ? "Ouvert" : "Fermé"}
               </Badge>
             </div>
-          </CardHeader>
+          </div>
 
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-4 md:space-y-5 p-4 md:p-6">
             <Link 
               to={`/u/${trip.user_id}`}
-              className="flex items-center gap-4 p-4 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors"
+              className="flex items-center gap-3 md:gap-4 p-3 md:p-4 border rounded-xl hover:border-primary/50 hover:shadow-sm transition-all duration-200 bg-card"
             >
-              <Avatar className="h-16 w-16">
+              <Avatar className="h-12 md:h-16 w-12 md:w-16 ring-2 ring-primary/10">
                 <AvatarImage src={profile?.avatar_url} />
-                <AvatarFallback className="text-lg">{profile?.full_name?.[0] || "U"}</AvatarFallback>
+                <AvatarFallback className="text-base md:text-lg bg-primary/10">{profile?.full_name?.[0] || "U"}</AvatarFallback>
               </Avatar>
-              <div>
-                <p className="font-semibold text-lg">{profile?.full_name || "Utilisateur"}</p>
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold text-sm md:text-base truncate">{profile?.full_name || "Utilisateur"}</p>
                 {profile?.rating_avg > 0 && (
-                  <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                    <Star className="h-4 w-4 fill-[#F59E0B] text-[#F59E0B]" />
-                    <span>{Number(profile.rating_avg).toFixed(1)}</span>
-                    <span>({profile.rating_count} avis)</span>
+                  <div className="flex items-center gap-1 text-xs md:text-sm text-muted-foreground">
+                    <Star className="h-3 md:h-4 w-3 md:w-4 fill-amber-400 text-amber-400" />
+                    <span className="font-medium">{Number(profile.rating_avg).toFixed(1)}</span>
+                    <span className="text-muted-foreground/70">({profile.rating_count})</span>
                   </div>
                 )}
               </div>
             </Link>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="p-4 border rounded-lg">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+              <div className="p-3 md:p-4 border rounded-xl bg-gradient-to-br from-primary/5 to-background">
                 <div className="flex items-center gap-2 mb-2">
-                  <Package className="h-5 w-5 text-primary" />
-                  <h3 className="font-semibold">Capacité disponible</h3>
+                  <div className="p-1.5 rounded-lg bg-primary/10">
+                    <Package className="h-4 md:h-5 w-4 md:w-5 text-primary" />
+                  </div>
+                  <h3 className="font-semibold text-xs md:text-sm text-muted-foreground">Capacité disponible</h3>
                 </div>
-                <p className="text-2xl font-bold">{trip.capacity_available_kg}kg</p>
-                <p className="text-sm text-muted-foreground">sur {trip.capacity_kg}kg au total</p>
+                <p className="text-xl md:text-2xl font-bold text-foreground">{trip.capacity_available_kg}kg</p>
+                <p className="text-xs md:text-sm text-muted-foreground mt-1">sur {trip.capacity_kg}kg</p>
               </div>
 
               {trip.price_expect && (
-                <div className="p-4 border rounded-lg">
-                  <h3 className="font-semibold mb-2">Prix souhaité</h3>
-                  <p className="text-2xl font-bold">{trip.price_expect}€</p>
+                <div className="p-3 md:p-4 border rounded-xl bg-gradient-to-br from-emerald-500/5 to-background">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="p-1.5 rounded-lg bg-emerald-500/10">
+                      <CreditCard className="h-4 md:h-5 w-4 md:w-5 text-emerald-600" />
+                    </div>
+                    <h3 className="font-semibold text-xs md:text-sm text-muted-foreground">Prix souhaité</h3>
+                  </div>
+                  <p className="text-xl md:text-2xl font-bold text-foreground">{trip.price_expect}€</p>
                 </div>
               )}
             </div>
 
             {trip.notes && (
-              <div className="p-4 bg-muted/30 rounded-lg">
-                <h3 className="font-semibold mb-2">Notes du voyageur</h3>
-                <p className="text-muted-foreground whitespace-pre-wrap">{trip.notes}</p>
+              <div className="p-3 md:p-4 bg-muted/20 border rounded-xl">
+                <h3 className="font-semibold mb-2 text-xs md:text-sm text-muted-foreground">Notes du voyageur</h3>
+                <p className="text-sm md:text-base text-foreground/90 whitespace-pre-wrap leading-relaxed">{trip.notes}</p>
               </div>
             )}
 
             {/* Boutons d'action */}
-            <div className="space-y-3">
+            <div className="space-y-2.5 md:space-y-3 pt-2">
               {trip.capacity_available_kg > 0 ? (
                 <Button 
                   onClick={() => setBookingDialogOpen(true)} 
-                  className="w-full" 
-                  size="lg"
+                  className="w-full h-11 md:h-12 shadow-sm font-medium" 
                   disabled={!user || user.id === trip.user_id}
                 >
                   <CreditCard className="w-4 h-4 mr-2" />
-                  Réserver des kilos ({trip.price_expect ? `${trip.price_expect}€/kg` : 'Prix à négocier'})
+                  <span className="text-sm md:text-base">Réserver ({trip.price_expect ? `${trip.price_expect}€/kg` : 'Prix à négocier'})</span>
                 </Button>
               ) : (
-                <Button disabled className="w-full" size="lg">
+                <Button disabled className="w-full h-11 md:h-12">
                   <Package className="w-4 h-4 mr-2" />
-                  Capacité épuisée
+                  <span className="text-sm md:text-base">Capacité épuisée</span>
                 </Button>
               )}
               
               <Button 
                 onClick={handleContact} 
                 variant="outline" 
-                className="w-full" 
-                size="lg"
+                className="w-full h-11 md:h-12 border-2 hover:bg-accent font-medium" 
                 disabled={!user || user.id === trip.user_id}
               >
                 <MessageCircle className="w-4 h-4 mr-2" />
-                Contacter le voyageur
+                <span className="text-sm md:text-base">Contacter le voyageur</span>
               </Button>
             </div>
 
@@ -221,11 +231,10 @@ const TripDetail = () => {
               <Button 
                 onClick={() => setReviewDialogOpen(true)} 
                 variant="outline" 
-                className="w-full" 
-                size="lg"
+                className="w-full h-11 md:h-12"
               >
                 <Star className="w-4 h-4 mr-2" />
-                Laisser un avis
+                <span className="text-sm md:text-base">Laisser un avis</span>
               </Button>
             )}
           </CardContent>

@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useState, useEffect, useRef } from "react";
 import { ChevronDown } from "lucide-react";
+import { useUnreadCount } from "@/hooks/useUnreadCount";
 
 interface MobileMenuProps {
   user: any;
@@ -13,6 +14,7 @@ interface MobileMenuProps {
 export const MobileMenu = ({ user, profile, isAdmin, onSignOut }: MobileMenuProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isPublishOpen, setIsPublishOpen] = useState(false);
+  const { unreadCount } = useUnreadCount();
   const menuRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
@@ -190,10 +192,15 @@ export const MobileMenu = ({ user, profile, isAdmin, onSignOut }: MobileMenuProp
               
               <Link 
                 to="/messages" 
-                className="text-[#333333] text-lg hover:opacity-70 transition-opacity"
+                className="text-[#333333] text-lg hover:opacity-70 transition-opacity relative inline-flex items-center gap-2"
                 onClick={handleLinkClick}
               >
                 Messagerie
+                {unreadCount > 0 && (
+                  <span className="bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </span>
+                )}
               </Link>
               
               <Link 
