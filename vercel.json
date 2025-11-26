@@ -4,6 +4,11 @@
   "devCommand": "bun run dev",
   "installCommand": "bun install",
   "framework": "vite",
+  "functions": {
+    "api/**/*.tsx": {
+      "runtime": "edge"
+    }
+  },
   "rewrites": [
     {
       "source": "/api/(.*)",
