@@ -4,7 +4,7 @@ export const config = {
   runtime: 'edge',
 };
 
-export default async function handler(req: Request) {
+export default async function handler(req) {
   try {
     const { searchParams } = new URL(req.url);
 
@@ -12,24 +12,9 @@ export default async function handler(req: Request) {
     const toCity = searchParams.get('to') || 'Cotonou';
     const fromCountry = searchParams.get('fromCountry') || 'France';
     const toCountry = searchParams.get('toCountry') || 'Bénin';
-    const weight = searchParams.get('weight') || '10';
-    const type = searchParams.get('type') || 'Documents';
-    const deadline = searchParams.get('deadline') || '1 janvier 2026';
-    const reward = searchParams.get('reward') || '50';
-
-    // Emoji basé sur le type
-    const typeEmojis: { [key: string]: string } = {
-      'documents': '📄',
-      'Documents': '📄',
-      'vetements': '👕',
-      'Vêtements': '👕',
-      'electronique': '💻',
-      'Électronique': '💻',
-      'autre': '📦',
-      'Autre': '📦',
-    };
-
-    const emoji = typeEmojis[type] || '📦';
+    const date = searchParams.get('date') || '1 janvier 2026';
+    const capacity = searchParams.get('capacity') || '20';
+    const price = searchParams.get('price') || '5';
 
     return new ImageResponse(
       (
@@ -41,7 +26,7 @@ export default async function handler(req: Request) {
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
             fontFamily: 'system-ui, -apple-system, sans-serif',
           }}
         >
@@ -58,24 +43,7 @@ export default async function handler(req: Request) {
               alignItems: 'center',
             }}
           >
-            📦 Kolimeet
-          </div>
-
-          {/* Badge Colis */}
-          <div
-            style={{
-              position: 'absolute',
-              top: 50,
-              right: 60,
-              background: 'white',
-              color: '#10b981',
-              fontSize: 24,
-              fontWeight: 'bold',
-              padding: '12px 24px',
-              borderRadius: 20,
-            }}
-          >
-            COLIS
+            ✈️ Kolimeet
           </div>
 
           {/* Carte principale */}
@@ -117,7 +85,7 @@ export default async function handler(req: Request) {
               <div
                 style={{
                   fontSize: 60,
-                  color: '#10b981',
+                  color: '#667eea',
                   marginLeft: 40,
                   marginRight: 40,
                 }}
@@ -150,7 +118,7 @@ export default async function handler(req: Request) {
               }}
             />
 
-            {/* Informations du colis */}
+            {/* Informations du trajet */}
             <div
               style={{
                 display: 'flex',
@@ -158,7 +126,7 @@ export default async function handler(req: Request) {
                 gap: 40,
               }}
             >
-              {/* Type */}
+              {/* Date */}
               <div
                 style={{
                   display: 'flex',
@@ -170,16 +138,16 @@ export default async function handler(req: Request) {
                   flex: 1,
                 }}
               >
-                <div style={{ fontSize: 40, marginBottom: 8 }}>{emoji}</div>
+                <div style={{ fontSize: 40, marginBottom: 8 }}>📅</div>
                 <div style={{ fontSize: 20, color: '#666', marginBottom: 4 }}>
-                  Type
+                  Départ
                 </div>
                 <div style={{ fontSize: 24, fontWeight: 'bold', color: '#1a1a1a' }}>
-                  {type}
+                  {date}
                 </div>
               </div>
 
-              {/* Poids */}
+              {/* Capacité */}
               <div
                 style={{
                   display: 'flex',
@@ -191,43 +159,22 @@ export default async function handler(req: Request) {
                   flex: 1,
                 }}
               >
-                <div style={{ fontSize: 40, marginBottom: 8 }}>⚖️</div>
+                <div style={{ fontSize: 40, marginBottom: 8 }}>📦</div>
                 <div style={{ fontSize: 20, color: '#666', marginBottom: 4 }}>
-                  Poids
+                  Capacité
                 </div>
                 <div style={{ fontSize: 24, fontWeight: 'bold', color: '#1a1a1a' }}>
-                  {weight} kg
+                  {capacity} kg
                 </div>
               </div>
 
-              {/* Deadline */}
+              {/* Prix */}
               <div
                 style={{
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
-                  background: '#f8f9fa',
-                  borderRadius: 16,
-                  padding: 24,
-                  flex: 1,
-                }}
-              >
-                <div style={{ fontSize: 40, marginBottom: 8 }}>⏰</div>
-                <div style={{ fontSize: 20, color: '#666', marginBottom: 4 }}>
-                  Deadline
-                </div>
-                <div style={{ fontSize: 22, fontWeight: 'bold', color: '#1a1a1a' }}>
-                  {deadline}
-                </div>
-              </div>
-
-              {/* Récompense */}
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                   borderRadius: 16,
                   padding: 24,
                   flex: 1,
@@ -235,10 +182,10 @@ export default async function handler(req: Request) {
               >
                 <div style={{ fontSize: 40, marginBottom: 8 }}>💰</div>
                 <div style={{ fontSize: 20, color: 'rgba(255,255,255,0.9)', marginBottom: 4 }}>
-                  Récompense
+                  Prix
                 </div>
                 <div style={{ fontSize: 24, fontWeight: 'bold', color: 'white' }}>
-                  {reward}€
+                  {price}€/kg
                 </div>
               </div>
             </div>
@@ -251,12 +198,12 @@ export default async function handler(req: Request) {
                 justifyContent: 'center',
                 marginTop: 40,
                 padding: 20,
-                background: '#f0fdf4',
+                background: '#f0f4ff',
                 borderRadius: 12,
               }}
             >
-              <div style={{ fontSize: 24, color: '#10b981', fontWeight: 600 }}>
-                🚀 Transportez ce colis sur Kolimeet
+              <div style={{ fontSize: 24, color: '#667eea', fontWeight: 600 }}>
+                🚀 Réservez maintenant sur Kolimeet
               </div>
             </div>
           </div>
@@ -267,7 +214,7 @@ export default async function handler(req: Request) {
         height: 630,
       }
     );
-  } catch (e: any) {
+  } catch (e) {
     console.error('OG Image generation error:', e);
     return new Response(`Failed to generate image: ${e.message}`, {
       status: 500,
