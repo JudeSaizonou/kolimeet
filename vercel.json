@@ -4,11 +4,6 @@
   "devCommand": "bun run dev",
   "installCommand": "bun install",
   "framework": "vite",
-  "functions": {
-    "api/og/*.js": {
-      "runtime": "edge"
-    }
-  },
   "rewrites": [
     {
       "source": "/api/(.*)",
