@@ -27,6 +27,7 @@ import PublishTrip from "./pages/publish/Trip";
 import PublishParcel from "./pages/publish/Parcel";
 import MyListings from "./pages/MyListings";
 import MyReservations from "./pages/MyReservations";
+import Favorites from "./pages/Favorites";
 import Feedback from "./pages/Feedback";
 import NotFound from "./pages/NotFound";
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -152,6 +153,14 @@ const App = () => (
                 element={
                   <ProtectedRoute>
                     <MyListings />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/favoris"
+                element={
+                  <ProtectedRoute>
+                    <Favorites />
                   </ProtectedRoute>
                 }
               />

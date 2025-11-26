@@ -1,5 +1,5 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Package, User, LogOut, FileText, Plane, MessageSquare, Shield, CreditCard } from "lucide-react";
+import { Package, User, LogOut, FileText, Plane, MessageSquare, Shield, CreditCard, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -233,6 +233,15 @@ const Navigation = () => {
                     >
                       <FileText className="h-4 w-4" />
                       Mes annonces
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link
+                      to="/favoris"
+                      className="flex items-center gap-2 cursor-pointer"
+                    >
+                      <Heart className="h-4 w-4" />
+                      Favoris
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>

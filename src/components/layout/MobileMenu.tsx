@@ -191,6 +191,14 @@ export const MobileMenu = ({ user, profile, isAdmin, onSignOut }: MobileMenuProp
               </Link>
               
               <Link 
+                to="/favoris" 
+                className="text-[#333333] text-lg hover:opacity-70 transition-opacity inline-flex items-center gap-2"
+                onClick={handleLinkClick}
+              >
+                <span>Favoris</span>
+              </Link>
+              
+              <Link 
                 to="/messages" 
                 className="text-[#333333] text-lg hover:opacity-70 transition-opacity relative inline-flex items-center gap-2"
                 onClick={handleLinkClick}

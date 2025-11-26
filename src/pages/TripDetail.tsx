@@ -2,13 +2,14 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useFavorite } from "@/hooks/useFavorite";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowRight, Calendar, Package, Star, CreditCard, MessageCircle } from "lucide-react";
+import { ArrowRight, Calendar, Package, Star, CreditCard, MessageCircle, Heart } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { MatchingSection } from "@/components/explorer/MatchingSection";
@@ -20,6 +21,7 @@ const TripDetail = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
+  const { isFavorited, favoritesCount, toggleFavorite } = useFavorite("trip", id || "");
   const [trip, setTrip] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
@@ -136,12 +138,23 @@ const TripDetail = () => {
                   <span>{format(new Date(trip.date_departure), "d MMMM yyyy", { locale: fr })}</span>
                 </div>
               </div>
-              <Badge 
-                variant={trip.status === "open" ? "default" : "secondary"} 
-                className="text-xs shrink-0"
-              >
-                {trip.status === "open" ? "Ouvert" : "Fermé"}
-              </Badge>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={toggleFavorite}
+                  className="h-9 w-9 md:h-10 md:w-10 shrink-0"
+                  title={isFavorited ? "Retirer des favoris" : "Ajouter aux favoris"}
+                >
+                  <Heart className={`h-4 w-4 md:h-5 md:w-5 ${isFavorited ? 'fill-red-500 text-red-500' : ''}` } />
+                </Button>
+                <Badge 
+                  variant={trip.status === "open" ? "default" : "secondary"} 
+                  className="text-xs shrink-0"
+                >
+                  {trip.status === "open" ? "Ouvert" : "Fermé"}
+                </Badge>
+              </div>
             </div>
           </div>
 
