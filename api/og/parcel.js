@@ -1,37 +1,32 @@
 import { ImageResponse } from '@vercel/og';
 
-export const config = {
-  runtime: 'edge',
-};
-
 export default async function handler(req) {
-  try {
-    const { searchParams } = new URL(req.url);
+  const { searchParams } = new URL(req.url);
 
-    const fromCity = searchParams.get('from') || 'Paris';
-    const toCity = searchParams.get('to') || 'Cotonou';
-    const fromCountry = searchParams.get('fromCountry') || 'France';
-    const toCountry = searchParams.get('toCountry') || 'Bénin';
-    const weight = searchParams.get('weight') || '10';
-    const type = searchParams.get('type') || 'Documents';
-    const deadline = searchParams.get('deadline') || '1 janvier 2026';
-    const reward = searchParams.get('reward') || '50';
+  const fromCity = searchParams.get('from') || 'Paris';
+  const toCity = searchParams.get('to') || 'Cotonou';
+  const fromCountry = searchParams.get('fromCountry') || 'France';
+  const toCountry = searchParams.get('toCountry') || 'Bénin';
+  const weight = searchParams.get('weight') || '10';
+  const type = searchParams.get('type') || 'Documents';
+  const deadline = searchParams.get('deadline') || '1 janvier 2026';
+  const reward = searchParams.get('reward') || '50';
 
-    // Emoji basé sur le type
-    const typeEmojis: { [key: string]: string } = {
-      'documents': '📄',
-      'Documents': '📄',
-      'vetements': '👕',
-      'Vêtements': '👕',
-      'electronique': '💻',
-      'Électronique': '💻',
-      'autre': '📦',
-      'Autre': '📦',
-    };
+  // Emoji basé sur le type
+  const typeEmojis = {
+    'documents': '📄',
+    'Documents': '📄',
+    'vetements': '👕',
+    'Vêtements': '👕',
+    'electronique': '💻',
+    'Électronique': '💻',
+    'autre': '📦',
+    'Autre': '📦',
+  };
 
-    const emoji = typeEmojis[type] || '📦';
+  const emoji = typeEmojis[type] || '📦';
 
-    return new ImageResponse(
+  return new ImageResponse(
       (
         <div
           style={{
@@ -267,10 +262,4 @@ export default async function handler(req) {
         height: 630,
       }
     );
-  } catch (e) {
-    console.error('OG Image generation error:', e);
-    return new Response(`Failed to generate image: ${e.message}`, {
-      status: 500,
-    });
-  }
 }

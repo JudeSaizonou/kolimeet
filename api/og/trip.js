@@ -1,22 +1,17 @@
 import { ImageResponse } from '@vercel/og';
 
-export const config = {
-  runtime: 'edge',
-};
-
 export default async function handler(req) {
-  try {
-    const { searchParams } = new URL(req.url);
+  const { searchParams } = new URL(req.url);
 
-    const fromCity = searchParams.get('from') || 'Paris';
-    const toCity = searchParams.get('to') || 'Cotonou';
-    const fromCountry = searchParams.get('fromCountry') || 'France';
-    const toCountry = searchParams.get('toCountry') || 'Bénin';
-    const date = searchParams.get('date') || '1 janvier 2026';
-    const capacity = searchParams.get('capacity') || '20';
-    const price = searchParams.get('price') || '5';
+  const fromCity = searchParams.get('from') || 'Paris';
+  const toCity = searchParams.get('to') || 'Cotonou';
+  const fromCountry = searchParams.get('fromCountry') || 'France';
+  const toCountry = searchParams.get('toCountry') || 'Bénin';
+  const date = searchParams.get('date') || '1 janvier 2026';
+  const capacity = searchParams.get('capacity') || '20';
+  const price = searchParams.get('price') || '5';
 
-    return new ImageResponse(
+  return new ImageResponse(
       (
         <div
           style={{
@@ -214,10 +209,4 @@ export default async function handler(req) {
         height: 630,
       }
     );
-  } catch (e) {
-    console.error('OG Image generation error:', e);
-    return new Response(`Failed to generate image: ${e.message}`, {
-      status: 500,
-    });
-  }
 }
