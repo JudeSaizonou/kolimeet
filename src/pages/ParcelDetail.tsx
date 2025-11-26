@@ -9,12 +9,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowRight, Calendar, Package, Star, Weight, MessageCircle, Heart } from "lucide-react";
+import { ArrowRight, Calendar, Package, Star, Weight, MessageCircle, Heart, Share2 } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { MatchingSection } from "@/components/explorer/MatchingSection";
 import { ReviewDialog } from "@/components/reviews/ReviewDialog";
 import { MatchingSuggestions } from "@/components/matching/MatchingSuggestions";
+import { ShareButton } from "@/components/ShareButton";
 
 const ParcelDetail = () => {
   const { id } = useParams();
@@ -132,6 +133,14 @@ const ParcelDetail = () => {
                 </div>
               </div>
               <div className="flex items-center gap-2">
+                <ShareButton
+                  title={`Colis ${parcel.from_city} → ${parcel.to_city}`}
+                  description={`${parcel.weight_kg}kg - ${typeLabels[parcel.type]} - Avant le ${format(new Date(parcel.deadline), "d MMM yyyy", { locale: fr })}`}
+                  url={`/colis/${parcel.id}`}
+                  variant="outline"
+                  size="icon"
+                  className="h-9 w-9 md:h-10 md:w-10 shrink-0"
+                />
                 <Button
                   variant="outline"
                   size="icon"

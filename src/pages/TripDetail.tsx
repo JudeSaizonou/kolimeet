@@ -9,7 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowRight, Calendar, Package, Star, CreditCard, MessageCircle, Heart, MapPin, Weight, Info } from "lucide-react";
+import { ArrowRight, Calendar, Package, Star, CreditCard, MessageCircle, Heart, MapPin, Weight, Info, Share2 } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { MatchingSection } from "@/components/explorer/MatchingSection";
@@ -18,6 +18,7 @@ import { BookingDialog } from "@/components/booking/BookingDialog";
 import { GlassCard } from "@/components/LiquidGlass";
 import { MatchingSuggestions } from "@/components/matching/MatchingSuggestions";
 import { Separator } from "@/components/ui/separator";
+import { ShareButton } from "@/components/ShareButton";
 
 const TripDetail = () => {
   const { id } = useParams();
@@ -128,15 +129,25 @@ const TripDetail = () => {
               </div>
             </div>
             
-            {/* Favorite Button */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute top-4 right-4 bg-white/50 backdrop-blur-sm hover:bg-white/80 rounded-full"
-              onClick={toggleFavorite}
-            >
-              <Heart className={`h-5 w-5 ${isFavorited ? "fill-red-500 text-red-500" : "text-gray-600"}`} />
-            </Button>
+            {/* Boutons d'action rapide */}
+            <div className="absolute top-4 right-4 flex gap-2">
+              <ShareButton
+                title={`Trajet ${trip.from_city} → ${trip.to_city}`}
+                description={`${trip.capacity_available_kg}kg disponibles - Départ le ${format(new Date(trip.date_departure), "d MMM yyyy", { locale: fr })}`}
+                url={`/trajets/${trip.id}`}
+                variant="ghost"
+                size="icon"
+                className="bg-white/50 backdrop-blur-sm hover:bg-white/80 rounded-full"
+              />
+              <Button
+                variant="ghost"
+                size="icon"
+                className="bg-white/50 backdrop-blur-sm hover:bg-white/80 rounded-full"
+                onClick={toggleFavorite}
+              >
+                <Heart className={`h-5 w-5 ${isFavorited ? "fill-red-500 text-red-500" : "text-gray-600"}`} />
+              </Button>
+            </div>
           </div>
 
           <div className="p-6 -mt-12 relative z-10">

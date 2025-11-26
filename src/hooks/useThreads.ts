@@ -67,12 +67,29 @@ export const useThreads = () => {
           (profiles || []).map(p => [p.user_id, p])
         );
 
-        // Batch fetch last messages
+        // Batch fetch last messages (exclure les demandes de réservation annulées)
         const { data: lastMessages } = await supabase
           .from("messages")
-          .select("thread_id, content, sender_id, created_at")
+          .select("thread_id, content, sender_id, created_at, message_type, reservation_request_id")
           .in("thread_id", threadIds)
           .order("created_at", { ascending: false });
+
+        // Récupérer les statuts des demandes de réservation
+        const reservationRequestIds = (lastMessages || [])
+          .filter(m => m.reservation_request_id)
+          .map(m => m.reservation_request_id);
+
+        let reservationStatuses = new Map();
+        if (reservationRequestIds.length > 0) {
+          const { data: reservations } = await supabase
+            .from("reservation_requests")
+            .select("id, status")
+            .in("id", reservationRequestIds);
+          
+          reservationStatuses = new Map(
+            (reservations || []).map(r => [r.id, r.status])
+          );
+        }
 
         // Batch fetch unread counts
         const unreadCounts = await Promise.all(
@@ -93,9 +110,17 @@ export const useThreads = () => {
           const otherUserId = isCreator ? thread.other_user_id : thread.created_by;
           const otherUserProfile = profileMap.get(otherUserId);
 
-          // Get last message for this thread
+          // Get last message for this thread (exclure les demandes annulées)
           const threadLastMessages = (lastMessages || [])
-            .filter((m: any) => m.thread_id === thread.id);
+            .filter((m: any) => {
+              if (m.thread_id !== thread.id) return false;
+              // Exclure les messages de réservation annulées
+              if (m.reservation_request_id) {
+                const status = reservationStatuses.get(m.reservation_request_id);
+                if (status === 'cancelled') return false;
+              }
+              return true;
+            });
           const lastMessage = threadLastMessages[0];
 
           // Get unread count
