@@ -72,7 +72,7 @@ const TripDetail = () => {
     }
 
     try {
-      // Check if thread already exists
+      // Vérifier si un thread existe déjà
       const { data: existingThread } = await supabase
         .from("threads")
         .select("id")
@@ -85,21 +85,8 @@ const TripDetail = () => {
         return;
       }
 
-      // Create new thread
-      const { data: newThread, error } = await supabase
-        .from("threads")
-        .insert({
-          created_by: user.id,
-          other_user_id: trip.user_id,
-          related_type: "trip",
-          related_id: id,
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      navigate(`/messages/${newThread.id}`);
+      // Naviguer vers une URL temporaire qui créera le thread au premier message
+      navigate(`/messages/new?type=trip&id=${id}&user=${trip.user_id}`);
     } catch (error: any) {
       toast({
         title: "Erreur",

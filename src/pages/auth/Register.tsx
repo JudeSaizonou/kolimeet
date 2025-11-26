@@ -210,7 +210,14 @@ const Register = () => {
 
   useEffect(() => {
     if (user) {
-      navigate("/");
+      // Vérifier s'il y a une URL de retour stockée
+      const returnTo = localStorage.getItem("returnTo");
+      if (returnTo) {
+        localStorage.removeItem("returnTo");
+        navigate(returnTo);
+      } else {
+        navigate("/");
+      }
     }
   }, [user, navigate]);
 

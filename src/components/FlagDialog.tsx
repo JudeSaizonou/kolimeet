@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Dialog,
   DialogContent,
@@ -30,14 +31,15 @@ export function FlagDialog({
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const handleSubmit = async () => {
     if (!user) {
-      toast({
-        title: "Erreur",
-        description: "Vous devez être connecté pour signaler du contenu",
-        variant: "destructive",
-      });
+      // Fermer le dialog et rediriger vers login
+      onOpenChange(false);
+      const returnTo = window.location.pathname + window.location.search;
+      localStorage.setItem("returnTo", returnTo);
+      navigate("/auth/login");
       return;
     }
 

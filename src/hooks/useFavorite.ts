@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
@@ -22,6 +23,7 @@ export const useFavorite = (
 ): UseFavoritesReturn => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [isFavorited, setIsFavorited] = useState(false);
   const [favoritesCount, setFavoritesCount] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -78,11 +80,10 @@ export const useFavorite = (
   // Ajouter ou retirer des favoris
   const toggleFavorite = async () => {
     if (!user) {
-      toast({
-        title: "Connexion requise",
-        description: "Vous devez être connecté pour ajouter des favoris.",
-        variant: "destructive",
-      });
+      // Stocker l'URL actuelle pour revenir après connexion
+      const returnTo = window.location.pathname + window.location.search;
+      localStorage.setItem("returnTo", returnTo);
+      navigate("/auth/login");
       return;
     }
 

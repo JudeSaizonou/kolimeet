@@ -75,7 +75,7 @@ const ParcelDetail = () => {
     }
 
     try {
-      // Check if thread already exists
+      // Vérifier si un thread existe déjà
       const { data: existingThread } = await supabase
         .from("threads")
         .select("id")
@@ -88,21 +88,8 @@ const ParcelDetail = () => {
         return;
       }
 
-      // Create new thread
-      const { data: newThread, error } = await supabase
-        .from("threads")
-        .insert({
-          created_by: user.id,
-          other_user_id: parcel.user_id,
-          related_type: "parcel",
-          related_id: id,
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      navigate(`/messages/${newThread.id}`);
+      // Naviguer vers une URL temporaire qui créera le thread au premier message
+      navigate(`/messages/new?type=parcel&id=${id}&user=${parcel.user_id}`);
     } catch (error: any) {
       toast({
         title: "Erreur",

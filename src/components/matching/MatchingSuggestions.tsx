@@ -137,7 +137,7 @@ export const MatchingSuggestions = ({
         return;
       }
 
-      // Créer ou récupérer le thread de conversation
+      // Vérifier si un thread existe déjà
       const { data: existingThread } = await supabase
         .from("threads")
         .select("id")
@@ -170,21 +170,9 @@ export const MatchingSuggestions = ({
 
       if (!otherUserId) throw new Error("Utilisateur introuvable");
 
-      // Créer un nouveau thread
-      const { data: newThread, error } = await supabase
-        .from("threads")
-        .insert({
-          created_by: user.id,
-          other_user_id: otherUserId,
-          related_type: type,
-          related_id: type === "parcel" ? matchTargetId : itemId,
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      navigate(`/messages/${newThread.id}`);
+      // Naviguer vers la page de nouveau message
+      const relatedType = type === "parcel" ? "trip" : "parcel";
+      navigate(`/messages/new?type=${relatedType}&id=${matchTargetId}&user=${otherUserId}`);
     } catch (error: any) {
       toast({
         variant: "destructive",

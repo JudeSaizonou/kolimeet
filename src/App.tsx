@@ -17,6 +17,7 @@ import ParcelDetail from "./pages/ParcelDetail";
 import Messages from "./pages/Messages";
 import MessagesLayout from "./pages/MessagesLayout";
 import MessageThread from "./pages/MessageThread";
+import NewMessageThread from "./pages/NewMessageThread";
 import UserProfile from "./pages/UserProfile";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
@@ -95,6 +96,7 @@ const App = () => (
                 }
               >
                 <Route index element={<div className="hidden" />} />
+                <Route path="new" element={<NewMessageThread />} />
                 <Route path=":id" element={<MessageThread />} />
               </Route>
               <Route path="/auth/login" element={<Login />} />
