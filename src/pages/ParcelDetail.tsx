@@ -16,6 +16,8 @@ import { MatchingSection } from "@/components/explorer/MatchingSection";
 import { ReviewDialog } from "@/components/reviews/ReviewDialog";
 import { MatchingSuggestions } from "@/components/matching/MatchingSuggestions";
 import { ShareButton } from "@/components/ShareButton";
+import { SEO } from "@/components/SEO";
+import { generateParcelOGImage } from "@/lib/utils/ogImage";
 
 const ParcelDetail = () => {
   const { id } = useParams();
@@ -113,8 +115,28 @@ const ParcelDetail = () => {
 
   const profile = parcel.profiles;
 
+  const ogImage = generateParcelOGImage({
+    fromCity: parcel.from_city || '',
+    toCity: parcel.to_city || '',
+    deadline: parcel.delivery_deadline ? format(new Date(parcel.delivery_deadline), "d MMM yyyy", { locale: fr }) : '',
+    weight: parcel.weight || 0,
+    type: typeLabels[parcel.type] || parcel.type || 'Colis',
+    senderName: profile?.full_name || "Expéditeur",
+  });
+
+  const shareTitle = `Colis ${parcel.from_city || 'Ville'} → ${parcel.to_city || 'Ville'}`;
+  const shareDescription = `${parcel.weight || 0}kg • ${typeLabels[parcel.type] || parcel.type || 'Colis'} • Livraison avant le ${parcel.delivery_deadline ? format(new Date(parcel.delivery_deadline), "d MMMM yyyy", { locale: fr }) : 'Date à confirmer'}`;
+  const shareUrl = window.location.href;
+
   return (
     <>
+      <SEO
+        title={shareTitle}
+        description={shareDescription}
+        image={ogImage}
+        url={shareUrl}
+        type="article"
+      />
       <div className="container mx-auto px-3 md:px-4 py-4 md:py-8">
         <Card className="mb-4 md:mb-6 overflow-hidden">
           <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-background p-4 md:p-6 border-b">

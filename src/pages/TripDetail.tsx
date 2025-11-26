@@ -19,6 +19,8 @@ import { GlassCard } from "@/components/LiquidGlass";
 import { MatchingSuggestions } from "@/components/matching/MatchingSuggestions";
 import { Separator } from "@/components/ui/separator";
 import { ShareButton } from "@/components/ShareButton";
+import { SEO } from "@/components/SEO";
+import { generateTripOGImage } from "@/lib/utils/ogImage";
 
 const TripDetail = () => {
   const { id } = useParams();
@@ -108,9 +110,30 @@ const TripDetail = () => {
 
   if (!trip) return null;
 
+  const ogImage = generateTripOGImage({
+    fromCity: trip.from_city || '',
+    toCity: trip.to_city || '',
+    date: trip.date_departure ? format(new Date(trip.date_departure), "d MMM yyyy", { locale: fr }) : '',
+    capacity: trip.available_weight || 0,
+    price: trip.price_per_kg || 0,
+    travelerName: trip.profiles?.full_name || "Voyageur",
+  });
+
+  const shareTitle = `Trajet ${trip.from_city || 'Ville'} → ${trip.to_city || 'Ville'}`;
+  const shareDescription = `${trip.available_weight || 0}kg disponibles • ${trip.price_per_kg || 0}€/kg • Départ le ${trip.date_departure ? format(new Date(trip.date_departure), "d MMMM yyyy", { locale: fr }) : 'Date à confirmer'}`;
+  const shareUrl = window.location.href;
+
   return (
-    <div className="min-h-screen bg-secondary/30 pb-24 pt-20 md:pt-24">
-      <div className="container mx-auto px-4 max-w-3xl">
+    <>
+      <SEO
+        title={shareTitle}
+        description={shareDescription}
+        image={ogImage}
+        url={shareUrl}
+        type="article"
+      />
+      <div className="min-h-screen bg-secondary/30 pb-24 pt-20 md:pt-24">
+        <div className="container mx-auto px-4 max-w-3xl">
         
         {/* Header Card */}
         <GlassCard 
@@ -262,7 +285,8 @@ const TripDetail = () => {
           trip={trip}
         />
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 
