@@ -1,34 +1,36 @@
-/** @jsxImportSource react */
 import { ImageResponse } from '@vercel/og';
-import React from 'react';
 
-export default async function handler(req) {
-  const { searchParams } = new URL(req.url);
+export const config = {
+  runtime: 'edge',
+};
 
-  const fromCity = searchParams.get('from') || 'Paris';
-  const toCity = searchParams.get('to') || 'Cotonou';
-  const fromCountry = searchParams.get('fromCountry') || 'France';
-  const toCountry = searchParams.get('toCountry') || 'Bénin';
-  const weight = searchParams.get('weight') || '10';
-  const type = searchParams.get('type') || 'Documents';
-  const deadline = searchParams.get('deadline') || '1 janvier 2026';
-  const reward = searchParams.get('reward') || '50';
+export default function handler(req) {
+  try {
+    const { searchParams } = new URL(req.url);
 
-  // Emoji basé sur le type
-  const typeEmojis = {
-    'documents': '📄',
-    'Documents': '📄',
-    'vetements': '👕',
-    'Vêtements': '👕',
-    'electronique': '💻',
-    'Électronique': '💻',
-    'autre': '📦',
-    'Autre': '📦',
-  };
+    const fromCity = searchParams.get('from') || 'Paris';
+    const toCity = searchParams.get('to') || 'Cotonou';
+    const fromCountry = searchParams.get('fromCountry') || 'France';
+    const toCountry = searchParams.get('toCountry') || 'Bénin';
+    const weight = searchParams.get('weight') || '10';
+    const type = searchParams.get('type') || 'Documents';
+    const deadline = searchParams.get('deadline') || '1 janvier 2026';
+    const reward = searchParams.get('reward') || '50';
 
-  const emoji = typeEmojis[type] || '📦';
+    const typeEmojis = {
+      'documents': '📄',
+      'Documents': '📄',
+      'vetements': '👕',
+      'Vêtements': '👕',
+      'electronique': '💻',
+      'Électronique': '💻',
+      'autre': '📦',
+      'Autre': '📦',
+    };
 
-  return new ImageResponse(
+    const emoji = typeEmojis[type] || '📦';
+
+    return new ImageResponse(
       (
         <div
           style={{
@@ -42,7 +44,6 @@ export default async function handler(req) {
             fontFamily: 'system-ui, -apple-system, sans-serif',
           }}
         >
-          {/* Logo Kolimeet */}
           <div
             style={{
               position: 'absolute',
@@ -58,7 +59,6 @@ export default async function handler(req) {
             📦 Kolimeet
           </div>
 
-          {/* Badge Colis */}
           <div
             style={{
               position: 'absolute',
@@ -75,7 +75,6 @@ export default async function handler(req) {
             COLIS
           </div>
 
-          {/* Carte principale */}
           <div
             style={{
               display: 'flex',
@@ -87,7 +86,6 @@ export default async function handler(req) {
               width: 900,
             }}
           >
-            {/* Header avec villes */}
             <div
               style={{
                 display: 'flex',
@@ -138,7 +136,6 @@ export default async function handler(req) {
               </div>
             </div>
 
-            {/* Séparateur */}
             <div
               style={{
                 height: 2,
@@ -147,7 +144,6 @@ export default async function handler(req) {
               }}
             />
 
-            {/* Informations du colis */}
             <div
               style={{
                 display: 'flex',
@@ -155,7 +151,6 @@ export default async function handler(req) {
                 gap: 40,
               }}
             >
-              {/* Type */}
               <div
                 style={{
                   display: 'flex',
@@ -176,7 +171,6 @@ export default async function handler(req) {
                 </div>
               </div>
 
-              {/* Poids */}
               <div
                 style={{
                   display: 'flex',
@@ -197,7 +191,6 @@ export default async function handler(req) {
                 </div>
               </div>
 
-              {/* Deadline */}
               <div
                 style={{
                   display: 'flex',
@@ -218,7 +211,6 @@ export default async function handler(req) {
                 </div>
               </div>
 
-              {/* Récompense */}
               <div
                 style={{
                   display: 'flex',
@@ -240,7 +232,6 @@ export default async function handler(req) {
               </div>
             </div>
 
-            {/* Footer avec CTA */}
             <div
               style={{
                 display: 'flex',
@@ -262,6 +253,11 @@ export default async function handler(req) {
       {
         width: 1200,
         height: 630,
-      }
+      },
     );
+  } catch (error) {
+    return new Response(`Failed to generate image`, {
+      status: 500,
+    });
+  }
 }

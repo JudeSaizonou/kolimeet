@@ -1,19 +1,22 @@
-/** @jsxImportSource react */
 import { ImageResponse } from '@vercel/og';
-import React from 'react';
 
-export default async function handler(req) {
-  const { searchParams } = new URL(req.url);
+export const config = {
+  runtime: 'edge',
+};
 
-  const fromCity = searchParams.get('from') || 'Paris';
-  const toCity = searchParams.get('to') || 'Cotonou';
-  const fromCountry = searchParams.get('fromCountry') || 'France';
-  const toCountry = searchParams.get('toCountry') || 'Bénin';
-  const date = searchParams.get('date') || '1 janvier 2026';
-  const capacity = searchParams.get('capacity') || '20';
-  const price = searchParams.get('price') || '5';
+export default function handler(req) {
+  try {
+    const { searchParams } = new URL(req.url);
 
-  return new ImageResponse(
+    const fromCity = searchParams.get('from') || 'Paris';
+    const toCity = searchParams.get('to') || 'Cotonou';
+    const fromCountry = searchParams.get('fromCountry') || 'France';
+    const toCountry = searchParams.get('toCountry') || 'Bénin';
+    const date = searchParams.get('date') || '1 janvier 2026';
+    const capacity = searchParams.get('capacity') || '20';
+    const price = searchParams.get('price') || '5';
+
+    return new ImageResponse(
       (
         <div
           style={{
@@ -27,7 +30,6 @@ export default async function handler(req) {
             fontFamily: 'system-ui, -apple-system, sans-serif',
           }}
         >
-          {/* Logo Kolimeet */}
           <div
             style={{
               position: 'absolute',
@@ -43,7 +45,6 @@ export default async function handler(req) {
             ✈️ Kolimeet
           </div>
 
-          {/* Carte principale */}
           <div
             style={{
               display: 'flex',
@@ -55,7 +56,6 @@ export default async function handler(req) {
               width: 900,
             }}
           >
-            {/* Header avec villes */}
             <div
               style={{
                 display: 'flex',
@@ -106,7 +106,6 @@ export default async function handler(req) {
               </div>
             </div>
 
-            {/* Séparateur */}
             <div
               style={{
                 height: 2,
@@ -115,7 +114,6 @@ export default async function handler(req) {
               }}
             />
 
-            {/* Informations du trajet */}
             <div
               style={{
                 display: 'flex',
@@ -123,7 +121,6 @@ export default async function handler(req) {
                 gap: 40,
               }}
             >
-              {/* Date */}
               <div
                 style={{
                   display: 'flex',
@@ -144,7 +141,6 @@ export default async function handler(req) {
                 </div>
               </div>
 
-              {/* Capacité */}
               <div
                 style={{
                   display: 'flex',
@@ -165,7 +161,6 @@ export default async function handler(req) {
                 </div>
               </div>
 
-              {/* Prix */}
               <div
                 style={{
                   display: 'flex',
@@ -187,7 +182,6 @@ export default async function handler(req) {
               </div>
             </div>
 
-            {/* Footer avec CTA */}
             <div
               style={{
                 display: 'flex',
@@ -209,6 +203,11 @@ export default async function handler(req) {
       {
         width: 1200,
         height: 630,
-      }
+      },
     );
+  } catch (error) {
+    return new Response(`Failed to generate image`, {
+      status: 500,
+    });
+  }
 }
