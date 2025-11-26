@@ -1,5 +1,5 @@
 -- ============================================================================
--- MIGRATION COMPLÈTE KILOMEET - À exécuter dans le SQL Editor de Supabase
+-- MIGRATION COMPLÈTE Kolimeet - À exécuter dans le SQL Editor de Supabase
 -- Projet: odzxqpaovgxcwqilildp
 -- Date: 23 novembre 2025
 -- ============================================================================

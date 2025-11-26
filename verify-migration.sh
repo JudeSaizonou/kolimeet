@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# Script de vérification de la migration Kilomeet
+# Script de vérification de la migration Kolimeet
 # Usage: ./verify-migration.sh
 
-echo "🔍 VÉRIFICATION DE LA MIGRATION KILOMEET"
+echo "🔍 VÉRIFICATION DE LA MIGRATION Kolimeet"
 echo "=========================================="
 echo ""
 

@@ -1,4 +1,4 @@
-# Kilomeet - Plateforme de covoiturage et transport de colis
+# Kolimeet - Plateforme de covoiturage et transport de colis
 
 ## Project info
 

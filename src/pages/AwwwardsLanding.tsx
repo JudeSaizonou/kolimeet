@@ -341,7 +341,7 @@ function HeroSection() {
                   transform: `translateX(${Math.sin(progress * Math.PI * 2 + Math.PI) * 10}px)`,
                 }}
               >
-                kilomeet met en relation les voyageurs avec les expéditeurs pour un
+                Kolimeet met en relation les voyageurs avec les expéditeurs pour un
                 transport de colis sécurisé et économique.
               </p>
             </GlassCard>
@@ -617,7 +617,7 @@ function StatsSection() {
                 opacity: 1 - progress * 0.3,
               }}
             >
-              kilomeet en chiffres
+              Kolimeet en chiffres
             </h2>
             <p 
               className="text-fluid-xl text-muted-foreground"

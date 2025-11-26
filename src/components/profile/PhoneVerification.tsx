@@ -180,7 +180,7 @@ export const PhoneVerification = ({
         ) : (
           <div className="space-y-3">
             <div className="space-y-2">
-              <Label htmlFor="code">Code de vérification</Label>
+              <Label htmlFor="code" className="text-xs uppercase text-muted-foreground font-semibold tracking-wider">Code de vérification</Label>
               <Input
                 id="code"
                 type="text"

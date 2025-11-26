@@ -9,7 +9,7 @@ const Footer = () => {
           <div className="md:col-span-2">
             <Link to="/" className="flex items-center gap-2 mb-4">
               <Package className="h-6 w-6 text-primary" />
-              <span className="text-xl font-bold text-foreground">kilomeet</span>
+              <span className="text-xl font-bold text-foreground">Kolimeet</span>
             </Link>
             <p className="text-sm text-muted-foreground max-w-md">
               Plateforme de mise en relation entre voyageurs et expéditeurs pour l'envoi de colis entre la France et le Bénin.
@@ -55,7 +55,7 @@ const Footer = () => {
         </div>
         
         <div className="mt-8 pt-8 border-t text-center text-sm text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} kilomeet. Tous droits réservés.</p>
+          <p>&copy; {new Date().getFullYear()} Kolimeet. Tous droits réservés.</p>
         </div>
       </div>
     </footer>

@@ -8,49 +8,79 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* kilomeet Design System - Couleurs opaques uniquement */
-    --background: 0 0% 100%;
-    --foreground: 220 39% 11%;
+    /* Kolimeet Premium Design System */
+    
+    /* Background: Off-white premium (#F9FAFB) */
+    --background: 210 40% 98%;
+    /* Foreground: Deep Slate (#0F172A) */
+    --foreground: 222 47% 11%;
 
+    /* Card: White with potential transparency */
     --card: 0 0% 100%;
-    --card-foreground: 220 39% 11%;
+    --card-foreground: 222 47% 11%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 220 39% 11%;
+    --popover-foreground: 222 47% 11%;
 
-    /* Bleu principal - #1F6FEB */
-    --primary: 217 84% 52%;
-    --primary-foreground: 0 0% 100%;
+    /* Primary: Electric Indigo (#4F46E5) - Vibrant & Trustworthy */
+    --primary: 243 75% 59%;
+    --primary-foreground: 210 40% 98%;
 
-    /* Gris clair - #F3F4F6 */
-    --secondary: 220 14% 96%;
-    --secondary-foreground: 220 39% 11%;
+    /* Secondary: Subtle Gray (#F3F4F6) */
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222 47% 11%;
 
-    --muted: 220 14% 96%;
-    --muted-foreground: 220 13% 46%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
 
-    /* Jaune accent - #F59E0B */
+    /* Accent: Warm Amber for travel/packages */
     --accent: 38 92% 50%;
-    --accent-foreground: 0 0% 100%;
+    --accent-foreground: 210 40% 98%;
 
-    /* Jaune warning (alias de accent) - #F59E0B */
-    --warning: 38 92% 50%;
-    --warning-foreground: 0 0% 100%;
+    /* Destructive: Soft Red */
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
 
-    /* Rouge erreur - #EF4444 */
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 100%;
+    /* Success: Emerald */
+    --success: 151 55% 41.5%;
+    --success-foreground: 210 40% 98%;
 
-    /* Vert succès - #10B981 */
-    --success: 160 84% 39%;
-    --success-foreground: 0 0% 100%;
+    /* Border: Ultra subtle (opacity handled in components or here) */
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 243 75% 59%;
 
-    /* Gris bordures - #E5E7EB */
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 217 84% 52%;
-
-    --radius: 0.5rem;
+    --radius: 1rem; /* 16px for that modern rounded feel */
+  }
+ 
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+ 
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+ 
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+ 
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+ 
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+ 
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+ 
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+ 
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+ 
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
   }
 }
 

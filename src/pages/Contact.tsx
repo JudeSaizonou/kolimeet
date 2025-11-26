@@ -82,8 +82,8 @@ const Contact = () => {
   return (
     <>
       <Helmet>
-        <title>Contact - kilomeet</title>
-        <meta name="description" content="Contactez l'équipe kilomeet pour toute question, suggestion ou signalement." />
+        <title>Contact - Kolimeet</title>
+        <meta name="description" content="Contactez l'équipe Kolimeet pour toute question, suggestion ou signalement." />
       </Helmet>
 
       <div className="min-h-screen bg-secondary">
@@ -99,14 +99,14 @@ const Contact = () => {
 
             <p className="text-muted-foreground mb-6 leading-relaxed">
               Vous avez une question, une suggestion ou souhaitez signaler un problème ? Remplissez le formulaire ci-dessous ou écrivez-nous directement à{" "}
-              <a href="mailto:contact@kilomeet.com" className="text-primary hover:underline">
-                contact@kilomeet.com
+              <a href="mailto:contact@Kolimeet.com" className="text-primary hover:underline">
+                contact@Kolimeet.com
               </a>
             </p>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Nom complet *</Label>
+                <Label htmlFor="name" className="text-xs uppercase text-muted-foreground font-semibold tracking-wider">Nom complet *</Label>
                 <Input
                   id="name"
                   placeholder="Votre nom"
@@ -119,7 +119,7 @@ const Contact = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="email">Email *</Label>
+                <Label htmlFor="email" className="text-xs uppercase text-muted-foreground font-semibold tracking-wider">Email *</Label>
                 <Input
                   id="email"
                   type="email"
@@ -133,7 +133,7 @@ const Contact = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="category">Catégorie *</Label>
+                <Label htmlFor="category" className="text-xs uppercase text-muted-foreground font-semibold tracking-wider">Catégorie *</Label>
                 <Select
                   defaultValue="autre"
                   onValueChange={(value) => setValue("category", value as "bug" | "suggestion" | "autre")}
@@ -150,7 +150,7 @@ const Contact = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="subject">Sujet *</Label>
+                <Label htmlFor="subject" className="text-xs uppercase text-muted-foreground font-semibold tracking-wider">Sujet *</Label>
                 <Input
                   id="subject"
                   placeholder="Objet de votre message"
@@ -163,7 +163,7 @@ const Contact = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="message">Message *</Label>
+                <Label htmlFor="message" className="text-xs uppercase text-muted-foreground font-semibold tracking-wider">Message *</Label>
                 <Textarea
                   id="message"
                   placeholder="Décrivez votre demande..."

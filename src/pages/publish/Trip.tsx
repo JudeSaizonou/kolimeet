@@ -116,14 +116,14 @@ const PublishTrip = () => {
           </CardHeader>
           <CardContent>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
                     name="from_country"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Pays de départ</FormLabel>
+                        <FormLabel className="text-xs uppercase text-muted-foreground font-semibold tracking-wider">Pays de départ</FormLabel>
                         <FormControl>
                           <Combobox
                             options={countries}
@@ -146,7 +146,7 @@ const PublishTrip = () => {
                     name="from_city"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Ville de départ</FormLabel>
+                        <FormLabel className="text-xs uppercase text-muted-foreground font-semibold tracking-wider">Ville de départ</FormLabel>
                         <FormControl>
                           {form.watch("from_country") && citiesByCountry[form.watch("from_country")] ? (
                             <Combobox
@@ -173,7 +173,7 @@ const PublishTrip = () => {
                     name="to_country"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Pays d'arrivée</FormLabel>
+                        <FormLabel className="text-xs uppercase text-muted-foreground font-semibold tracking-wider">Pays d'arrivée</FormLabel>
                         <FormControl>
                           <Combobox
                             options={countries}
@@ -196,7 +196,7 @@ const PublishTrip = () => {
                     name="to_city"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Ville d'arrivée</FormLabel>
+                        <FormLabel className="text-xs uppercase text-muted-foreground font-semibold tracking-wider">Ville d'arrivée</FormLabel>
                         <FormControl>
                           {form.watch("to_country") && citiesByCountry[form.watch("to_country")] ? (
                             <Combobox
@@ -222,7 +222,7 @@ const PublishTrip = () => {
                   name="date_departure"
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
-                      <FormLabel>Date de départ</FormLabel>
+                      <FormLabel className="text-xs uppercase text-muted-foreground font-semibold tracking-wider">Date de départ</FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
                           <FormControl>
@@ -263,7 +263,7 @@ const PublishTrip = () => {
                     name="capacity_kg"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Capacité totale (kg)</FormLabel>
+                        <FormLabel className="text-xs uppercase text-muted-foreground font-semibold tracking-wider">Capacité totale (kg)</FormLabel>
                         <FormControl>
                           <Input
                             type="number"
@@ -280,7 +280,7 @@ const PublishTrip = () => {
                     name="capacity_available_kg"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Capacité disponible (kg)</FormLabel>
+                        <FormLabel className="text-xs uppercase text-muted-foreground font-semibold tracking-wider">Capacité disponible (kg)</FormLabel>
                         <FormControl>
                           <Input
                             type="number"
@@ -299,7 +299,7 @@ const PublishTrip = () => {
                   name="price_expect"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Prix souhaité (€) - Optionnel</FormLabel>
+                      <FormLabel className="text-xs uppercase text-muted-foreground font-semibold tracking-wider">Prix souhaité (€) - Optionnel</FormLabel>
                       <FormControl>
                         <Input
                           type="number"
@@ -320,7 +320,7 @@ const PublishTrip = () => {
                   name="notes"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Notes (optionnel)</FormLabel>
+                      <FormLabel className="text-xs uppercase text-muted-foreground font-semibold tracking-wider">Notes (optionnel)</FormLabel>
                       <FormControl>
                         <Textarea
                           placeholder="Ex: J'accepte uniquement les petits colis..."

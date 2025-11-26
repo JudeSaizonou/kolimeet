@@ -286,14 +286,14 @@ const Register = () => {
       >
         <Link to="/" className="flex items-center justify-center gap-2 mb-8">
           <Package className="h-8 w-8 text-primary" />
-          <span className="text-2xl font-bold text-foreground">kilomeet</span>
+          <span className="text-2xl font-bold text-foreground">Kolimeet</span>
         </Link>
 
         <h1 className="text-2xl font-bold text-center text-foreground mb-2">
           Créer un compte
         </h1>
         <p className="text-center text-muted-foreground mb-6">
-          Rejoignez kilomeet aujourd'hui
+          Rejoignez Kolimeet aujourd'hui
         </p>
 
         <div className="space-y-3">
@@ -334,7 +334,7 @@ const Register = () => {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="fullName">Nom complet</Label>
+            <Label htmlFor="fullName" className="text-xs uppercase text-muted-foreground font-semibold tracking-wider">Nom complet</Label>
             <Input 
               id="fullName" 
               type="text" 
@@ -346,7 +346,7 @@ const Register = () => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email" className="text-xs uppercase text-muted-foreground font-semibold tracking-wider">Email</Label>
             <Input 
               id="email" 
               type="email" 
@@ -358,7 +358,7 @@ const Register = () => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">Mot de passe</Label>
+            <Label htmlFor="password" className="text-xs uppercase text-muted-foreground font-semibold tracking-wider">Mot de passe</Label>
             <Input 
               id="password" 
               type="password" 
@@ -370,7 +370,7 @@ const Register = () => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="confirmPassword">Confirmer le mot de passe</Label>
+            <Label htmlFor="confirmPassword" className="text-xs uppercase text-muted-foreground font-semibold tracking-wider">Confirmer le mot de passe</Label>
             <Input 
               id="confirmPassword" 
               type="password" 

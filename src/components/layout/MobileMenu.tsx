@@ -68,14 +68,14 @@ export const MobileMenu = ({ user, profile, isAdmin, onSignOut }: MobileMenuProp
       >
         <div 
           className={cn(
-            "w-6 h-0.5 bg-white rounded-full transition-all duration-300",
-            isOpen && "rotate-45 translate-y-2"
+            "w-6 h-0.5 bg-foreground rounded-full transition-all duration-300",
+            isOpen && "rotate-45 translate-y-2 bg-white"
           )}
         />
         <div 
           className={cn(
-            "w-6 h-0.5 bg-white rounded-full transition-all duration-300",
-            isOpen && "-rotate-45 -translate-y-2"
+            "w-6 h-0.5 bg-foreground rounded-full transition-all duration-300",
+            isOpen && "-rotate-45 -translate-y-2 bg-white"
           )}
         />
       </button>
@@ -94,53 +94,9 @@ export const MobileMenu = ({ user, profile, isAdmin, onSignOut }: MobileMenuProp
       >
         {/* Navigation Links */}
         <div className="flex flex-col items-center gap-[15px] w-full">
-          <a 
-            href="https://kolimeet.framer.ai/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[#333333] text-lg hover:opacity-70 transition-opacity"
-            onClick={handleLinkClick}
-          >
-            Accueil
-          </a>
-          
-          {!user && (
-            <>
-              <a 
-                href="https://kolimeet.framer.ai/services"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[#333333] text-lg hover:opacity-70 transition-opacity"
-                onClick={handleLinkClick}
-              >
-                Nos services
-              </a>
-              
-              <a 
-                href="https://kolimeet.framer.ai/about-us"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[#333333] text-lg hover:opacity-70 transition-opacity"
-                onClick={handleLinkClick}
-              >
-                À propos de nous
-              </a>
-            </>
-          )}
-          
-          <a 
-            href="https://kolimeet.framer.ai/blog"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[#333333] text-lg hover:opacity-70 transition-opacity"
-            onClick={handleLinkClick}
-          >
-            Blog
-          </a>
-          
           <Link 
             to="/explorer" 
-            className="text-[#333333] text-lg hover:opacity-70 transition-opacity"
+            className="text-[#333333] text-lg font-medium hover:opacity-70 transition-opacity"
             onClick={handleLinkClick}
           >
             Explorer
@@ -152,7 +108,7 @@ export const MobileMenu = ({ user, profile, isAdmin, onSignOut }: MobileMenuProp
               <div className="w-full flex flex-col items-center gap-[15px]">
                 <button
                   onClick={() => setIsPublishOpen(!isPublishOpen)}
-                  className="text-[#333333] text-lg hover:opacity-70 transition-opacity flex items-center gap-2"
+                  className="text-[#333333] text-lg font-medium hover:opacity-70 transition-opacity flex items-center gap-2"
                 >
                   Publier
                   <ChevronDown className={cn(
@@ -162,10 +118,10 @@ export const MobileMenu = ({ user, profile, isAdmin, onSignOut }: MobileMenuProp
                 </button>
                 
                 {isPublishOpen && (
-                  <div className="flex flex-col items-center gap-[15px] w-full">
+                  <div className="flex flex-col items-center gap-[15px] w-full bg-white/50 rounded-xl py-4">
                     <Link 
                       to="/publier/colis" 
-                      className="text-[#333333] text-base hover:opacity-70 transition-opacity pl-6"
+                      className="text-[#333333] text-base hover:opacity-70 transition-opacity"
                       onClick={handleLinkClick}
                     >
                       Un colis
@@ -173,7 +129,7 @@ export const MobileMenu = ({ user, profile, isAdmin, onSignOut }: MobileMenuProp
                     
                     <Link 
                       to="/publier/trajet" 
-                      className="text-[#333333] text-base hover:opacity-70 transition-opacity pl-6"
+                      className="text-[#333333] text-base hover:opacity-70 transition-opacity"
                       onClick={handleLinkClick}
                     >
                       Une annonce
@@ -183,24 +139,8 @@ export const MobileMenu = ({ user, profile, isAdmin, onSignOut }: MobileMenuProp
               </div>
               
               <Link 
-                to="/mes-annonces" 
-                className="text-[#333333] text-lg hover:opacity-70 transition-opacity"
-                onClick={handleLinkClick}
-              >
-                Mes annonces
-              </Link>
-              
-              <Link 
-                to="/favoris" 
-                className="text-[#333333] text-lg hover:opacity-70 transition-opacity inline-flex items-center gap-2"
-                onClick={handleLinkClick}
-              >
-                <span>Favoris</span>
-              </Link>
-              
-              <Link 
                 to="/messages" 
-                className="text-[#333333] text-lg hover:opacity-70 transition-opacity relative inline-flex items-center gap-2"
+                className="text-[#333333] text-lg font-medium hover:opacity-70 transition-opacity relative inline-flex items-center gap-2"
                 onClick={handleLinkClick}
               >
                 Messagerie
@@ -210,10 +150,26 @@ export const MobileMenu = ({ user, profile, isAdmin, onSignOut }: MobileMenuProp
                   </span>
                 )}
               </Link>
+
+              <Link 
+                to="/mes-annonces" 
+                className="text-[#333333] text-lg font-medium hover:opacity-70 transition-opacity"
+                onClick={handleLinkClick}
+              >
+                Mes annonces
+              </Link>
+              
+              <Link 
+                to="/favoris" 
+                className="text-[#333333] text-lg font-medium hover:opacity-70 transition-opacity inline-flex items-center gap-2"
+                onClick={handleLinkClick}
+              >
+                <span>Favoris</span>
+              </Link>
               
               <Link 
                 to="/profil" 
-                className="text-[#333333] text-lg hover:opacity-70 transition-opacity"
+                className="text-[#333333] text-lg font-medium hover:opacity-70 transition-opacity"
                 onClick={handleLinkClick}
               >
                 Mon profil
@@ -222,7 +178,7 @@ export const MobileMenu = ({ user, profile, isAdmin, onSignOut }: MobileMenuProp
               {isAdmin && (
                 <Link 
                   to="/admin" 
-                  className="text-[#333333] text-lg hover:opacity-70 transition-opacity"
+                  className="text-[#333333] text-lg font-medium hover:opacity-70 transition-opacity"
                   onClick={handleLinkClick}
                 >
                   Administration
@@ -234,13 +190,45 @@ export const MobileMenu = ({ user, profile, isAdmin, onSignOut }: MobileMenuProp
               {/* CTA Button - Login */}
               <Link 
                 to="/auth/login"
-                className="px-6 py-3 bg-transparent border border-black/50 rounded-full text-[#333333] hover:bg-black/5 transition-colors"
+                className="px-6 py-3 bg-primary text-white rounded-full font-medium hover:bg-primary/90 transition-colors w-full text-center"
                 onClick={handleLinkClick}
               >
                 Connexion
               </Link>
             </>
           )}
+
+          <div className="w-full h-px bg-gray-200 my-2" />
+
+          <a 
+            href="https://kolimeet.framer.ai/blog"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-muted-foreground text-base hover:text-primary transition-colors"
+            onClick={handleLinkClick}
+          >
+            Blog
+          </a>
+          
+          <a 
+            href="https://kolimeet.framer.ai/services"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-muted-foreground text-base hover:text-primary transition-colors"
+            onClick={handleLinkClick}
+          >
+            Nos services
+          </a>
+          
+          <a 
+            href="https://kolimeet.framer.ai/about-us"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-muted-foreground text-base hover:text-primary transition-colors"
+            onClick={handleLinkClick}
+          >
+            À propos de nous
+          </a>
         </div>
       </div>
     </>

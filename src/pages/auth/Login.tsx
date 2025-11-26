@@ -276,7 +276,7 @@ const Login = () => {
       >
         <Link to="/" className="flex items-center justify-center gap-2 mb-8">
           <Package className="h-8 w-8 text-primary" />
-          <span className="text-2xl font-bold text-foreground">kilomeet</span>
+          <span className="text-2xl font-bold text-foreground">Kolimeet</span>
         </Link>
 
         <h1 className="text-2xl font-bold text-center text-foreground mb-2">
@@ -324,7 +324,7 @@ const Login = () => {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email" className="text-xs uppercase text-muted-foreground font-semibold tracking-wider">Email</Label>
             <Input 
               id="email" 
               type="email" 
@@ -336,7 +336,7 @@ const Login = () => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">Mot de passe</Label>
+            <Label htmlFor="password" className="text-xs uppercase text-muted-foreground font-semibold tracking-wider">Mot de passe</Label>
             <Input 
               id="password" 
               type="password" 

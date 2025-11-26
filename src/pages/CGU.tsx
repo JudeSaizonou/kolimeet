@@ -6,8 +6,8 @@ const CGU = () => {
   return (
     <>
       <Helmet>
-        <title>Conditions Générales d'Utilisation - kilomeet</title>
-        <meta name="description" content="Conditions générales d'utilisation de kilomeet, plateforme de mise en relation pour l'envoi de colis entre la France et le Bénin." />
+        <title>Conditions Générales d'Utilisation - Kolimeet</title>
+        <meta name="description" content="Conditions générales d'utilisation de Kolimeet, plateforme de mise en relation pour l'envoi de colis entre la France et le Bénin." />
       </Helmet>
 
       <div className="min-h-screen bg-secondary">
@@ -22,14 +22,14 @@ const CGU = () => {
               <section className="mb-8">
                 <h2 className="text-xl font-semibold text-foreground mb-3">Préambule</h2>
                 <p className="text-muted-foreground leading-relaxed">
-                  kilomeet est une plateforme de mise en relation entre voyageurs et expéditeurs souhaitant acheminer des colis entre la France et le Bénin. La plateforme ne transporte pas elle-même de colis et n'est en aucun cas responsable des échanges entre utilisateurs.
+                  Kolimeet est une plateforme de mise en relation entre voyageurs et expéditeurs souhaitant acheminer des colis entre la France et le Bénin. La plateforme ne transporte pas elle-même de colis et n'est en aucun cas responsable des échanges entre utilisateurs.
                 </p>
               </section>
 
               <section className="mb-8">
                 <h2 className="text-xl font-semibold text-foreground mb-3">1. Acceptation des conditions</h2>
                 <p className="text-muted-foreground leading-relaxed">
-                  L'accès ou l'utilisation de kilomeet implique l'acceptation sans réserve des présentes Conditions Générales d'Utilisation (CGU). Si vous n'acceptez pas ces conditions, veuillez ne pas utiliser notre service.
+                  L'accès ou l'utilisation de Kolimeet implique l'acceptation sans réserve des présentes Conditions Générales d'Utilisation (CGU). Si vous n'acceptez pas ces conditions, veuillez ne pas utiliser notre service.
                 </p>
               </section>
 
@@ -39,7 +39,7 @@ const CGU = () => {
                   L'utilisateur s'engage à fournir des informations exactes (nom, numéro de téléphone, pays, ville) et à maintenir son compte à jour.
                 </p>
                 <p className="text-muted-foreground leading-relaxed">
-                  kilomeet se réserve le droit de suspendre tout compte suspect, frauduleux ou inactif sans préavis.
+                  Kolimeet se réserve le droit de suspendre tout compte suspect, frauduleux ou inactif sans préavis.
                 </p>
               </section>
 
@@ -48,7 +48,7 @@ const CGU = () => {
                 <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
                   <li>Les voyageurs publient des trajets disponibles avec leur capacité de transport</li>
                   <li>Les expéditeurs publient des demandes d'envoi de colis</li>
-                  <li>kilomeet facilite la mise en relation mais n'intervient pas dans la transaction</li>
+                  <li>Kolimeet facilite la mise en relation mais n'intervient pas dans la transaction</li>
                   <li>Les utilisateurs communiquent via la messagerie intégrée</li>
                 </ul>
               </section>
@@ -89,7 +89,7 @@ const CGU = () => {
               <section className="mb-8">
                 <h2 className="text-xl font-semibold text-foreground mb-3">6. Données personnelles</h2>
                 <p className="text-muted-foreground leading-relaxed mb-3">
-                  kilomeet collecte uniquement les données nécessaires à l'usage du service : informations de profil, messages, annonces et avis.
+                  Kolimeet collecte uniquement les données nécessaires à l'usage du service : informations de profil, messages, annonces et avis.
                 </p>
                 <p className="text-muted-foreground leading-relaxed">
                   Ces données ne sont jamais revendues à des tiers. Elles sont utilisées exclusivement pour le fonctionnement de la plateforme et la mise en relation entre utilisateurs.
@@ -102,14 +102,14 @@ const CGU = () => {
                   L'utilisateur peut supprimer son compte à tout moment depuis son profil.
                 </p>
                 <p className="text-muted-foreground leading-relaxed">
-                  kilomeet peut suspendre ou supprimer un compte en cas d'abus, fraude, non-respect des CGU, ou comportement nuisible à la communauté.
+                  Kolimeet peut suspendre ou supprimer un compte en cas d'abus, fraude, non-respect des CGU, ou comportement nuisible à la communauté.
                 </p>
               </section>
 
               <section className="mb-8">
                 <h2 className="text-xl font-semibold text-foreground mb-3">8. Modifications</h2>
                 <p className="text-muted-foreground leading-relaxed">
-                  kilomeet se réserve le droit de modifier les présentes CGU à tout moment. Les utilisateurs seront informés des modifications via l'application et/ou par email. L'utilisation continue du service après modification vaut acceptation des nouvelles conditions.
+                  Kolimeet se réserve le droit de modifier les présentes CGU à tout moment. Les utilisateurs seront informés des modifications via l'application et/ou par email. L'utilisation continue du service après modification vaut acceptation des nouvelles conditions.
                 </p>
               </section>
 
@@ -120,7 +120,7 @@ const CGU = () => {
                   <Link to="/contact" className="text-primary hover:underline">
                     page de contact
                   </Link>{" "}
-                  ou à l'adresse : contact@kilomeet.com
+                  ou à l'adresse : contact@Kolimeet.com
                 </p>
               </section>
 

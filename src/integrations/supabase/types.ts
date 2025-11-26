@@ -12,31 +12,6 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "13.0.5"
   }
-  graphql_public: {
-    Tables: {
-      [_ in never]: never
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      graphql: {
-        Args: {
-          extensions?: Json
-          operationName?: string
-          query?: string
-          variables?: Json
-        }
-        Returns: Json
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
   public: {
     Tables: {
       favorites: {
@@ -184,6 +159,87 @@ export type Database = {
             columns: ["thread_id"]
             isOneToOne: false
             referencedRelation: "threads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          created_at: string | null
+          id: string
+          message: string
+          read: boolean | null
+          related_id: string | null
+          related_type: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          message: string
+          read?: boolean | null
+          related_id?: string | null
+          related_type?: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          message?: string
+          read?: boolean | null
+          related_id?: string | null
+          related_type?: string | null
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      parcel_matches: {
+        Row: {
+          created_at: string
+          id: string
+          match_score: number
+          parcel_id: string
+          status: string
+          trip_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          match_score: number
+          parcel_id: string
+          status?: string
+          trip_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          match_score?: number
+          parcel_id?: string
+          status?: string
+          trip_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "parcel_matches_parcel_id_fkey"
+            columns: ["parcel_id"]
+            isOneToOne: false
+            referencedRelation: "parcels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "parcel_matches_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
             referencedColumns: ["id"]
           },
         ]
@@ -708,6 +764,63 @@ export type Database = {
         }
         Relationships: []
       }
+      parcel_matches_detailed: {
+        Row: {
+          capacity_available_kg: number | null
+          created_at: string | null
+          date_departure: string | null
+          deadline: string | null
+          id: string | null
+          match_score: number | null
+          parcel_from_city: string | null
+          parcel_from_country: string | null
+          parcel_id: string | null
+          parcel_to_city: string | null
+          parcel_to_country: string | null
+          parcel_type: string | null
+          parcel_user_id: string | null
+          price_expect: number | null
+          size: string | null
+          status: string | null
+          trip_from_city: string | null
+          trip_from_country: string | null
+          trip_id: string | null
+          trip_to_city: string | null
+          trip_to_country: string | null
+          trip_user_id: string | null
+          weight_kg: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "parcel_matches_parcel_id_fkey"
+            columns: ["parcel_id"]
+            isOneToOne: false
+            referencedRelation: "parcels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "parcel_matches_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "parcels_user_id_fkey"
+            columns: ["parcel_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "trips_user_id_fkey"
+            columns: ["trip_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       thread_message_stats: {
         Row: {
           last_message_at: string | null
@@ -720,6 +833,7 @@ export type Database = {
       }
     }
     Functions: {
+      cleanup_expired_matches: { Args: never; Returns: undefined }
       cleanup_old_typing_status: { Args: never; Returns: undefined }
       confirm_delivery_and_release_funds: {
         Args: { p_confirmation_code?: string; p_reservation_id: string }
@@ -729,6 +843,54 @@ export type Database = {
         Args: { p_item_id: string; p_item_type: string }
         Returns: number
       }
+      generate_parcel_matches: {
+        Args: { p_parcel_id: string }
+        Returns: undefined
+      }
+      generate_trip_matches: { Args: { p_trip_id: string }; Returns: undefined }
+      get_parcel_top_matches: {
+        Args: { p_limit?: number; p_parcel_id: string }
+        Returns: {
+          capacity_available_kg: number
+          date_departure: string
+          match_id: string
+          match_score: number
+          price_expect: number
+          traveler_name: string
+          traveler_rating: number
+          trip_from_city: string
+          trip_id: string
+          trip_to_city: string
+        }[]
+      }
+      get_recent_notifications: {
+        Args: { p_limit?: number }
+        Returns: {
+          created_at: string
+          id: string
+          message: string
+          read: boolean
+          related_id: string
+          related_type: string
+          title: string
+          type: string
+        }[]
+      }
+      get_trip_top_matches: {
+        Args: { p_limit?: number; p_trip_id: string }
+        Returns: {
+          deadline: string
+          match_id: string
+          match_score: number
+          parcel_from_city: string
+          parcel_id: string
+          parcel_to_city: string
+          parcel_type: string
+          sender_name: string
+          sender_rating: number
+          weight_kg: number
+        }[]
+      }
       get_unread_count_by_thread: {
         Args: { p_user_id: string }
         Returns: {
@@ -736,6 +898,7 @@ export type Database = {
           unread_count: number
         }[]
       }
+      get_unread_notifications_count: { Args: never; Returns: number }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -749,6 +912,10 @@ export type Database = {
       }
       is_user_admin: { Args: { user_uuid: string }; Returns: boolean }
       mark_message_as_read: { Args: { message_id: string }; Returns: undefined }
+      mark_notification_read: {
+        Args: { p_notification_id: string }
+        Returns: undefined
+      }
       mark_thread_messages_as_read: {
         Args: { p_thread_id: string; p_user_id: string }
         Returns: undefined
@@ -885,9 +1052,6 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
-  graphql_public: {
-    Enums: {},
-  },
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user"],

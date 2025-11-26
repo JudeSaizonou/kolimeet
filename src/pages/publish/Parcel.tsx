@@ -167,14 +167,14 @@ const PublishParcel = () => {
           </CardHeader>
           <CardContent>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
                     name="type"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Type de colis</FormLabel>
+                        <FormLabel className="text-xs uppercase text-muted-foreground font-semibold tracking-wider">Type de colis</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger>
@@ -197,7 +197,7 @@ const PublishParcel = () => {
                     name="size"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Taille</FormLabel>
+                        <FormLabel className="text-xs uppercase text-muted-foreground font-semibold tracking-wider">Taille</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger>
@@ -221,7 +221,7 @@ const PublishParcel = () => {
                   name="weight_kg"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Poids (kg)</FormLabel>
+                      <FormLabel className="text-xs uppercase text-muted-foreground font-semibold tracking-wider">Poids (kg)</FormLabel>
                       <FormControl>
                         <Input
                           type="number"
@@ -241,7 +241,7 @@ const PublishParcel = () => {
                     name="from_country"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Pays de départ</FormLabel>
+                        <FormLabel className="text-xs uppercase text-muted-foreground font-semibold tracking-wider">Pays de départ</FormLabel>
                         <FormControl>
                           <Combobox
                             options={countries}
@@ -264,7 +264,7 @@ const PublishParcel = () => {
                     name="from_city"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Ville de départ</FormLabel>
+                        <FormLabel className="text-xs uppercase text-muted-foreground font-semibold tracking-wider">Ville de départ</FormLabel>
                         <FormControl>
                           {form.watch("from_country") && citiesByCountry[form.watch("from_country")] ? (
                             <Combobox
@@ -291,7 +291,7 @@ const PublishParcel = () => {
                     name="to_country"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Pays d'arrivée</FormLabel>
+                        <FormLabel className="text-xs uppercase text-muted-foreground font-semibold tracking-wider">Pays d'arrivée</FormLabel>
                         <FormControl>
                           <Combobox
                             options={countries}
@@ -314,7 +314,7 @@ const PublishParcel = () => {
                     name="to_city"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Ville d'arrivée</FormLabel>
+                        <FormLabel className="text-xs uppercase text-muted-foreground font-semibold tracking-wider">Ville d'arrivée</FormLabel>
                         <FormControl>
                           {form.watch("to_country") && citiesByCountry[form.watch("to_country")] ? (
                             <Combobox
@@ -340,7 +340,7 @@ const PublishParcel = () => {
                   name="deadline"
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
-                      <FormLabel>Date limite de livraison</FormLabel>
+                      <FormLabel className="text-xs uppercase text-muted-foreground font-semibold tracking-wider">Date limite de livraison</FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
                           <FormControl>
@@ -380,7 +380,7 @@ const PublishParcel = () => {
                   name="description"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Description (optionnel)</FormLabel>
+                      <FormLabel className="text-xs uppercase text-muted-foreground font-semibold tracking-wider">Description (optionnel)</FormLabel>
                       <FormControl>
                         <Textarea
                           placeholder="Décrivez votre colis..."
@@ -394,7 +394,7 @@ const PublishParcel = () => {
                 />
 
                 <div className="space-y-4">
-                  <FormLabel>Photos (max 3)</FormLabel>
+                  <FormLabel className="text-xs uppercase text-muted-foreground font-semibold tracking-wider">Photos (max 3)</FormLabel>
                   <div className="grid grid-cols-3 gap-4">
                     {previewUrls.map((url, index) => (
                       <div key={index} className="relative aspect-square">

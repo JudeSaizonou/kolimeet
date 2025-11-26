@@ -78,6 +78,8 @@ interface GlassCardProps extends GlassBaseProps {
   rounded?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl';
   /** Hover lift effect */
   hoverLift?: boolean;
+  /** OnClick handler */
+  onClick?: () => void;
   /** Children */
   children?: ReactNode;
 }
@@ -92,6 +94,7 @@ export function GlassCard({
   padding = 'lg',
   rounded = 'xl',
   hoverLift = true,
+  onClick,
   className,
   children,
   ...props
@@ -124,6 +127,7 @@ export function GlassCard({
       className={cn(
         'relative overflow-hidden',
         roundedClasses[rounded],
+        onClick && 'cursor-pointer',
         className
       )}
       initial={{ opacity: 0, y: 20 }}
@@ -131,6 +135,7 @@ export function GlassCard({
       viewport={{ once: true, margin: '-50px' }}
       transition={{ duration: 0.6, ease: 'easeOut' }}
       whileHover={hoverLift ? { y: -8, scale: 1.02 } : undefined}
+      onClick={onClick}
       {...props}
     >
       {/* Backdrop blur layer */}

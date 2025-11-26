@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kilomeet-v2';
+const CACHE_NAME = 'Kolimeet-v2';
 const urlsToCache = [
   '/',
   '/index.html',

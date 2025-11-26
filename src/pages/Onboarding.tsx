@@ -146,7 +146,7 @@ const Onboarding = () => {
 
       toast({
         title: "Profil complété",
-        description: "Bienvenue sur kilomeet !",
+        description: "Bienvenue sur Kolimeet !",
       });
 
       navigate("/");

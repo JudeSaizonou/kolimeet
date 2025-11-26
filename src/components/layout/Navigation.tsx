@@ -15,6 +15,7 @@ import { useUnreadCount } from "@/hooks/useUnreadCount";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { MobileMenu } from "./MobileMenu";
+import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { cn } from "@/lib/utils";
 
 const Navigation = () => {
@@ -54,20 +55,20 @@ const Navigation = () => {
     )}>
       <nav className={cn(
         "flex items-center justify-between",
-        "px-6 py-4 gap-2.5",
-        "bg-black/50 backdrop-blur-md",
+        "px-6 py-3 gap-4",
+        "bg-white/80 backdrop-blur-md",
         "rounded-full",
         "border border-white/20",
-        "shadow-lg shadow-black/10",
+        "shadow-glass",
         // Responsive padding
-        "md:px-12 md:py-6"
+        "md:px-8 md:py-4"
       )}>
         {/* Logo */}
         {user ? (
           <Link to="/explorer" className="flex items-center gap-2 flex-shrink-0">
-            <Package className="h-6 w-6 text-white" />
-            <span className="text-xl font-bold text-[#d6d6d6] whitespace-nowrap">
-              kilomeet
+            <Package className="h-6 w-6 text-primary" />
+            <span className="text-xl font-bold text-foreground whitespace-nowrap">
+              Kolimeet
             </span>
           </Link>
         ) : (
@@ -77,9 +78,9 @@ const Navigation = () => {
             rel="noopener noreferrer"
             className="flex items-center gap-2 flex-shrink-0"
           >
-            <Package className="h-6 w-6 text-white" />
-            <span className="text-xl font-bold text-[#d6d6d6] whitespace-nowrap">
-              kilomeet
+            <Package className="h-6 w-6 text-primary" />
+            <span className="text-xl font-bold text-foreground whitespace-nowrap">
+              Kolimeet
             </span>
           </a>
         )}
@@ -90,7 +91,7 @@ const Navigation = () => {
             href="https://kolimeet.framer.ai/"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[#d6d6d6] hover:text-white transition-all duration-200 text-base font-medium whitespace-nowrap"
+            className="text-muted-foreground hover:text-primary transition-all duration-200 text-base font-medium whitespace-nowrap"
           >
             Accueil
           </a>
@@ -101,7 +102,7 @@ const Navigation = () => {
                 href="https://kolimeet.framer.ai/services"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[#d6d6d6] hover:text-white transition-all duration-200 text-base font-medium whitespace-nowrap"
+                className="text-muted-foreground hover:text-primary transition-all duration-200 text-base font-medium whitespace-nowrap"
               >
                 Nos services
               </a>
@@ -110,7 +111,7 @@ const Navigation = () => {
                 href="https://kolimeet.framer.ai/about-us"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[#d6d6d6] hover:text-white transition-all duration-200 text-base font-medium whitespace-nowrap"
+                className="text-muted-foreground hover:text-primary transition-all duration-200 text-base font-medium whitespace-nowrap"
               >
                 À propos de nous
               </a>
@@ -121,14 +122,14 @@ const Navigation = () => {
             href="https://kolimeet.framer.ai/blog"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[#d6d6d6] hover:text-white transition-all duration-200 text-base font-medium whitespace-nowrap"
+            className="text-muted-foreground hover:text-primary transition-all duration-200 text-base font-medium whitespace-nowrap"
           >
             Blog
           </a>
           
           <Link 
             to="/explorer"
-            className="text-[#d6d6d6] hover:text-white transition-all duration-200 text-base font-medium whitespace-nowrap"
+            className="text-muted-foreground hover:text-primary transition-all duration-200 text-base font-medium whitespace-nowrap"
           >
             Explorer
           </Link>
@@ -137,13 +138,13 @@ const Navigation = () => {
             <>
               <Link 
                 to="/explorer"
-                className="text-[#d6d6d6] hover:text-white transition-all duration-200 text-base font-medium whitespace-nowrap"
+                className="text-muted-foreground hover:text-primary transition-all duration-200 text-base font-medium whitespace-nowrap"
               >
                 Explorer
               </Link>
               <Link 
                 to="/messages"
-                className="text-[#d6d6d6] hover:text-white transition-all duration-200 text-base font-medium whitespace-nowrap relative"
+                className="text-muted-foreground hover:text-primary transition-all duration-200 text-base font-medium whitespace-nowrap relative"
               >
                 Messagerie
                 {unreadCount > 0 && (
@@ -163,7 +164,7 @@ const Navigation = () => {
               <DropdownMenuTrigger asChild>
                 <Button 
                   variant="ghost"
-                  className="text-[#d6d6d6] hover:text-white hover:bg-white/10 transition-all duration-200"
+                  className="text-muted-foreground hover:text-primary hover:bg-white/10 transition-all duration-200"
                 >
                   Publier
                 </Button>
@@ -184,6 +185,8 @@ const Navigation = () => {
               </DropdownMenuContent>
             </DropdownMenu>
           )}
+
+          {user && <NotificationBell />}
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

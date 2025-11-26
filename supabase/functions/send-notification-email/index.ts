@@ -31,7 +31,7 @@ serve(async (req) => {
     // TODO: Integrate Resend when RESEND_API_KEY is available
     // const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
     // await resend.emails.send({
-    //   from: "kilomeet <notifications@kilomeet.com>",
+    //   from: "Kolimeet <notifications@Kolimeet.com>",
     //   to: [to],
     //   subject,
     //   html,

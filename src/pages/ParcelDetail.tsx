@@ -14,6 +14,7 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { MatchingSection } from "@/components/explorer/MatchingSection";
 import { ReviewDialog } from "@/components/reviews/ReviewDialog";
+import { MatchingSuggestions } from "@/components/matching/MatchingSuggestions";
 
 const ParcelDetail = () => {
   const { id } = useParams();
@@ -253,6 +254,11 @@ const ParcelDetail = () => {
             </div>
           </CardContent>
         </Card>
+
+        {/* Suggestions de trajets compatibles */}
+        <div className="mb-6">
+          <MatchingSuggestions type="parcel" itemId={parcel.id} maxSuggestions={5} />
+        </div>
 
         <MatchingSection type="parcel" item={parcel} />
       </div>

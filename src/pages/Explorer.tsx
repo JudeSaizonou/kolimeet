@@ -47,11 +47,11 @@ const Explorer = () => {
           <div className="p-2 bg-primary rounded-lg">
             <Search className="h-6 w-6 text-white" />
           </div>
-          <h1 className="text-3xl md:text-4xl font-bold text-foreground">
+          <h1 className="text-2xl md:text-4xl font-extrabold text-foreground tracking-tight">
             Explorer les annonces
           </h1>
         </div>
-        <p className="text-muted-foreground text-lg">
+        <p className="text-slate-600 text-base md:text-lg font-medium">
           Trouvez le voyageur ou l'expéditeur qui correspond à vos besoins.
         </p>
       </div>
@@ -95,9 +95,9 @@ const Explorer = () => {
           />
 
           {tripsLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6">
               {[...Array(6)].map((_, i) => (
-                <Skeleton key={i} className="h-64 rounded-xl" />
+                <Skeleton key={i} className="h-48 md:h-64 rounded-xl" />
               ))}
             </div>
           ) : trips.length === 0 ? (
@@ -108,7 +108,7 @@ const Explorer = () => {
             />
           ) : (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6">
                 {trips.map((trip) => (
                   <TripCard key={trip.id} trip={trip} />
                 ))}
@@ -163,9 +163,9 @@ const Explorer = () => {
           />
 
           {parcelsLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6">
               {[...Array(6)].map((_, i) => (
-                <Skeleton key={i} className="h-64 rounded-xl" />
+                <Skeleton key={i} className="h-48 md:h-64 rounded-xl" />
               ))}
             </div>
           ) : parcels.length === 0 ? (
@@ -176,7 +176,7 @@ const Explorer = () => {
             />
           ) : (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6">
                 {parcels.map((parcel) => (
                   <ParcelCard key={parcel.id} parcel={parcel} />
                 ))}

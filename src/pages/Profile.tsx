@@ -242,7 +242,7 @@ const Profile = () => {
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="full_name">
+                <Label htmlFor="full_name" className="text-xs uppercase text-muted-foreground font-semibold tracking-wider">
                   Nom complet <span className="text-destructive">*</span>
                 </Label>
                 <Input
@@ -257,7 +257,7 @@ const Profile = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="country">
+                <Label htmlFor="country" className="text-xs uppercase text-muted-foreground font-semibold tracking-wider">
                   Pays <span className="text-destructive">*</span>
                 </Label>
                 <Select
@@ -282,7 +282,7 @@ const Profile = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="city">
+                <Label htmlFor="city" className="text-xs uppercase text-muted-foreground font-semibold tracking-wider">
                   Ville <span className="text-destructive">*</span>
                 </Label>
                 {selectedCountry && citiesByCountry[selectedCountry] ? (
@@ -320,7 +320,7 @@ const Profile = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="phone_e164">Téléphone</Label>
+                <Label htmlFor="phone_e164" className="text-xs uppercase text-muted-foreground font-semibold tracking-wider">Téléphone</Label>
                 <Input
                   id="phone_e164"
                   type="tel"

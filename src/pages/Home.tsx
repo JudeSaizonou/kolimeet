@@ -29,7 +29,7 @@ const Home = () => {
             Envoyer ou transporter un colis facilement entre plusieurs destinations
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground mb-8 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-            kilomeet met en relation les voyageurs avec les expéditeurs pour un transport de colis sécurisé et économique.
+            Kolimeet met en relation les voyageurs avec les expéditeurs pour un transport de colis sécurisé et économique.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in" style={{ animationDelay: '0.4s' }}>
             <Link to="/explorer">
@@ -100,7 +100,7 @@ const Home = () => {
             Prêt à commencer ?
           </h2>
           <p className="text-lg text-muted-foreground mb-8">
-            Rejoignez kilomeet aujourd'hui et découvrez une nouvelle façon d'envoyer vos colis.
+            Rejoignez Kolimeet aujourd'hui et découvrez une nouvelle façon d'envoyer vos colis.
           </p>
           <Link to="/auth/register">
             <MagneticButton size="lg" className="font-semibold shadow-lg hover:shadow-xl" magnetStrength={0.5}>

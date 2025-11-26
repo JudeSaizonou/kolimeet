@@ -116,8 +116,8 @@ const MessageThread = () => {
           <AlertTriangle className="h-4 w-4 text-yellow-600 shrink-0" />
           <AlertDescription className="text-xs md:text-sm text-yellow-800 dark:text-yellow-200">
             <strong className="font-semibold">⚠️ Sécurité :</strong>
-            <span className="hidden md:inline"> Gardez toutes vos communications sur kilomeet. Ne partagez jamais votre numéro ou email avant de rencontrer la personne.</span>
-            <span className="md:hidden"> Restez sur kilomeet, ne partagez pas vos coordonnées.</span>
+            <span className="hidden md:inline"> Gardez toutes vos communications sur Kolimeet. Ne partagez jamais votre numéro ou email avant de rencontrer la personne.</span>
+            <span className="md:hidden"> Restez sur Kolimeet, ne partagez pas vos coordonnées.</span>
           </AlertDescription>
         </Alert>
       </header>

@@ -120,7 +120,7 @@ export default function Feedback() {
         </Card>
 
         <p className="text-sm text-muted-foreground text-center mt-6">
-          Merci de contribuer à l'amélioration de kilomeet ! ✈️📦
+          Merci de contribuer à l'amélioration de Kolimeet ! ✈️📦
         </p>
       </main>
     </div>

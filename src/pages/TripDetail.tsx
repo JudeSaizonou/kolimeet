@@ -9,12 +9,15 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowRight, Calendar, Package, Star, CreditCard, MessageCircle, Heart } from "lucide-react";
+import { ArrowRight, Calendar, Package, Star, CreditCard, MessageCircle, Heart, MapPin, Weight, Info } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { MatchingSection } from "@/components/explorer/MatchingSection";
 import { ReviewDialog } from "@/components/reviews/ReviewDialog";
 import { BookingDialog } from "@/components/booking/BookingDialog";
+import { GlassCard } from "@/components/LiquidGlass";
+import { MatchingSuggestions } from "@/components/matching/MatchingSuggestions";
+import { Separator } from "@/components/ui/separator";
 
 const TripDetail = () => {
   const { id } = useParams();
@@ -117,161 +120,151 @@ const TripDetail = () => {
 
   if (!trip) return null;
 
-  const profile = trip.profiles;
-
   return (
-    <>
-      <div className="container mx-auto px-3 md:px-4 py-4 md:py-8">
-        <Card className="mb-4 md:mb-6 overflow-hidden">
-          <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-background p-4 md:p-6 border-b">
-            <div className="flex items-start justify-between gap-3">
-              <div className="space-y-2 flex-1">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <div className="flex items-center gap-2 text-base md:text-xl font-bold">
-                    <span className="text-foreground">{trip.from_city}</span>
-                    <ArrowRight className="h-4 md:h-5 w-4 md:w-5 text-primary" />
-                    <span className="text-foreground">{trip.to_city}</span>
+    <div className="min-h-screen bg-secondary/30 pb-24 pt-20 md:pt-24">
+      <div className="container mx-auto px-4 max-w-3xl">
+        
+        {/* Header Card */}
+        <GlassCard 
+          className="relative overflow-hidden mb-6"
+          intensity="medium"
+          rounded="2xl"
+          padding="sm"
+        >
+          {/* Gradient Background Header */}
+          <div className="h-32 bg-gradient-to-r from-primary/20 via-primary/10 to-transparent relative">
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="flex items-center gap-4 text-primary/80">
+                <span className="text-2xl font-bold">{trip.from_city}</span>
+                <ArrowRight className="h-6 w-6" />
+                <span className="text-2xl font-bold">{trip.to_city}</span>
+              </div>
+            </div>
+            
+            {/* Favorite Button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute top-4 right-4 bg-white/50 backdrop-blur-sm hover:bg-white/80 rounded-full"
+              onClick={toggleFavorite}
+            >
+              <Heart className={`h-5 w-5 ${isFavorited ? "fill-red-500 text-red-500" : "text-gray-600"}`} />
+            </Button>
+          </div>
+
+          <div className="p-6 -mt-12 relative z-10">
+            <div className="flex justify-between items-end mb-6">
+              <div className="flex items-center gap-4">
+                <Avatar className="h-20 w-20 border-4 border-white shadow-lg">
+                  <AvatarImage src={trip.profiles?.avatar_url} />
+                  <AvatarFallback>{trip.profiles?.full_name?.[0]}</AvatarFallback>
+                </Avatar>
+                <div className="mb-2">
+                  <h1 className="text-xl font-bold text-foreground">{trip.profiles?.full_name}</h1>
+                  <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                    <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                    <span className="font-medium text-foreground">{trip.profiles?.rating_avg?.toFixed(1) || "Nouveau"}</span>
+                    {trip.profiles?.rating_count > 0 && <span>({trip.profiles?.rating_count})</span>}
                   </div>
                 </div>
-                <div className="flex items-center gap-1.5 text-xs md:text-sm text-muted-foreground">
-                  <Calendar className="h-3.5 md:h-4 w-3.5 md:w-4" />
-                  <span>{format(new Date(trip.date_departure), "d MMMM yyyy", { locale: fr })}</span>
+              </div>
+              
+              <div className="text-right mb-2">
+                <div className="text-2xl font-bold text-primary">
+                  {trip.price_expect ? `${trip.price_expect}€` : "Sur devis"}
+                </div>
+                <div className="text-xs text-muted-foreground uppercase font-semibold tracking-wider">par kg</div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              <div className="bg-secondary/50 p-3 rounded-xl flex items-center gap-3">
+                <div className="bg-primary/10 p-2 rounded-lg">
+                  <Calendar className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <div className="text-[10px] uppercase text-muted-foreground font-bold tracking-wider">Départ</div>
+                  <div className="font-semibold text-sm">
+                    {format(new Date(trip.date_departure), "d MMM yyyy", { locale: fr })}
+                  </div>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={toggleFavorite}
-                  className="h-9 w-9 md:h-10 md:w-10 shrink-0"
-                  title={isFavorited ? "Retirer des favoris" : "Ajouter aux favoris"}
-                >
-                  <Heart className={`h-4 w-4 md:h-5 md:w-5 ${isFavorited ? 'fill-red-500 text-red-500' : ''}` } />
-                </Button>
-                <Badge 
-                  variant={trip.status === "open" ? "default" : "secondary"} 
-                  className="text-xs shrink-0"
-                >
-                  {trip.status === "open" ? "Ouvert" : "Fermé"}
-                </Badge>
+
+              <div className="bg-secondary/50 p-3 rounded-xl flex items-center gap-3">
+                <div className="bg-primary/10 p-2 rounded-lg">
+                  <Weight className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <div className="text-[10px] uppercase text-muted-foreground font-bold tracking-wider">Capacité</div>
+                  <div className="font-semibold text-sm">
+                    {trip.capacity_available_kg} kg dispo
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-xs uppercase text-muted-foreground font-bold tracking-wider mb-2 flex items-center gap-2">
+                  <Info className="h-3 w-3" />
+                  Description
+                </h3>
+                <p className="text-sm text-foreground/80 leading-relaxed">
+                  {trip.notes || "Aucune description fournie pour ce trajet."}
+                </p>
               </div>
             </div>
           </div>
+        </GlassCard>
 
-          <CardContent className="space-y-4 md:space-y-5 p-4 md:p-6">
-            <Link 
-              to={`/u/${trip.user_id}`}
-              className="flex items-center gap-3 md:gap-4 p-3 md:p-4 border rounded-xl hover:border-primary/50 hover:shadow-sm transition-all duration-200 bg-card"
+        {/* Action Buttons */}
+        <div className="fixed bottom-0 left-0 right-0 p-4 bg-white/80 backdrop-blur-xl border-t border-white/20 z-40 md:relative md:bg-transparent md:border-0 md:p-0 md:backdrop-blur-none">
+          <div className="container max-w-3xl mx-auto flex gap-3">
+            <Button 
+              className="flex-1 h-12 rounded-xl font-semibold text-base shadow-lg shadow-primary/20"
+              onClick={() => setBookingDialogOpen(true)}
             >
-              <Avatar className="h-12 md:h-16 w-12 md:w-16 ring-2 ring-primary/10">
-                <AvatarImage src={profile?.avatar_url} />
-                <AvatarFallback className="text-base md:text-lg bg-primary/10">{profile?.full_name?.[0] || "U"}</AvatarFallback>
-              </Avatar>
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold text-sm md:text-base truncate">{profile?.full_name || "Utilisateur"}</p>
-                {profile?.rating_avg > 0 && (
-                  <div className="flex items-center gap-1 text-xs md:text-sm text-muted-foreground">
-                    <Star className="h-3 md:h-4 w-3 md:w-4 fill-amber-400 text-amber-400" />
-                    <span className="font-medium">{Number(profile.rating_avg).toFixed(1)}</span>
-                    <span className="text-muted-foreground/70">({profile.rating_count})</span>
-                  </div>
-                )}
-              </div>
-            </Link>
+              <Package className="mr-2 h-5 w-5" />
+              Réserver
+            </Button>
+            <Button 
+              variant="outline" 
+              className="h-12 w-12 rounded-xl p-0 border-2"
+              onClick={handleContact}
+            >
+              <MessageCircle className="h-5 w-5" />
+            </Button>
+          </div>
+        </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
-              <div className="p-3 md:p-4 border rounded-xl bg-gradient-to-br from-primary/5 to-background">
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="p-1.5 rounded-lg bg-primary/10">
-                    <Package className="h-4 md:h-5 w-4 md:w-5 text-primary" />
-                  </div>
-                  <h3 className="font-semibold text-xs md:text-sm text-muted-foreground">Capacité disponible</h3>
-                </div>
-                <p className="text-xl md:text-2xl font-bold text-foreground">{trip.capacity_available_kg}kg</p>
-                <p className="text-xs md:text-sm text-muted-foreground mt-1">sur {trip.capacity_kg}kg</p>
-              </div>
+        {/* Suggestions de colis compatibles */}
+        <div className="mt-8 mb-6">
+          <MatchingSuggestions type="trip" itemId={trip.id} maxSuggestions={5} />
+        </div>
 
-              {trip.price_expect && (
-                <div className="p-3 md:p-4 border rounded-xl bg-gradient-to-br from-emerald-500/5 to-background">
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="p-1.5 rounded-lg bg-emerald-500/10">
-                      <CreditCard className="h-4 md:h-5 w-4 md:w-5 text-emerald-600" />
-                    </div>
-                    <h3 className="font-semibold text-xs md:text-sm text-muted-foreground">Prix souhaité</h3>
-                  </div>
-                  <p className="text-xl md:text-2xl font-bold text-foreground">{trip.price_expect}€</p>
-                </div>
-              )}
-            </div>
+        {/* Matching Section */}
+        <div className="mb-24 md:mb-8">
+          <h2 className="text-lg font-bold mb-4 px-2">Autres colis disponibles</h2>
+          <MatchingSection 
+            type="trip" 
+            item={trip} 
+          />
+        </div>
 
-            {trip.notes && (
-              <div className="p-3 md:p-4 bg-muted/20 border rounded-xl">
-                <h3 className="font-semibold mb-2 text-xs md:text-sm text-muted-foreground">Notes du voyageur</h3>
-                <p className="text-sm md:text-base text-foreground/90 whitespace-pre-wrap leading-relaxed">{trip.notes}</p>
-              </div>
-            )}
+        <ReviewDialog
+          open={reviewDialogOpen}
+          onOpenChange={setReviewDialogOpen}
+          targetUserId={trip.user_id}
+          targetUserName={trip.profiles?.full_name || "ce voyageur"}
+        />
 
-            {/* Boutons d'action */}
-            <div className="space-y-2.5 md:space-y-3 pt-2">
-              {trip.capacity_available_kg > 0 ? (
-                <Button 
-                  onClick={() => setBookingDialogOpen(true)} 
-                  className="w-full h-11 md:h-12 shadow-sm font-medium" 
-                  disabled={!user || user.id === trip.user_id}
-                >
-                  <CreditCard className="w-4 h-4 mr-2" />
-                  <span className="text-sm md:text-base">Réserver ({trip.price_expect ? `${trip.price_expect}€/kg` : 'Prix à négocier'})</span>
-                </Button>
-              ) : (
-                <Button disabled className="w-full h-11 md:h-12">
-                  <Package className="w-4 h-4 mr-2" />
-                  <span className="text-sm md:text-base">Capacité épuisée</span>
-                </Button>
-              )}
-              
-              <Button 
-                onClick={handleContact} 
-                variant="outline" 
-                className="w-full h-11 md:h-12 border-2 hover:bg-accent font-medium" 
-                disabled={!user || user.id === trip.user_id}
-              >
-                <MessageCircle className="w-4 h-4 mr-2" />
-                <span className="text-sm md:text-base">Contacter le voyageur</span>
-              </Button>
-            </div>
-
-            {user && user.id !== trip.user_id && trip.status === "closed" && (
-              <Button 
-                onClick={() => setReviewDialogOpen(true)} 
-                variant="outline" 
-                className="w-full h-11 md:h-12"
-              >
-                <Star className="w-4 h-4 mr-2" />
-                <span className="text-sm md:text-base">Laisser un avis</span>
-              </Button>
-            )}
-          </CardContent>
-        </Card>
-
-        <MatchingSection type="trip" item={trip} />
+        <BookingDialog
+          open={bookingDialogOpen}
+          onOpenChange={setBookingDialogOpen}
+          trip={trip}
+        />
       </div>
-
-      {user && user.id !== trip.user_id && (
-        <>
-          <ReviewDialog
-            open={reviewDialogOpen}
-            onOpenChange={setReviewDialogOpen}
-            targetUserId={trip.user_id}
-            targetUserName={profile?.full_name || "ce voyageur"}
-          />
-          <BookingDialog
-            open={bookingDialogOpen}
-            onOpenChange={setBookingDialogOpen}
-            trip={trip}
-          />
-        </>
-      )}
-    </>
+    </div>
   );
 };
 

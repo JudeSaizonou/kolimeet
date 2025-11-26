@@ -1,6 +1,6 @@
 {
-  "name": "kilomeet - Envoi de colis France-Bénin",
-  "short_name": "kilomeet",
+  "name": "Kolimeet - Envoi de colis France-Bénin",
+  "short_name": "Kolimeet",
   "description": "Plateforme de mise en relation entre voyageurs et expéditeurs pour l'envoi de colis entre la France et le Bénin",
   "start_url": "/",
   "scope": "/",

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "🚀 DÉPLOIEMENT KILOMEET SUR VERCEL"
+echo "🚀 DÉPLOIEMENT Kolimeet SUR VERCEL"
 echo "=================================="
 echo ""
 

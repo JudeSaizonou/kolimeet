@@ -1,4 +1,4 @@
-# Déploiement Kilomeet sur Vercel
+# Déploiement Kolimeet sur Vercel
 
 ## 🚀 Guide de Déploiement Complet
 
