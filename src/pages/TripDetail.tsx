@@ -113,10 +113,11 @@ const TripDetail = () => {
   const ogImage = generateTripOGImage({
     fromCity: trip.from_city || '',
     toCity: trip.to_city || '',
+    fromCountry: trip.from_country || '',
+    toCountry: trip.to_country || '',
     date: trip.date_departure ? format(new Date(trip.date_departure), "d MMM yyyy", { locale: fr }) : '',
     capacity: trip.available_weight || 0,
     price: trip.price_per_kg || 0,
-    travelerName: trip.profiles?.full_name || "Voyageur",
   });
 
   const shareTitle = `Trajet ${trip.from_city || 'Ville'} → ${trip.to_city || 'Ville'}`;

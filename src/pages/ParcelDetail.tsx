@@ -118,10 +118,12 @@ const ParcelDetail = () => {
   const ogImage = generateParcelOGImage({
     fromCity: parcel.from_city || '',
     toCity: parcel.to_city || '',
+    fromCountry: parcel.from_country || '',
+    toCountry: parcel.to_country || '',
     deadline: parcel.delivery_deadline ? format(new Date(parcel.delivery_deadline), "d MMM yyyy", { locale: fr }) : '',
     weight: parcel.weight || 0,
     type: typeLabels[parcel.type] || parcel.type || 'Colis',
-    senderName: profile?.full_name || "Expéditeur",
+    reward: parcel.reward || 0,
   });
 
   const shareTitle = `Colis ${parcel.from_city || 'Ville'} → ${parcel.to_city || 'Ville'}`;
