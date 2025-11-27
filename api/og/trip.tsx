@@ -16,7 +16,7 @@ export default async function handler(req: Request) {
     const capacity = searchParams.get('capacity') || '10';
     const price = searchParams.get('price') || '5';
 
-    return new ImageResponse(
+    const response = new ImageResponse(
       (
         <div
           style={{
@@ -125,10 +125,19 @@ export default async function handler(req: Request) {
         height: 630,
       }
     );
+    
+    // Add CORS headers
+    response.headers.set('Access-Control-Allow-Origin', '*');
+    response.headers.set('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    
+    return response;
   } catch (e) {
     console.error(e);
     return new Response(`Failed to generate image`, {
       status: 500,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+      },
     });
   }
 }
