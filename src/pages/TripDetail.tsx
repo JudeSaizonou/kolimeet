@@ -19,6 +19,7 @@ import { GlassCard } from "@/components/LiquidGlass";
 import { MatchingSuggestions } from "@/components/matching/MatchingSuggestions";
 import { Separator } from "@/components/ui/separator";
 import { ShareButton } from "@/components/ShareButton";
+import { ShareStoryButton } from "@/components/ShareStoryButton";
 import { SEO } from "@/components/SEO";
 import { generateTripOGImage } from "@/lib/utils/ogImage";
 
@@ -155,6 +156,18 @@ const TripDetail = () => {
             
             {/* Boutons d'action rapide */}
             <div className="absolute top-4 right-4 flex gap-2">
+              <ShareStoryButton
+                type="trip"
+                data={{
+                  fromCity: trip.from_city || '',
+                  toCity: trip.to_city || '',
+                  fromCountry: trip.from_country || '',
+                  toCountry: trip.to_country || '',
+                  date: trip.date_departure ? format(new Date(trip.date_departure), "d MMM yyyy", { locale: fr }) : '',
+                  capacity: trip.available_weight || 0,
+                  price: trip.price_per_kg || 0,
+                }}
+              />
               <ShareButton
                 title={`Trajet ${trip.from_city} → ${trip.to_city}`}
                 description={`${trip.capacity_available_kg}kg disponibles - Départ le ${format(new Date(trip.date_departure), "d MMM yyyy", { locale: fr })}`}

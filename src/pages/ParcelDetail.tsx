@@ -16,6 +16,7 @@ import { MatchingSection } from "@/components/explorer/MatchingSection";
 import { ReviewDialog } from "@/components/reviews/ReviewDialog";
 import { MatchingSuggestions } from "@/components/matching/MatchingSuggestions";
 import { ShareButton } from "@/components/ShareButton";
+import { ShareStoryButton } from "@/components/ShareStoryButton";
 import { SEO } from "@/components/SEO";
 import { generateParcelOGImage } from "@/lib/utils/ogImage";
 
@@ -157,6 +158,19 @@ const ParcelDetail = () => {
                 </div>
               </div>
               <div className="flex items-center gap-2">
+                <ShareStoryButton
+                  type="parcel"
+                  data={{
+                    fromCity: parcel.from_city || '',
+                    toCity: parcel.to_city || '',
+                    fromCountry: parcel.from_country || '',
+                    toCountry: parcel.to_country || '',
+                    weight: parcel.weight_kg || 0,
+                    parcelType: parcel.type || 'colis',
+                    deadline: parcel.deadline ? format(new Date(parcel.deadline), "d MMM yyyy", { locale: fr }) : '',
+                    reward: parcel.reward || 0,
+                  }}
+                />
                 <ShareButton
                   title={`Colis ${parcel.from_city} → ${parcel.to_city}`}
                   description={`${parcel.weight_kg}kg - ${typeLabels[parcel.type]} - Avant le ${format(new Date(parcel.deadline), "d MMM yyyy", { locale: fr })}`}
