@@ -63,10 +63,11 @@ export const MatchingSection = ({ type, item }: MatchingSectionProps) => {
       setLoading(true);
       try {
         const oppositeType = type === "trip" ? "parcels" : "trips";
+        const foreignKey = type === "trip" ? "parcels_user_id_fkey" : "trips_user_id_fkey";
         
         let query = supabase
           .from(oppositeType)
-          .select("*, profiles!*_user_id_fkey(full_name, avatar_url, rating_avg)")
+          .select(`*, profiles!${foreignKey}(full_name, avatar_url, rating_avg)`)
           .eq("status", "open")
           .ilike("from_country", item.from_country)
           .ilike("from_city", item.from_city)
@@ -81,7 +82,14 @@ export const MatchingSection = ({ type, item }: MatchingSectionProps) => {
 
         const { data, error } = await query.limit(20);
 
-        if (error) throw error;
+        if (error) {
+          // Ne pas logger les erreurs 400 (bad request) ou PGRST100 (parse error) - souvent dues à des paramètres invalides ou cache navigateur
+          if (error.code !== 'PGRST116' && error.code !== 'PGRST100' && error.status !== 400) {
+            console.error("Error fetching matches:", error);
+          }
+          // Si c'est une erreur de parsing (PGRST100), c'est probablement un cache navigateur - on ignore silencieusement
+          return;
+        }
 
         const scoredMatches = ((data as any[]) || [])
           .map(match => ({

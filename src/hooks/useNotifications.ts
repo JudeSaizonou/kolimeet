@@ -39,7 +39,13 @@ export const useNotifications = () => {
         .order('created_at', { ascending: false })
         .limit(20);
 
-      if (error) throw error;
+      if (error) {
+        // Ne pas logger les erreurs 400 (bad request) - souvent dues à des paramètres invalides
+        if (error.code !== 'PGRST116' && error.status !== 400) {
+          console.error('Error loading match notifications:', error);
+        }
+        return;
+      }
 
       const allNotifications: Notification[] = [];
 

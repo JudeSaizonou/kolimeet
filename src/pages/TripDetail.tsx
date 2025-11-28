@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -33,6 +33,7 @@ const TripDetail = () => {
   const [loading, setLoading] = useState(true);
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
   const [bookingDialogOpen, setBookingDialogOpen] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchTrip = async () => {
@@ -139,6 +140,7 @@ const TripDetail = () => {
         
         {/* Header Card */}
         <GlassCard 
+          ref={cardRef}
           className="relative overflow-hidden mb-6"
           intensity="medium"
           rounded="2xl"
@@ -167,6 +169,7 @@ const TripDetail = () => {
                   capacity: trip.available_weight || 0,
                   price: trip.price_per_kg || 0,
                 }}
+                element={cardRef.current}
               />
               <ShareButton
                 title={`Trajet ${trip.from_city} → ${trip.to_city}`}
@@ -175,6 +178,21 @@ const TripDetail = () => {
                 variant="ghost"
                 size="icon"
                 className="bg-white/50 backdrop-blur-sm hover:bg-white/80 rounded-full"
+                storyShare={{
+                  type: 'trip',
+                  data: {
+                    fromCity: trip.from_city || '',
+                    toCity: trip.to_city || '',
+                    fromCountry: trip.from_country || '',
+                    toCountry: trip.to_country || '',
+                    date: trip.date_departure
+                      ? format(new Date(trip.date_departure), "d MMM yyyy", { locale: fr })
+                      : '',
+                    capacity: trip.available_weight || trip.capacity_available_kg || 0,
+                    price: trip.price_per_kg || trip.price_expect || 0,
+                  },
+                  element: cardRef.current,
+                }}
               />
               <Button
                 variant="ghost"

@@ -1,5 +1,5 @@
 import { motion, HTMLMotionProps } from 'framer-motion';
-import { ReactNode, CSSProperties } from 'react';
+import React, { ReactNode, CSSProperties } from 'react';
 import { cn } from '@/lib/utils';
 
 /**
@@ -84,7 +84,7 @@ interface GlassCardProps extends GlassBaseProps {
   children?: ReactNode;
 }
 
-export function GlassCard({
+export const GlassCard = React.forwardRef<HTMLDivElement, GlassCardProps>(({
   intensity = 'medium',
   variant = 'default',
   liquidDistortion = true,
@@ -98,7 +98,7 @@ export function GlassCard({
   className,
   children,
   ...props
-}: GlassCardProps) {
+}, ref) => {
   const config = INTENSITY_CONFIG[intensity];
 
   const paddingClasses = {
@@ -124,6 +124,7 @@ export function GlassCard({
 
   return (
     <motion.div
+      ref={ref}
       className={cn(
         'relative overflow-hidden',
         roundedClasses[rounded],
@@ -221,7 +222,9 @@ export function GlassCard({
       />
     </motion.div>
   );
-}
+});
+
+GlassCard.displayName = 'GlassCard';
 
 // ============================================================================
 // GLASS BUTTON - Bouton avec effet verre

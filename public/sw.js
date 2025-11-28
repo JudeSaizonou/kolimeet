@@ -1,4 +1,4 @@
-const CACHE_NAME = 'Kolimeet-v2';
+const CACHE_NAME = 'Kolimeet-v3';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -27,7 +27,10 @@ self.addEventListener('activate', (event) => {
           }
         })
       );
-    }).then(() => self.clients.claim())
+    }).then(() => {
+      // Force update all clients
+      return self.clients.claim();
+    })
   );
 });
 
@@ -36,15 +39,34 @@ self.addEventListener('fetch', (event) => {
   // Skip non-GET requests
   if (event.request.method !== 'GET') return;
 
+  // Skip chrome-extension and other unsupported schemes
+  try {
+    const url = new URL(event.request.url);
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+      return; // Don't handle non-HTTP(S) requests
+    }
+  } catch (e) {
+    return; // Invalid URL, skip
+  }
+
   event.respondWith(
     fetch(event.request)
       .then((response) => {
-        // Cache successful responses
+        // Cache successful responses (only HTTP/HTTPS)
         if (response.status === 200) {
-          const responseClone = response.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseClone);
-          });
+          try {
+            const url = new URL(event.request.url);
+            if (url.protocol === 'http:' || url.protocol === 'https:') {
+              const responseClone = response.clone();
+              caches.open(CACHE_NAME).then((cache) => {
+                cache.put(event.request, responseClone).catch(() => {
+                  // Ignore cache errors silently (chrome-extension, etc.)
+                });
+              });
+            }
+          } catch (e) {
+            // Invalid URL, skip caching
+          }
         }
         return response;
       })

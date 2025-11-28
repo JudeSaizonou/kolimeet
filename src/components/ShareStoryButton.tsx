@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Download, Loader2, ImageIcon } from 'lucide-react';
 import { toast } from 'sonner';
+import { shareStoryImage, ShareImagePayload } from '@/lib/utils/shareImage';
 
 interface ShareStoryButtonProps {
   type: 'trip' | 'parcel';
@@ -18,72 +19,72 @@ interface ShareStoryButtonProps {
     deadline?: string;
     reward?: number;
   };
+  element?: HTMLElement | null;
 }
 
-export function ShareStoryButton({ type, data }: ShareStoryButtonProps) {
+export function ShareStoryButton({ type, data, element }: ShareStoryButtonProps) {
   const [loading, setLoading] = useState(false);
-
-  const generateImageUrl = () => {
-    const baseUrl = import.meta.env.VITE_APP_URL || window.location.origin;
-    const params = new URLSearchParams();
-    
-    params.set('from', data.fromCity || '');
-    params.set('to', data.toCity || '');
-    params.set('fromCountry', data.fromCountry || '');
-    params.set('toCountry', data.toCountry || '');
-    
-    if (type === 'trip') {
-      if (data.date) params.set('date', data.date);
-      if (data.capacity !== undefined) params.set('capacity', data.capacity.toString());
-      if (data.price !== undefined) params.set('price', data.price.toString());
-      return `${baseUrl}/api/og/trip?${params.toString()}`;
-    } else {
-      if (data.weight !== undefined) params.set('weight', data.weight.toString());
-      if (data.parcelType) params.set('type', data.parcelType);
-      if (data.deadline) params.set('deadline', data.deadline);
-      if (data.reward !== undefined) params.set('reward', data.reward.toString());
-      return `${baseUrl}/api/og/parcel?${params.toString()}`;
-    }
-  };
 
   const downloadImage = async () => {
     setLoading(true);
     try {
-      const imageUrl = generateImageUrl();
+      // Trouver l'élément GlassCard
+      let targetElement = element;
       
-      // Fetch l'image depuis notre API
-      const response = await fetch(imageUrl);
-      if (!response.ok) throw new Error('Erreur lors de la génération');
-      
-      const blob = await response.blob();
-      
-      // Sur mobile, essayer le partage natif avec l'image
-      if (navigator.share && navigator.canShare) {
-        const file = new File([blob], `kolimeet-${type}.png`, { type: 'image/png' });
-        const shareData = { files: [file] };
+      if (!targetElement || targetElement.offsetWidth === 0) {
+        // Chercher le GlassCard dans la page
+        // D'abord chercher par la structure complète
+        const glassCards = document.querySelectorAll('.relative.overflow-hidden');
+        for (const card of glassCards) {
+          if (card instanceof HTMLElement && 
+              card.offsetWidth > 0 && 
+              card.offsetHeight > 0 &&
+              card.querySelector('[class*="backdrop-blur"]')) {
+            targetElement = card;
+            break;
+          }
+        }
         
-        if (navigator.canShare(shareData)) {
-          await navigator.share(shareData);
-          toast.success('Image prête à partager !');
-          setLoading(false);
-          return;
+        // Si toujours pas trouvé, chercher n'importe quel élément avec backdrop-blur
+        if (!targetElement || targetElement.offsetWidth === 0) {
+          const backdropElement = document.querySelector('[class*="backdrop-blur"]')?.closest('.relative') as HTMLElement;
+          if (backdropElement && backdropElement.offsetWidth > 0) {
+            targetElement = backdropElement;
+          }
         }
       }
       
-      // Sinon, télécharger classiquement
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `kolimeet-${type}-${data.fromCity}-${data.toCity}.png`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
+      const payload: ShareImagePayload = { type, data, element: targetElement || undefined };
+      const result = await shareStoryImage(payload);
+      const successMessage =
+        result === 'shared'
+          ? 'Image prête à partager !'
+          : 'Image téléchargée ! Partagez-la sur vos réseaux.';
+      toast.success(successMessage);
+    } catch (error: any) {
+      // Ignorer les annulations de partage (AbortError) - c'est un comportement normal
+      if (error.name === 'AbortError') {
+        // L'utilisateur a annulé, ne rien faire
+        return;
+      }
       
-      toast.success('Image téléchargée ! Partagez-la sur vos réseaux.');
-    } catch (error) {
-      console.error('Erreur:', error);
-      toast.error('Erreur lors de la génération de l\'image');
+      // Ne pas logger les erreurs normales (annulation, etc.)
+      if (error?.name !== 'AbortError' && error?.message !== 'Share canceled') {
+        console.error('Erreur génération image:', error);
+      }
+      
+      const errorMessage = error?.message === 'dom-capture-failed'
+        ? "Impossible de capturer l'élément. L'image sera générée via l'API."
+        : error?.message === 'image-empty' 
+        ? "L'image générée est vide. Réessayez."
+        : error?.message === 'image-generation-failed'
+        ? "Erreur lors de la génération. Vérifiez votre connexion."
+        : "Une erreur est survenue. Réessayez.";
+      
+      // Seulement afficher l'erreur si ce n'est pas une annulation
+      if (error?.name !== 'AbortError' && error?.message !== 'Share canceled') {
+        toast.error(errorMessage);
+      }
     } finally {
       setLoading(false);
     }
