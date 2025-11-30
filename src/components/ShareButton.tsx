@@ -263,43 +263,89 @@ export function ShareButton({
         }
       }
       
-      // Utiliser le partage natif (comme le bouton principal)
-      // Cela ouvrira le menu de partage natif où l'utilisateur peut choisir WhatsApp
-      const result = await shareStoryImage(storyShare, {
-        title,
-        text: description,
-        url: shareUrl,
+      // Générer l'image
+      const blob = await getImageBlob(storyShare);
+      const file = new File([blob], `kolimeet-${storyShare.type}.png`, {
+        type: 'image/png',
       });
       
-      if (result === 'shared') {
-        toast({
-          title: "Partage ouvert",
-          description: "Choisissez WhatsApp dans le menu de partage",
-        });
-      } else {
-        // Si le partage natif n'est pas disponible, fallback vers l'ancienne méthode
-        const blob = await getImageBlob(storyShare);
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `kolimeet-${storyShare.type}.png`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
+      // Utiliser l'API Web Share pour ouvrir directement WhatsApp avec l'image
+      if (navigator.share && navigator.canShare) {
+        const shareData: ShareData = {
+          files: [file],
+          title: title,
+          text: `${description}\n\n${shareUrl}`,
+          url: shareUrl,
+        };
         
-        const message = `${title}\n\n${description}\n\n${shareUrl}`;
-        if (/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-          window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
+        // Vérifier si on peut partager avec cette configuration
+        if (navigator.canShare(shareData)) {
+          try {
+            await navigator.share(shareData);
+            toast({
+              title: "Partage ouvert",
+              description: "Choisissez WhatsApp dans le menu de partage",
+            });
+            return;
+          } catch (error: any) {
+            if (error.name === 'AbortError') {
+              return;
+            }
+            // Si erreur, essayer seulement avec les fichiers
+            const filesOnly: ShareData = { files: [file] };
+            if (navigator.canShare(filesOnly)) {
+              try {
+                await navigator.share(filesOnly);
+                toast({
+                  title: "Partage ouvert",
+                  description: "Choisissez WhatsApp dans le menu de partage",
+                });
+                return;
+              } catch (fileError: any) {
+                if (fileError.name === 'AbortError') {
+                  return;
+                }
+              }
+            }
+          }
         } else {
-          window.open(`https://web.whatsapp.com/send?text=${encodeURIComponent(message)}`, '_blank');
+          // Si canShare retourne false, essayer quand même
+          try {
+            await navigator.share(shareData);
+            toast({
+              title: "Partage ouvert",
+              description: "Choisissez WhatsApp dans le menu de partage",
+            });
+            return;
+          } catch (error: any) {
+            if (error.name === 'AbortError') {
+              return;
+            }
+          }
         }
-        
-        toast({
-          title: "Image téléchargée",
-          description: "Partagez l'image via WhatsApp",
-        });
       }
+      
+      // Fallback: télécharger l'image et ouvrir WhatsApp avec le texte
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `kolimeet-${storyShare.type}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      
+      const message = `${title}\n\n${description}\n\n${shareUrl}`;
+      if (/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+        window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
+      } else {
+        window.open(`https://web.whatsapp.com/send?text=${encodeURIComponent(message)}`, '_blank');
+      }
+      
+      toast({
+        title: "Image téléchargée",
+        description: "Partagez l'image via WhatsApp",
+      });
     } catch (error: any) {
       if (error.name === 'AbortError') {
         return;
@@ -335,37 +381,83 @@ export function ShareButton({
         }
       }
       
-      // Utiliser le partage natif (comme le bouton principal)
-      // Cela ouvrira le menu de partage natif où l'utilisateur peut choisir Facebook
-      const result = await shareStoryImage(storyShare, {
-        title,
-        text: description,
-        url: shareUrl,
+      // Générer l'image
+      const blob = await getImageBlob(storyShare);
+      const file = new File([blob], `kolimeet-${storyShare.type}.png`, {
+        type: 'image/png',
       });
       
-      if (result === 'shared') {
-        toast({
-          title: "Partage ouvert",
-          description: "Choisissez Facebook dans le menu de partage",
-        });
-      } else {
-        // Si le partage natif n'est pas disponible, fallback vers l'ancienne méthode
-        const blob = await getImageBlob(storyShare);
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `kolimeet-${storyShare.type}.png`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
+      // Utiliser l'API Web Share pour ouvrir directement Facebook avec l'image
+      if (navigator.share && navigator.canShare) {
+        const shareData: ShareData = {
+          files: [file],
+          title: title,
+          text: `${description}\n\n${shareUrl}`,
+          url: shareUrl,
+        };
         
-        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`, '_blank');
-        toast({
-          title: "Image téléchargée",
-          description: "Partagez l'image téléchargée sur Facebook",
-        });
+        // Vérifier si on peut partager avec cette configuration
+        if (navigator.canShare(shareData)) {
+          try {
+            await navigator.share(shareData);
+            toast({
+              title: "Partage ouvert",
+              description: "Choisissez Facebook dans le menu de partage",
+            });
+            return;
+          } catch (error: any) {
+            if (error.name === 'AbortError') {
+              return;
+            }
+            // Si erreur, essayer seulement avec les fichiers
+            const filesOnly: ShareData = { files: [file] };
+            if (navigator.canShare(filesOnly)) {
+              try {
+                await navigator.share(filesOnly);
+                toast({
+                  title: "Partage ouvert",
+                  description: "Choisissez Facebook dans le menu de partage",
+                });
+                return;
+              } catch (fileError: any) {
+                if (fileError.name === 'AbortError') {
+                  return;
+                }
+              }
+            }
+          }
+        } else {
+          // Si canShare retourne false, essayer quand même
+          try {
+            await navigator.share(shareData);
+            toast({
+              title: "Partage ouvert",
+              description: "Choisissez Facebook dans le menu de partage",
+            });
+            return;
+          } catch (error: any) {
+            if (error.name === 'AbortError') {
+              return;
+            }
+          }
+        }
       }
+      
+      // Fallback: télécharger l'image et ouvrir Facebook
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `kolimeet-${storyShare.type}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      
+      window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`, '_blank');
+      toast({
+        title: "Image téléchargée",
+        description: "Partagez l'image téléchargée sur Facebook",
+      });
     } catch (error: any) {
       if (error.name === 'AbortError') {
         return;
