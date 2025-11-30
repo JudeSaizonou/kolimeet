@@ -142,13 +142,16 @@ export const shareStoryImage = async (
 ): Promise<ShareImageResult> => {
   const blob = await getImageBlob(payload);
 
-  // Utiliser l'API Web Share si disponible (mobile et desktop)
+  // Utiliser l'API Web Share si disponible
+  // IMPORTANT: Sur mobile, on essaie TOUJOURS le partage natif en premier
+  // Cela ouvre le menu de partage natif (WhatsApp, Instagram, etc.)
   if (navigator.share) {
     const file = new File([blob], `kolimeet-${payload.type}.png`, {
       type: 'image/png',
     });
     
     // Essayer d'abord avec image + texte + URL
+    // C'est ce qui ouvre le menu de partage natif sur mobile
     let shareData: ShareData = { 
       files: [file]
     };
@@ -164,16 +167,17 @@ export const shareStoryImage = async (
       shareData.url = shareText.url;
     }
 
-    // Essayer de partager avec image + texte + URL
+    // Sur mobile, on essaie TOUJOURS le partage natif en premier
+    // Ne pas vérifier canShare - on essaie directement
+    // Cela ouvre le menu de partage natif du système
     try {
-      // Vérifier si on peut partager avec cette configuration
-      if (!navigator.canShare || navigator.canShare(shareData)) {
-        await navigator.share(shareData);
-        return 'shared';
-      }
+      await navigator.share(shareData);
+      // Si on arrive ici, le menu de partage natif s'est ouvert
+      return 'shared';
     } catch (error: any) {
       // Si l'utilisateur a annulé, on passe au téléchargement
       if (error.name === 'AbortError') {
+        // L'utilisateur a annulé le menu de partage, on télécharge quand même
         // Ne pas throw, continuer avec le téléchargement
       } else if (error.name === 'NotSupportedError' || error.message?.includes('not supported')) {
         // Le navigateur ne supporte pas cette combinaison, essayer seulement avec les fichiers
@@ -188,15 +192,9 @@ export const shareStoryImage = async (
     // (certains navigateurs ne supportent pas fichiers + texte)
     const filesOnlyData: ShareData = { files: [file] };
     try {
-      // Vérifier si on peut partager avec les fichiers seulement
-      if (!navigator.canShare || navigator.canShare(filesOnlyData)) {
-        await navigator.share(filesOnlyData);
-        return 'shared';
-      } else {
-        // Si canShare retourne false, essayer quand même (certains navigateurs ont des bugs)
-        await navigator.share(filesOnlyData);
-        return 'shared';
-      }
+      // Essayer le partage directement - cela devrait ouvrir le menu natif
+      await navigator.share(filesOnlyData);
+      return 'shared';
     } catch (error: any) {
       if (error.name === 'AbortError') {
         // L'utilisateur a annulé, continuer avec le téléchargement
