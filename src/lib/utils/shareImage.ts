@@ -142,13 +142,73 @@ export const shareStoryImage = async (
 ): Promise<ShareImageResult> => {
   const blob = await getImageBlob(payload);
 
-  // Pour le moment, on désactive le partage natif mobile car ça télécharge toujours
-  // On va utiliser directement le téléchargement et laisser WhatsApp/Facebook gérer le partage
-  // TODO: Réactiver le partage natif mobile une fois le problème résolu
-  
-  // Télécharger l'image directement
+  // Utiliser l'API Web Share si disponible (mobile et desktop)
+  if (navigator.share) {
+    const file = new File([blob], `kolimeet-${payload.type}.png`, {
+      type: 'image/png',
+    });
+    
+    // Essayer d'abord avec image + texte + URL
+    let shareData: ShareData = { 
+      files: [file]
+    };
+    
+    // Ajouter le texte et l'URL si fournis
+    if (shareText?.title) {
+      shareData.title = shareText.title;
+    }
+    if (shareText?.text) {
+      shareData.text = shareText.text;
+    }
+    if (shareText?.url) {
+      shareData.url = shareText.url;
+    }
 
-  // Télécharger l'image
+    // Essayer de partager avec image + texte + URL
+    try {
+      // Vérifier si on peut partager avec cette configuration
+      if (!navigator.canShare || navigator.canShare(shareData)) {
+        await navigator.share(shareData);
+        return 'shared';
+      }
+    } catch (error: any) {
+      // Si l'utilisateur a annulé, on passe au téléchargement
+      if (error.name === 'AbortError') {
+        // Ne pas throw, continuer avec le téléchargement
+      } else if (error.name === 'NotSupportedError' || error.message?.includes('not supported')) {
+        // Le navigateur ne supporte pas cette combinaison, essayer seulement avec les fichiers
+        // Ne pas throw, continuer avec l'essai suivant
+      } else {
+        // Autre erreur, essayer seulement avec les fichiers
+        // Ne pas throw, continuer avec l'essai suivant
+      }
+    }
+
+    // Si le partage avec texte a échoué, essayer seulement avec les fichiers
+    // (certains navigateurs ne supportent pas fichiers + texte)
+    const filesOnlyData: ShareData = { files: [file] };
+    try {
+      // Vérifier si on peut partager avec les fichiers seulement
+      if (!navigator.canShare || navigator.canShare(filesOnlyData)) {
+        await navigator.share(filesOnlyData);
+        return 'shared';
+      } else {
+        // Si canShare retourne false, essayer quand même (certains navigateurs ont des bugs)
+        await navigator.share(filesOnlyData);
+        return 'shared';
+      }
+    } catch (error: any) {
+      if (error.name === 'AbortError') {
+        // L'utilisateur a annulé, continuer avec le téléchargement
+        // Ne pas throw, on va télécharger l'image
+      } else {
+        // Autre erreur, continuer vers le téléchargement
+        // Ne pas throw, on va télécharger l'image
+      }
+    }
+  }
+
+  // Fallback: télécharger l'image si le partage natif n'est pas disponible ou a échoué
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
