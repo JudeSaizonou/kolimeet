@@ -14,6 +14,79 @@ export type Database = {
   }
   public: {
     Tables: {
+      bookings: {
+        Row: {
+          accepted_at: string | null
+          completed_at: string | null
+          created_at: string
+          id: string
+          message: string | null
+          price_per_kg: number | null
+          status: string
+          total_price: number | null
+          traveler_id: string
+          traveler_notes: string | null
+          trip_id: string
+          updated_at: string
+          user_id: string
+          weight_kg: number
+        }
+        Insert: {
+          accepted_at?: string | null
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          message?: string | null
+          price_per_kg?: number | null
+          status?: string
+          total_price?: number | null
+          traveler_id: string
+          traveler_notes?: string | null
+          trip_id: string
+          updated_at?: string
+          user_id: string
+          weight_kg: number
+        }
+        Update: {
+          accepted_at?: string | null
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          message?: string | null
+          price_per_kg?: number | null
+          status?: string
+          total_price?: number | null
+          traveler_id?: string
+          traveler_notes?: string | null
+          trip_id?: string
+          updated_at?: string
+          user_id?: string
+          weight_kg?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookings_traveler_id_fkey"
+            columns: ["traveler_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "bookings_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       favorites: {
         Row: {
           created_at: string
@@ -442,6 +515,8 @@ export type Database = {
           phone_verified: boolean | null
           rating_avg: number | null
           rating_count: number | null
+          referral_count: number | null
+          referred_by_count: number | null
           reports_received: number | null
           suspended_until: string | null
           suspension_reason: string | null
@@ -467,6 +542,8 @@ export type Database = {
           phone_verified?: boolean | null
           rating_avg?: number | null
           rating_count?: number | null
+          referral_count?: number | null
+          referred_by_count?: number | null
           reports_received?: number | null
           suspended_until?: string | null
           suspension_reason?: string | null
@@ -492,6 +569,8 @@ export type Database = {
           phone_verified?: boolean | null
           rating_avg?: number | null
           rating_count?: number | null
+          referral_count?: number | null
+          referred_by_count?: number | null
           reports_received?: number | null
           suspended_until?: string | null
           suspension_reason?: string | null
@@ -502,6 +581,54 @@ export type Database = {
           verified_at?: string | null
         }
         Relationships: []
+      }
+      referrals: {
+        Row: {
+          accepted_at: string | null
+          created_at: string | null
+          id: string
+          message: string | null
+          referred_id: string
+          referrer_id: string
+          relationship: string | null
+          status: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          created_at?: string | null
+          id?: string
+          message?: string | null
+          referred_id: string
+          referrer_id: string
+          relationship?: string | null
+          status?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          created_at?: string | null
+          id?: string
+          message?: string | null
+          referred_id?: string
+          referrer_id?: string
+          relationship?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referrals_referred_id_fkey"
+            columns: ["referred_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "referrals_referrer_id_fkey"
+            columns: ["referrer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
       }
       reports: {
         Row: {
@@ -1002,6 +1129,59 @@ export type Database = {
       }
     }
     Views: {
+      bookings_with_profiles: {
+        Row: {
+          accepted_at: string | null
+          capacity_available_kg: number | null
+          completed_at: string | null
+          created_at: string | null
+          date_departure: string | null
+          from_city: string | null
+          from_country: string | null
+          id: string | null
+          message: string | null
+          price_per_kg: number | null
+          sender_avatar: string | null
+          sender_name: string | null
+          sender_rating: number | null
+          status: string | null
+          to_city: string | null
+          to_country: string | null
+          total_price: number | null
+          traveler_avatar: string | null
+          traveler_id: string | null
+          traveler_name: string | null
+          traveler_notes: string | null
+          traveler_rating: number | null
+          trip_id: string | null
+          updated_at: string | null
+          user_id: string | null
+          weight_kg: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookings_traveler_id_fkey"
+            columns: ["traveler_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "bookings_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       favorites_with_details: {
         Row: {
           created_at: string | null

@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useFavorite } from "@/hooks/useFavorite";
 import { useToast } from "@/hooks/use-toast";
+import { useReferrals } from "@/hooks/useReferrals";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -21,6 +22,7 @@ import { ShareButton } from "@/components/ShareButton";
 import { SEO } from "@/components/SEO";
 import { generateTripOGImage } from "@/lib/utils/ogImage";
 import { ReportButton } from "@/components/ReportButton";
+import { TrustBadge, ReferralRequestDialog, ReferrersList } from "@/components/trust";
 
 const TripDetail = () => {
   const { id } = useParams();
@@ -28,10 +30,12 @@ const TripDetail = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const { isFavorited, favoritesCount, toggleFavorite } = useFavorite("trip", id || "");
+  const { getReferrersForUser } = useReferrals();
   const [trip, setTrip] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
   const [bookingDialogOpen, setBookingDialogOpen] = useState(false);
+  const [ownerReferrers, setOwnerReferrers] = useState<any[]>([]);
   const cardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -39,12 +43,18 @@ const TripDetail = () => {
       try {
         const { data, error } = await supabase
           .from("trips")
-          .select("*, profiles!trips_user_id_fkey(full_name, avatar_url, rating_avg, rating_count)")
+          .select("*, profiles!trips_user_id_fkey(full_name, avatar_url, rating_avg, rating_count, trust_score, is_verified)")
           .eq("id", id)
           .single();
 
         if (error) throw error;
         setTrip(data);
+        
+        // Charger les parrains du propriétaire du trajet
+        if (data?.user_id) {
+          const referrers = await getReferrersForUser(data.user_id);
+          setOwnerReferrers(referrers);
+        }
       } catch (error: any) {
         toast({
           variant: "destructive",
@@ -265,29 +275,62 @@ const TripDetail = () => {
             {/* Séparateur */}
             <div className="h-px bg-slate-100 mb-5" />
 
-            {/* Profil du voyageur intégré */}
-            <Link 
-              to={`/u/${trip.user_id}`}
-              className="flex items-center gap-3 p-3 bg-slate-50 rounded-2xl hover:bg-slate-100 transition-colors border border-slate-100"
-            >
-              <Avatar className="h-12 w-12 ring-2 ring-primary/20">
-                <AvatarImage src={trip.profiles?.avatar_url} />
-                <AvatarFallback className="text-sm bg-primary/10 text-primary">
-                  {trip.profiles?.full_name?.[0]}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-sm text-slate-900 truncate">{trip.profiles?.full_name}</h3>
-                <div className="flex items-center gap-1 text-xs text-slate-500">
-                  <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-                  <span>{trip.profiles?.rating_avg?.toFixed(1) || "Nouveau"}</span>
-                  {trip.profiles?.rating_count > 0 && (
-                    <span>• {trip.profiles?.rating_count} avis</span>
+            {/* Profil du voyageur intégré avec système de confiance */}
+            <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 space-y-3">
+              <Link 
+                to={`/u/${trip.user_id}`}
+                className="flex items-center gap-3 hover:bg-slate-100 rounded-xl p-1 -m-1 transition-colors"
+              >
+                <Avatar className="h-12 w-12 ring-2 ring-primary/20">
+                  <AvatarImage src={trip.profiles?.avatar_url} />
+                  <AvatarFallback className="text-sm bg-primary/10 text-primary">
+                    {trip.profiles?.full_name?.[0]}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-semibold text-sm text-slate-900 truncate">{trip.profiles?.full_name}</h3>
+                    <TrustBadge 
+                      score={trip.profiles?.trust_score || 50} 
+                      referrerCount={ownerReferrers.length}
+                      isVerified={trip.profiles?.is_verified}
+                      size="sm"
+                    />
+                  </div>
+                  <div className="flex items-center gap-1 text-xs text-slate-500">
+                    <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+                    <span>{trip.profiles?.rating_avg?.toFixed(1) || "Nouveau"}</span>
+                    {trip.profiles?.rating_count > 0 && (
+                      <span>• {trip.profiles?.rating_count} avis</span>
+                    )}
+                  </div>
+                </div>
+                <ChevronRight className="h-4 w-4 text-slate-400" />
+              </Link>
+              
+              {/* Parrains et bouton de parrainage */}
+              <div className="flex items-center justify-between pt-2 border-t border-slate-200">
+                <div className="flex items-center gap-2">
+                  {ownerReferrers.length > 0 ? (
+                    <>
+                      <ReferrersList referrers={ownerReferrers} maxDisplay={3} size="sm" />
+                      <span className="text-xs text-slate-500">
+                        {ownerReferrers.length} parrain{ownerReferrers.length > 1 ? 's' : ''}
+                      </span>
+                    </>
+                  ) : (
+                    <span className="text-xs text-slate-400">Pas encore parrainé</span>
                   )}
                 </div>
+                {user && user.id !== trip.user_id && (
+                  <ReferralRequestDialog
+                    targetUserId={trip.user_id}
+                    targetUserName={trip.profiles?.full_name || 'ce voyageur'}
+                    className="h-8 text-xs"
+                  />
+                )}
               </div>
-              <ChevronRight className="h-4 w-4 text-slate-400" />
-            </Link>
+            </div>
 
             {/* Description */}
             {trip.notes && (

@@ -9,6 +9,8 @@ import { ReviewDialog } from "@/components/reviews/ReviewDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { Star, MapPin, MessageCircle } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useReferrals } from "@/hooks/useReferrals";
+import { TrustBadge, ReferralRequestDialog, ReferrersList } from "@/components/trust";
 
 interface UserProfile {
   user_id: string;
@@ -18,14 +20,18 @@ interface UserProfile {
   city: string | null;
   rating_avg: number | null;
   rating_count: number | null;
+  trust_score?: number;
+  is_verified?: boolean;
 }
 
 export default function UserProfile() {
   const { userId } = useParams<{ userId: string }>();
   const { user: currentUser } = useAuth();
+  const { getReferrersForUser } = useReferrals();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
+  const [referrers, setReferrers] = useState<any[]>([]);
 
   useEffect(() => {
     if (userId) {
@@ -38,12 +44,18 @@ export default function UserProfile() {
       setLoading(true);
       const { data, error } = await supabase
         .from("profiles")
-        .select("user_id, full_name, avatar_url, country, city, rating_avg, rating_count")
+        .select("user_id, full_name, avatar_url, country, city, rating_avg, rating_count, trust_score, is_verified")
         .eq("user_id", userId)
         .single();
 
       if (error) throw error;
       setProfile(data);
+      
+      // Charger les parrains de cet utilisateur
+      if (userId) {
+        const userReferrers = await getReferrersForUser(userId);
+        setReferrers(userReferrers);
+      }
     } catch (error) {
       console.error("Error loading profile:", error);
     } finally {
@@ -98,9 +110,17 @@ export default function UserProfile() {
               </Avatar>
 
               <div className="flex-1">
-                <h1 className="text-2xl font-bold mb-2">
-                  {profile.full_name || "Utilisateur"}
-                </h1>
+                <div className="flex items-center gap-3 mb-2">
+                  <h1 className="text-2xl font-bold">
+                    {profile.full_name || "Utilisateur"}
+                  </h1>
+                  <TrustBadge 
+                    score={profile.trust_score || 50} 
+                    referrerCount={referrers.length}
+                    isVerified={profile.is_verified}
+                    size="md"
+                  />
+                </div>
 
                 {(profile.city || profile.country) && (
                   <div className="flex items-center gap-2 text-muted-foreground mb-3">
@@ -120,9 +140,19 @@ export default function UserProfile() {
                     ({profile.rating_count || 0} avis)
                   </span>
                 </div>
+                
+                {/* Liste des parrains */}
+                {referrers.length > 0 && (
+                  <div className="flex items-center gap-2 mb-4 p-3 bg-violet-50 rounded-xl">
+                    <ReferrersList referrers={referrers} maxDisplay={4} size="sm" />
+                    <span className="text-sm text-violet-700">
+                      Parrainé par {referrers.length} personne{referrers.length > 1 ? 's' : ''}
+                    </span>
+                  </div>
+                )}
 
                 {!isOwnProfile && currentUser && (
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 flex-wrap">
                     <Button onClick={() => setReviewDialogOpen(true)} size="sm">
                       Laisser un avis
                     </Button>
@@ -132,6 +162,10 @@ export default function UserProfile() {
                         Contacter
                       </Link>
                     </Button>
+                    <ReferralRequestDialog
+                      targetUserId={profile.user_id}
+                      targetUserName={profile.full_name || 'cet utilisateur'}
+                    />
                   </div>
                 )}
 

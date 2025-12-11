@@ -17,8 +17,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { Upload, User, Star, LogOut, EyeOff } from "lucide-react";
 import { PhoneVerification } from "@/components/profile/PhoneVerification";
+import { PushNotificationSettings } from "@/components/notifications/PushNotificationSettings";
 import { useNavigate } from "react-router-dom";
 import { countries, citiesByCountry } from "@/lib/data/countries";
+import { TrustBadge, MyReferralsSection } from "@/components/trust";
 
 const Profile = () => {
   const [loading, setLoading] = useState(false);
@@ -35,6 +37,9 @@ const Profile = () => {
   const [rating, setRating] = useState({ avg: 0, count: 0 });
   const [selectedCountry, setSelectedCountry] = useState("");
   const [defaultAnonymous, setDefaultAnonymous] = useState(false);
+  const [trustScore, setTrustScore] = useState(50);
+  const [referredByCount, setReferredByCount] = useState(0);
+  const [isVerified, setIsVerified] = useState(false);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -71,6 +76,9 @@ const Profile = () => {
           count: profile.rating_count || 0,
         });
         setDefaultAnonymous(profile.default_anonymous_posting || false);
+        setTrustScore(profile.trust_score || 50);
+        setReferredByCount(profile.referred_by_count || 0);
+        setIsVerified(profile.is_verified || false);
       }
     } catch (error: any) {
       console.error("Error loading profile:", error);
@@ -234,9 +242,23 @@ const Profile = () => {
                     </span>
                   </div>
                 )}
+
+                {/* Badge de confiance */}
+                <div className="mt-3">
+                  <TrustBadge
+                    trustScore={trustScore}
+                    referredByCount={referredByCount}
+                    isVerified={isVerified}
+                    size="md"
+                    showLabel
+                  />
+                </div>
               </div>
             </div>
           </Card>
+
+          {/* Section Parrainage */}
+          <MyReferralsSection />
 
           {/* Profile Form */}
           <Card className="p-4 sm:p-6 border shadow-sm">
@@ -397,6 +419,9 @@ const Profile = () => {
               }}
             />
           )}
+
+          {/* Push Notifications */}
+          <PushNotificationSettings />
         </div>
       </div>
     </ProtectedRoute>

@@ -6,10 +6,12 @@ import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { AdminRoute } from "@/components/auth/AdminRoute";
 import Navigation from "./components/layout/Navigation";
+import { BottomNavbar } from "./components/layout/BottomNavbar";
 import Footer from "./components/layout/Footer";
 import { SuspensionBanner } from "@/components/SuspensionBanner";
 import { PWAInstallBanner } from "@/components/PWAInstallBanner";
 import { OfflineBanner } from "@/components/OfflineBanner";
+import { useAuth } from "@/hooks/useAuth";
 import Home from "./pages/Home";
 import Explorer from "./pages/Explorer";
 import TripDetail from "./pages/TripDetail";
@@ -58,11 +60,28 @@ const FooterWrapper = () => {
 
 const MainWrapper = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
+  const { user } = useAuth();
+  
   // Pas de padding-top sur mobile quand dans une conversation (navbar masquée)
   const isInConversation = location.pathname.startsWith('/messages/') && location.pathname !== '/messages';
+  // Pages où la bottom navbar est masquée (synchronisé avec BottomNavbar.tsx)
+  const hiddenBottomNavPaths = ['/publier/', '/auth/', '/onboarding'];
+  const shouldHideBottomNav = hiddenBottomNavPaths.some(path => location.pathname.startsWith(path));
+  
+  // Sur mobile quand connecté : pas de navbar top, donc pt-4 suffit
+  // Sur mobile quand non connecté : navbar top visible, donc pt-24
+  // Sur desktop : toujours pt-28 pour la navbar top
+  const topPadding = isInConversation 
+    ? "pt-0 md:pt-28" 
+    : user 
+      ? "pt-4 md:pt-28" 
+      : "pt-24 md:pt-28";
+  
+  // Bottom padding pour la bottom navbar (uniquement sur mobile et si connecté)
+  const bottomPadding = !shouldHideBottomNav && user ? "pb-24 md:pb-0" : "";
   
   return (
-    <main className={isInConversation ? "flex-1 pt-0 md:pt-28" : "flex-1 pt-24 md:pt-28"}>
+    <main className={`flex-1 ${topPadding} ${bottomPadding}`}>
       {children}
     </main>
   );
@@ -216,6 +235,7 @@ const App = () => (
             </Routes>
           </MainWrapper>
           <FooterWrapper />
+          <BottomNavbar />
         </div>
       </BrowserRouter>
     </TooltipProvider>

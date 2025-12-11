@@ -515,6 +515,8 @@ export type Database = {
           phone_verified: boolean | null
           rating_avg: number | null
           rating_count: number | null
+          referral_count: number | null
+          referred_by_count: number | null
           reports_received: number | null
           suspended_until: string | null
           suspension_reason: string | null
@@ -540,6 +542,8 @@ export type Database = {
           phone_verified?: boolean | null
           rating_avg?: number | null
           rating_count?: number | null
+          referral_count?: number | null
+          referred_by_count?: number | null
           reports_received?: number | null
           suspended_until?: string | null
           suspension_reason?: string | null
@@ -565,6 +569,8 @@ export type Database = {
           phone_verified?: boolean | null
           rating_avg?: number | null
           rating_count?: number | null
+          referral_count?: number | null
+          referred_by_count?: number | null
           reports_received?: number | null
           suspended_until?: string | null
           suspension_reason?: string | null
@@ -575,6 +581,54 @@ export type Database = {
           verified_at?: string | null
         }
         Relationships: []
+      }
+      referrals: {
+        Row: {
+          accepted_at: string | null
+          created_at: string | null
+          id: string
+          message: string | null
+          referred_id: string
+          referrer_id: string
+          relationship: string | null
+          status: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          created_at?: string | null
+          id?: string
+          message?: string | null
+          referred_id: string
+          referrer_id: string
+          relationship?: string | null
+          status?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          created_at?: string | null
+          id?: string
+          message?: string | null
+          referred_id?: string
+          referrer_id?: string
+          relationship?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referrals_referred_id_fkey"
+            columns: ["referred_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "referrals_referrer_id_fkey"
+            columns: ["referrer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
       }
       reports: {
         Row: {

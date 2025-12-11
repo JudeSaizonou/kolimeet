@@ -1,0 +1,310 @@
+import { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { UserPlus, Loader2, AlertCircle, Shield, Clock, Phone, CheckCircle2 } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { useToast } from '@/hooks/use-toast';
+import { useReferrals, REFERRAL_CONSTRAINTS, EligibilityResult } from '@/hooks/useReferrals';
+import { useAuth } from '@/hooks/useAuth';
+import { Link } from 'react-router-dom';
+
+interface ReferralRequestDialogProps {
+  targetUserId: string;
+  targetUserName: string;
+  className?: string;
+}
+
+const RELATIONSHIPS = [
+  { value: 'friend', label: 'Ami(e)' },
+  { value: 'family', label: 'Famille' },
+  { value: 'colleague', label: 'Collègue' },
+  { value: 'neighbor', label: 'Voisin(e)' },
+  { value: 'other', label: 'Autre' },
+];
+
+export function ReferralRequestDialog({ 
+  targetUserId, 
+  targetUserName,
+  className 
+}: ReferralRequestDialogProps) {
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const { sendReferralRequest, checkReferralEligibility } = useReferrals();
+  const [open, setOpen] = useState(false);
+  const [relationship, setRelationship] = useState('');
+  const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [eligibility, setEligibility] = useState<EligibilityResult | null>(null);
+  const [checking, setChecking] = useState(false);
+
+  useEffect(() => {
+    if (user && targetUserId && user.id !== targetUserId) {
+      checkEligibility();
+    }
+  }, [user, targetUserId]);
+
+  const checkEligibility = async () => {
+    setChecking(true);
+    const result = await checkReferralEligibility(targetUserId);
+    setEligibility(result);
+    setChecking(false);
+  };
+
+  if (!user || user.id === targetUserId) return null;
+
+  if (checking) {
+    return (
+      <Button variant="outline" size="sm" disabled className={className}>
+        <Loader2 className="h-4 w-4 animate-spin" />
+      </Button>
+    );
+  }
+
+  // Afficher un bouton désactivé avec info si non éligible
+  if (eligibility && !eligibility.canRefer) {
+    // Si déjà parrainé
+    if (eligibility.reason?.includes('déjà parrainé')) {
+      return (
+        <Button variant="outline" size="sm" disabled className={className}>
+          <CheckCircle2 className="h-4 w-4 mr-2 text-green-500" />
+          Déjà parrainé
+        </Button>
+      );
+    }
+
+    // Si téléphone non vérifié
+    if (eligibility.details?.isPhoneVerified === false) {
+      return (
+        <Button variant="outline" size="sm" asChild className={className}>
+          <Link to="/profile">
+            <Phone className="h-4 w-4 mr-2 text-amber-500" />
+            Vérifier téléphone
+          </Link>
+        </Button>
+      );
+    }
+
+    // Autres cas (cooldown, limite, ancienneté)
+    return (
+      <Dialog>
+        <DialogTrigger asChild>
+          <Button variant="outline" size="sm" className={`${className} opacity-70`}>
+            <UserPlus className="h-4 w-4 mr-2" />
+            Parrainer
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertCircle className="h-5 w-5 text-amber-500" />
+              Parrainage non disponible
+            </DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-muted-foreground mb-4">{eligibility.reason}</p>
+            
+            {eligibility.details && (
+              <div className="bg-slate-50 rounded-lg p-4 space-y-2 text-sm">
+                <h4 className="font-medium text-slate-700 mb-2">Vos informations</h4>
+                {eligibility.details.accountAgeDays !== undefined && (
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Ancienneté du compte :</span>
+                    <span className={eligibility.details.accountAgeDays >= REFERRAL_CONSTRAINTS.MIN_ACCOUNT_AGE_DAYS ? 'text-green-600' : 'text-amber-600'}>
+                      {eligibility.details.accountAgeDays} jours
+                    </span>
+                  </div>
+                )}
+                {eligibility.details.referralCount !== undefined && (
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Parrainages effectués :</span>
+                    <span className={eligibility.details.referralCount < REFERRAL_CONSTRAINTS.MAX_REFERRALS_AS_REFERRER ? 'text-green-600' : 'text-amber-600'}>
+                      {eligibility.details.referralCount}/{REFERRAL_CONSTRAINTS.MAX_REFERRALS_AS_REFERRER}
+                    </span>
+                  </div>
+                )}
+                {eligibility.details.isPhoneVerified !== undefined && (
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Téléphone vérifié :</span>
+                    <span className={eligibility.details.isPhoneVerified ? 'text-green-600' : 'text-amber-600'}>
+                      {eligibility.details.isPhoneVerified ? 'Oui ✓' : 'Non'}
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => {}}>
+              Compris
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  const handleSubmit = async () => {
+    if (!relationship) {
+      toast({
+        title: "Champ requis",
+        description: "Veuillez sélectionner votre relation",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Re-vérifier l'éligibilité avant d'envoyer
+    const recheckEligibility = await checkReferralEligibility(targetUserId);
+    if (!recheckEligibility.canRefer) {
+      toast({
+        title: "Parrainage non autorisé",
+        description: recheckEligibility.reason,
+        variant: "destructive",
+      });
+      setEligibility(recheckEligibility);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const result = await sendReferralRequest(targetUserId, relationship, message);
+      
+      if (result.error) {
+        if (result.error.includes('duplicate') || result.error.includes('unique')) {
+          toast({
+            title: "Demande existante",
+            description: "Vous avez déjà envoyé une demande de parrainage à cette personne",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Erreur",
+            description: "Erreur lors de l'envoi de la demande",
+            variant: "destructive",
+          });
+        }
+        return;
+      }
+
+      toast({
+        title: "Demande envoyée ! 🎉",
+        description: `${targetUserName} recevra votre demande et pourra l'accepter.`,
+      });
+      setOpen(false);
+      setRelationship('');
+      setMessage('');
+      // Rafraîchir l'éligibilité (cooldown maintenant actif)
+      setEligibility({ canRefer: false, reason: 'Vous avez déjà parrainé ou envoyé une demande à cette personne' });
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Erreur lors de l'envoi",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline" size="sm" className={className}>
+          <UserPlus className="h-4 w-4 mr-2" />
+          Parrainer
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Shield className="h-5 w-5 text-primary" />
+            Parrainer {targetUserName}
+          </DialogTitle>
+          <DialogDescription>
+            En parrainant quelqu'un, vous certifiez le connaître personnellement 
+            et lui faites confiance. Votre parrainage augmentera son score de confiance.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-4 py-4">
+          <div className="space-y-2">
+            <Label>Comment connaissez-vous cette personne ? *</Label>
+            <Select value={relationship} onValueChange={setRelationship}>
+              <SelectTrigger>
+                <SelectValue placeholder="Sélectionnez votre relation" />
+              </SelectTrigger>
+              <SelectContent>
+                {RELATIONSHIPS.map((r) => (
+                  <SelectItem key={r.value} value={r.value}>
+                    {r.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Message (optionnel)</Label>
+            <Textarea
+              placeholder="Ex: On se connaît depuis 5 ans, c'est une personne de confiance..."
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              rows={3}
+            />
+          </div>
+
+          <div className="bg-violet-50 p-3 rounded-lg text-sm text-violet-700">
+            <p className="font-medium mb-1">💡 Bon à savoir</p>
+            <p className="text-xs mb-2">
+              Le parrainage est un engagement de confiance. Ne parrainez que des 
+              personnes que vous connaissez vraiment. En cas de problème avec un 
+              filleul, votre propre score de confiance pourrait être affecté.
+            </p>
+            <div className="text-xs space-y-1 pt-2 border-t border-violet-200">
+              <div className="flex items-center gap-1">
+                <Clock className="h-3 w-3" />
+                <span>Délai de {REFERRAL_CONSTRAINTS.COOLDOWN_HOURS}h entre chaque parrainage</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <UserPlus className="h-3 w-3" />
+                <span>Maximum {REFERRAL_CONSTRAINTS.MAX_REFERRALS_AS_REFERRER} filleuls par parrain</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setOpen(false)}>
+            Annuler
+          </Button>
+          <Button onClick={handleSubmit} disabled={!relationship || loading}>
+            {loading ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Envoi...
+              </>
+            ) : (
+              'Envoyer la demande'
+            )}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}

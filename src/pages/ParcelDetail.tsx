@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useFavorite } from "@/hooks/useFavorite";
 import { useToast } from "@/hooks/use-toast";
+import { useReferrals } from "@/hooks/useReferrals";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -18,6 +19,7 @@ import { ShareButton } from "@/components/ShareButton";
 import { SEO } from "@/components/SEO";
 import { generateParcelOGImage } from "@/lib/utils/ogImage";
 import { ReportButton } from "@/components/ReportButton";
+import { TrustBadge, ReferralRequestDialog, ReferrersList } from "@/components/trust";
 
 const ParcelDetail = () => {
   const { id } = useParams();
@@ -25,10 +27,12 @@ const ParcelDetail = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const { isFavorited, favoritesCount, toggleFavorite } = useFavorite("parcel", id || "");
+  const { getReferrersForUser } = useReferrals();
   const [parcel, setParcel] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
   const [validPhotos, setValidPhotos] = useState<string[]>([]);
+  const [ownerReferrers, setOwnerReferrers] = useState<any[]>([]);
 
   const typeLabels: Record<string, string> = {
     documents: "Documents",
@@ -42,12 +46,18 @@ const ParcelDetail = () => {
       try {
         const { data, error } = await supabase
           .from("parcels")
-          .select("*, profiles!parcels_user_id_fkey(full_name, avatar_url, rating_avg, rating_count)")
+          .select("*, profiles!parcels_user_id_fkey(full_name, avatar_url, rating_avg, rating_count, trust_score, is_verified)")
           .eq("id", id)
           .single();
 
         if (error) throw error;
         setParcel(data);
+        
+        // Charger les parrains du propriétaire du colis
+        if (data?.user_id) {
+          const referrers = await getReferrersForUser(data.user_id);
+          setOwnerReferrers(referrers);
+        }
       } catch (error: any) {
         toast({
           variant: "destructive",
@@ -285,33 +295,66 @@ const ParcelDetail = () => {
             {/* Séparateur */}
             <div className="h-px bg-slate-100 mb-5" />
 
-            {/* Profil de l'expéditeur intégré */}
-            <Link 
-              to={`/u/${parcel.user_id}`}
-              className="flex items-center gap-3 p-3 bg-slate-50 rounded-2xl hover:bg-slate-100 transition-colors border border-slate-100"
-            >
-              <Avatar className="h-12 w-12 ring-2 ring-violet-500/20">
-                <AvatarImage src={profile?.avatar_url} />
-                <AvatarFallback className="text-sm bg-violet-500/10 text-violet-600">
-                  {profile?.full_name?.[0] || "U"}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-sm text-slate-900 truncate">{profile?.full_name || "Utilisateur"}</h3>
-                <div className="flex items-center gap-1 text-xs text-slate-500">
-                  {profile?.rating_avg > 0 ? (
+            {/* Profil de l'expéditeur intégré avec système de confiance */}
+            <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 space-y-3">
+              <Link 
+                to={`/u/${parcel.user_id}`}
+                className="flex items-center gap-3 hover:bg-slate-100 rounded-xl p-1 -m-1 transition-colors"
+              >
+                <Avatar className="h-12 w-12 ring-2 ring-violet-500/20">
+                  <AvatarImage src={profile?.avatar_url} />
+                  <AvatarFallback className="text-sm bg-violet-500/10 text-violet-600">
+                    {profile?.full_name?.[0] || "U"}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-semibold text-sm text-slate-900 truncate">{profile?.full_name || "Utilisateur"}</h3>
+                    <TrustBadge 
+                      score={profile?.trust_score || 50} 
+                      referrerCount={ownerReferrers.length}
+                      isVerified={profile?.is_verified}
+                      size="sm"
+                    />
+                  </div>
+                  <div className="flex items-center gap-1 text-xs text-slate-500">
+                    {profile?.rating_avg > 0 ? (
+                      <>
+                        <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+                        <span>{Number(profile.rating_avg).toFixed(1)}</span>
+                        <span>• {profile.rating_count} avis</span>
+                      </>
+                    ) : (
+                      <span>Nouvel utilisateur</span>
+                    )}
+                  </div>
+                </div>
+                <ChevronRight className="h-4 w-4 text-slate-400" />
+              </Link>
+              
+              {/* Parrains et bouton de parrainage */}
+              <div className="flex items-center justify-between pt-2 border-t border-slate-200">
+                <div className="flex items-center gap-2">
+                  {ownerReferrers.length > 0 ? (
                     <>
-                      <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-                      <span>{Number(profile.rating_avg).toFixed(1)}</span>
-                      <span>• {profile.rating_count} avis</span>
+                      <ReferrersList referrers={ownerReferrers} maxDisplay={3} size="sm" />
+                      <span className="text-xs text-slate-500">
+                        {ownerReferrers.length} parrain{ownerReferrers.length > 1 ? 's' : ''}
+                      </span>
                     </>
                   ) : (
-                    <span>Nouvel utilisateur</span>
+                    <span className="text-xs text-slate-400">Pas encore parrainé</span>
                   )}
                 </div>
+                {user && user.id !== parcel.user_id && (
+                  <ReferralRequestDialog
+                    targetUserId={parcel.user_id}
+                    targetUserName={profile?.full_name || 'cet expéditeur'}
+                    className="h-8 text-xs"
+                  />
+                )}
               </div>
-              <ChevronRight className="h-4 w-4 text-slate-400" />
-            </Link>
+            </div>
 
             {/* Description */}
             {parcel.description && (

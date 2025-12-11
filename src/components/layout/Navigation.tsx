@@ -28,7 +28,8 @@ const Navigation = () => {
 
   // Masquer la navbar sur mobile quand on est dans une conversation
   const isInConversation = location.pathname.startsWith('/messages/') && location.pathname !== '/messages';
-  const shouldHideOnMobile = isInConversation;
+  // Masquer sur mobile quand l'utilisateur est connecté (on utilise la bottom navbar)
+  const shouldHideOnMobile = isInConversation || user;
 
   useEffect(() => {
     if (user) {
