@@ -8,7 +8,11 @@ import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 
-export function PushNotificationSettings() {
+interface PushNotificationSettingsProps {
+  compact?: boolean;
+}
+
+export function PushNotificationSettings({ compact = false }: PushNotificationSettingsProps) {
   const { toast } = useToast();
   const {
     isSupported,
@@ -53,6 +57,43 @@ export function PushNotificationSettings() {
     setTestSent(true);
     setTimeout(() => setTestSent(false), 3000);
   };
+
+  // Mode compact pour intégration dans la page profil
+  if (compact) {
+    return (
+      <div className="px-4 py-3 flex items-center justify-between border-b border-slate-100">
+        <div className="flex items-center gap-3">
+          <div className={cn(
+            "w-8 h-8 rounded-lg flex items-center justify-center",
+            !isSupported ? "bg-amber-100" : isSubscribed ? "bg-green-100" : "bg-slate-100"
+          )}>
+            {!isSupported ? (
+              <AlertCircle className="h-4 w-4 text-amber-600" />
+            ) : isSubscribed ? (
+              <Bell className="h-4 w-4 text-green-600" />
+            ) : (
+              <BellOff className="h-4 w-4 text-slate-600" />
+            )}
+          </div>
+          <div>
+            <p className="text-sm font-medium text-slate-900">Notifications push</p>
+            <p className="text-xs text-slate-500">
+              {!isSupported ? 'Non supportées' : isSubscribed ? 'Activées' : 'Désactivées'}
+            </p>
+          </div>
+        </div>
+        {loading ? (
+          <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
+        ) : (
+          <Switch
+            checked={isSubscribed}
+            onCheckedChange={handleToggle}
+            disabled={loading || permission === 'denied' || !isSupported}
+          />
+        )}
+      </div>
+    );
+  }
 
   if (!isSupported) {
     return (

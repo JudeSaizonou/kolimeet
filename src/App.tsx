@@ -7,6 +7,7 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { AdminRoute } from "@/components/auth/AdminRoute";
 import Navigation from "./components/layout/Navigation";
 import { BottomNavbar } from "./components/layout/BottomNavbar";
+import { MobileHeader } from "./components/layout/MobileHeader";
 import Footer from "./components/layout/Footer";
 import { SuspensionBanner } from "@/components/SuspensionBanner";
 import { PWAInstallBanner } from "@/components/PWAInstallBanner";
@@ -51,9 +52,15 @@ const queryClient = new QueryClient();
 
 const FooterWrapper = () => {
   const location = useLocation();
-  // Afficher le footer uniquement sur /explorer
+  const { user } = useAuth();
+  
+  // Afficher le footer uniquement sur /explorer et / mais pas sur mobile quand connecté
   if (location.pathname === '/explorer' || location.pathname === '/') {
-    return <Footer />;
+    return (
+      <div className={user ? "hidden md:block" : ""}>
+        <Footer />
+      </div>
+    );
   }
   return null;
 };
@@ -64,17 +71,25 @@ const MainWrapper = ({ children }: { children: React.ReactNode }) => {
   
   // Pas de padding-top sur mobile quand dans une conversation (navbar masquée)
   const isInConversation = location.pathname.startsWith('/messages/') && location.pathname !== '/messages';
+  
+  // Pages où le header mobile est affiché (uniquement Explorer et Favoris)
+  const mobileHeaderPages = ['/', '/explorer', '/favoris'];
+  const shouldShowMobileHeader = user && mobileHeaderPages.includes(location.pathname);
+  
   // Pages où la bottom navbar est masquée (synchronisé avec BottomNavbar.tsx)
   const hiddenBottomNavPaths = ['/publier/', '/auth/', '/onboarding'];
   const shouldHideBottomNav = hiddenBottomNavPaths.some(path => location.pathname.startsWith(path));
   
-  // Sur mobile quand connecté : pas de navbar top, donc pt-4 suffit
+  // Sur mobile quand connecté avec MobileHeader : pt-16 pour laisser place au header
+  // Sur mobile quand connecté sans MobileHeader : pt-4
   // Sur mobile quand non connecté : navbar top visible, donc pt-24
   // Sur desktop : toujours pt-28 pour la navbar top
   const topPadding = isInConversation 
     ? "pt-0 md:pt-28" 
     : user 
-      ? "pt-4 md:pt-28" 
+      ? shouldShowMobileHeader
+        ? "pt-16 md:pt-28"
+        : "pt-4 md:pt-28" 
       : "pt-24 md:pt-28";
   
   // Bottom padding pour la bottom navbar (uniquement sur mobile et si connecté)
@@ -95,6 +110,7 @@ const App = () => (
       <BrowserRouter>
         <div className="flex flex-col min-h-screen overflow-x-hidden">
           <Navigation />
+          <MobileHeader />
           <OfflineBanner />
           <PWAInstallBanner />
           <MainWrapper>

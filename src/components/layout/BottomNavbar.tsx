@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Compass, Heart, Plus, Bell, User, Plane, Package, X } from "lucide-react";
+import { Compass, Heart, Plus, MessageCircle, User, Plane, Package, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
-import { useNotifications } from "@/hooks/useNotifications";
+import { useThreads } from "@/hooks/useThreads";
 import {
   Sheet,
   SheetContent,
@@ -24,8 +24,11 @@ export function BottomNavbar() {
   const { user } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
-  const { unreadCount } = useNotifications();
+  const { threads } = useThreads();
   const [publishSheetOpen, setPublishSheetOpen] = useState(false);
+
+  // Compter les messages non lus
+  const unreadMessagesCount = threads?.filter(t => t.unread_count > 0).length || 0;
 
   // Ne pas afficher si l'utilisateur n'est pas connecté
   if (!user) return null;
@@ -59,11 +62,11 @@ export function BottomNavbar() {
       action: () => setPublishSheetOpen(true),
     },
     {
-      label: "Notifs",
-      href: "/notifications",
-      icon: <Bell className="h-6 w-6" strokeWidth={1.5} />,
-      activeIcon: <Bell className="h-6 w-6 fill-current" strokeWidth={2} />,
-      badge: unreadCount,
+      label: "Messages",
+      href: "/messages",
+      icon: <MessageCircle className="h-6 w-6" strokeWidth={1.5} />,
+      activeIcon: <MessageCircle className="h-6 w-6 fill-current" strokeWidth={2} />,
+      badge: unreadMessagesCount,
     },
     {
       label: "Profil",
@@ -88,7 +91,7 @@ export function BottomNavbar() {
 
   return (
     <>
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 pb-safe">
         {/* Fond avec effet de flou et bordure subtile */}
         <div className="absolute inset-0 bg-white/95 backdrop-blur-xl border-t border-slate-100 shadow-[0_-4px_20px_rgba(0,0,0,0.08)]" />
         

@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -15,7 +14,7 @@ import {
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
-import { Upload, User, Star, LogOut, EyeOff } from "lucide-react";
+import { Camera, Star, LogOut, EyeOff, ChevronRight, Shield, Settings, HelpCircle, Phone, MapPin, Bell } from "lucide-react";
 import { PhoneVerification } from "@/components/profile/PhoneVerification";
 import { PushNotificationSettings } from "@/components/notifications/PushNotificationSettings";
 import { useNavigate } from "react-router-dom";
@@ -193,223 +192,160 @@ const Profile = () => {
 
   return (
     <ProtectedRoute>
-      <div className="bg-secondary min-h-screen py-6 px-3 sm:py-12 sm:px-4">
-        <div className="max-w-md mx-auto space-y-4">
-          {/* Profile Header */}
-          <Card className="p-4 sm:p-6 border shadow-sm">
-            <div className="flex flex-col items-center text-center gap-3">
-              <div className="relative">
-                <Avatar className="h-20 w-20 sm:h-24 sm:w-24">
-                  <AvatarImage src={avatarUrl} alt="Avatar" />
-                  <AvatarFallback className="bg-primary/10">
-                    <User className="h-10 w-10 sm:h-12 sm:w-12 text-primary" />
-                  </AvatarFallback>
-                </Avatar>
-                <Label
-                  htmlFor="avatar-upload"
-                  className="absolute -bottom-1 -right-1 cursor-pointer inline-flex items-center justify-center h-8 w-8 bg-primary text-primary-foreground rounded-full hover:bg-primary/90 transition-colors shadow-md"
-                >
-                  <Upload className="h-4 w-4" />
-                </Label>
-                <Input
-                  id="avatar-upload"
-                  type="file"
-                  accept="image/*"
-                  onChange={uploadAvatar}
-                  disabled={uploading}
-                  className="hidden"
-                />
-              </div>
-
-              <div>
-                <h1 className="text-lg sm:text-xl font-bold text-foreground">
-                  {formData.full_name || "Votre profil"}
-                </h1>
-                <p className="text-sm text-muted-foreground">
-                  {formData.city && formData.country
-                    ? `${formData.city}, ${formData.country}`
-                    : "Aucune localisation"}
-                </p>
-
-                {rating.count > 0 && (
-                  <div className="flex items-center justify-center gap-1.5 mt-2">
-                    <Star className="h-4 w-4 text-warning fill-warning" />
-                    <span className="font-medium text-sm text-foreground">
-                      {rating.avg.toFixed(1)}
-                    </span>
-                    <span className="text-xs text-muted-foreground">
-                      ({rating.count} avis)
-                    </span>
-                  </div>
-                )}
-
-                {/* Badge de confiance */}
-                <div className="mt-3">
-                  <TrustBadge
-                    trustScore={trustScore}
-                    referredByCount={referredByCount}
-                    isVerified={isVerified}
-                    size="md"
-                    showLabel
-                  />
-                </div>
-              </div>
+      <div className="min-h-screen bg-slate-50/50">
+        {/* Header profil avec fond dégradé */}
+        <div className="bg-gradient-to-b from-primary/5 to-white px-4 pt-6 pb-8">
+          {/* Avatar centré */}
+          <div className="flex flex-col items-center">
+            <div className="relative mb-4">
+              <Avatar className="h-24 w-24 ring-4 ring-white shadow-lg">
+                <AvatarImage src={avatarUrl} alt="Avatar" />
+                <AvatarFallback className="bg-primary/10 text-primary text-3xl font-semibold">
+                  {formData.full_name?.charAt(0)?.toUpperCase() || "?"}
+                </AvatarFallback>
+              </Avatar>
+              <label
+                htmlFor="avatar-upload"
+                className="absolute bottom-0 right-0 cursor-pointer w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center shadow-lg active:scale-95 transition-transform border-2 border-white"
+              >
+                <Camera className="h-4 w-4" />
+              </label>
+              <Input
+                id="avatar-upload"
+                type="file"
+                accept="image/*"
+                onChange={uploadAvatar}
+                disabled={uploading}
+                className="hidden"
+              />
             </div>
-          </Card>
 
-          {/* Section Parrainage */}
+            {/* Nom et localisation */}
+            <h1 className="text-2xl font-bold text-slate-900 text-center">
+              {formData.full_name || "Votre nom"}
+            </h1>
+            {formData.city && formData.country && (
+              <p className="text-sm text-slate-500 flex items-center gap-1 mt-1">
+                <MapPin className="h-4 w-4" />
+                {formData.city}, {formData.country}
+              </p>
+            )}
+
+            {/* Stats */}
+            <div className="flex items-center gap-4 mt-4">
+              {rating.count > 0 && (
+                <div className="flex items-center gap-1.5 bg-amber-50 px-3 py-1.5 rounded-full">
+                  <Star className="h-4 w-4 text-amber-500 fill-amber-500" />
+                  <span className="text-sm font-semibold text-amber-700">{rating.avg.toFixed(1)}</span>
+                  <span className="text-xs text-amber-600">({rating.count})</span>
+                </div>
+              )}
+              <TrustBadge
+                trustScore={trustScore}
+                referredByCount={referredByCount}
+                isVerified={isVerified}
+                size="sm"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Section Parrainage */}
+        <div className="px-4 -mt-2">
           <MyReferralsSection />
+        </div>
 
-          {/* Profile Form */}
-          <Card className="p-4 sm:p-6 border shadow-sm">
-            <h2 className="text-base sm:text-lg font-bold text-foreground mb-4">
+        {/* Formulaire */}
+        <div className="mt-4 mx-4 bg-white rounded-2xl shadow-sm overflow-hidden">
+          <div className="px-4 py-3 bg-slate-50 border-b border-slate-100">
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
               Informations personnelles
-            </h2>
+            </p>
+          </div>
 
-            <form onSubmit={handleSubmit} className="space-y-3">
-              <div className="space-y-1.5">
-                <Label htmlFor="full_name" className="text-xs text-muted-foreground font-medium">
-                  Nom complet <span className="text-destructive">*</span>
-                </Label>
-                <Input
-                  id="full_name"
-                  type="text"
-                  value={formData.full_name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, full_name: e.target.value })
-                  }
-                  className="h-10"
-                  required
-                />
-              </div>
+          {/* Nom */}
+          <div className="px-4 py-4 border-b border-slate-100">
+            <Label className="text-xs text-slate-400 font-medium">Nom complet</Label>
+            <Input
+              value={formData.full_name}
+              onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
+              placeholder="Votre nom"
+              className="border-0 p-0 h-7 text-base text-slate-900 focus-visible:ring-0 placeholder:text-slate-300"
+            />
+          </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                  <Label htmlFor="country" className="text-xs text-muted-foreground font-medium">
-                    Pays <span className="text-destructive">*</span>
-                  </Label>
-                  <Select
-                    value={formData.country}
-                    onValueChange={(value) => {
-                      setFormData({ ...formData, country: value, city: "" });
-                      setSelectedCountry(value);
-                    }}
-                    required
-                  >
-                    <SelectTrigger id="country" className="h-10">
-                      <SelectValue placeholder="Pays" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {countries.map((country) => (
-                        <SelectItem key={country} value={country}>
-                          {country}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+          {/* Pays */}
+          <div className="px-4 py-4 border-b border-slate-100">
+            <Label className="text-xs text-slate-400 font-medium">Pays</Label>
+            <Select
+              value={formData.country}
+              onValueChange={(value) => {
+                setFormData({ ...formData, country: value, city: "" });
+                setSelectedCountry(value);
+              }}
+            >
+              <SelectTrigger className="border-0 p-0 h-7 text-base text-slate-900 focus:ring-0 [&>svg]:text-slate-400">
+                <SelectValue placeholder="Choisir un pays" />
+              </SelectTrigger>
+              <SelectContent>
+                {countries.map((country) => (
+                  <SelectItem key={country} value={country}>{country}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-                <div className="space-y-1.5">
-                  <Label htmlFor="city" className="text-xs text-muted-foreground font-medium">
-                    Ville <span className="text-destructive">*</span>
-                  </Label>
-                  {selectedCountry && citiesByCountry[selectedCountry] ? (
-                    <Select
-                      value={formData.city}
-                      onValueChange={(value) =>
-                        setFormData({ ...formData, city: value })
-                      }
-                      required
-                    >
-                      <SelectTrigger id="city" className="h-10">
-                        <SelectValue placeholder="Ville" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {citiesByCountry[selectedCountry].map((city) => (
-                          <SelectItem key={city} value={city}>
-                            {city}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  ) : (
-                    <Input
-                      id="city"
-                      type="text"
-                      value={formData.city}
-                      onChange={(e) =>
-                        setFormData({ ...formData, city: e.target.value })
-                      }
-                      placeholder="Ville"
-                      disabled={!selectedCountry}
-                      className="h-10"
-                      required
-                    />
-                  )}
-                </div>
-              </div>
+          {/* Ville */}
+          <div className="px-4 py-4 border-b border-slate-100">
+            <Label className="text-xs text-slate-400 font-medium">Ville</Label>
+            {selectedCountry && citiesByCountry[selectedCountry] ? (
+              <Select
+                value={formData.city}
+                onValueChange={(value) => setFormData({ ...formData, city: value })}
+              >
+                <SelectTrigger className="border-0 p-0 h-7 text-base text-slate-900 focus:ring-0 [&>svg]:text-slate-400">
+                  <SelectValue placeholder="Choisir une ville" />
+                </SelectTrigger>
+                <SelectContent>
+                  {citiesByCountry[selectedCountry].map((city) => (
+                    <SelectItem key={city} value={city}>{city}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            ) : (
+              <Input
+                value={formData.city}
+                onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                placeholder="Votre ville"
+                disabled={!selectedCountry}
+                className="border-0 p-0 h-7 text-base text-slate-900 focus-visible:ring-0 placeholder:text-slate-300"
+              />
+            )}
+          </div>
 
-              <div className="space-y-1.5">
-                <Label htmlFor="phone_e164" className="text-xs text-muted-foreground font-medium">
-                  Téléphone
-                </Label>
-                <Input
-                  id="phone_e164"
-                  type="tel"
-                  placeholder="+33612345678"
-                  value={formData.phone_e164}
-                  onChange={(e) =>
-                    setFormData({ ...formData, phone_e164: e.target.value })
-                  }
-                  className="h-10"
-                />
-                <p className="text-[11px] text-muted-foreground">
-                  Avec indicatif pays (ex: +33)
-                </p>
-              </div>
+          {/* Téléphone */}
+          <div className="px-4 py-4 flex items-center justify-between">
+            <div className="flex-1">
+              <Label className="text-xs text-slate-400 font-medium">Téléphone</Label>
+              <Input
+                type="tel"
+                value={formData.phone_e164}
+                onChange={(e) => setFormData({ ...formData, phone_e164: e.target.value })}
+                placeholder="+33 6 12 34 56 78"
+                className="border-0 p-0 h-7 text-base text-slate-900 focus-visible:ring-0 placeholder:text-slate-300"
+              />
+            </div>
+            {phoneVerified && (
+              <span className="text-xs text-emerald-600 font-medium bg-emerald-50 px-2.5 py-1 rounded-full">
+                ✓ Vérifié
+              </span>
+            )}
+          </div>
+        </div>
 
-              {/* Paramètre publication anonyme */}
-              <div className="flex items-center justify-between rounded-lg border p-3 bg-muted/30">
-                <div className="space-y-0.5 flex-1 mr-3">
-                  <Label className="text-sm flex items-center gap-1.5 font-medium">
-                    <EyeOff className="h-3.5 w-3.5" />
-                    Publier anonymement
-                  </Label>
-                  <p className="text-[11px] text-muted-foreground leading-tight">
-                    Vos annonces seront anonymes par défaut
-                  </p>
-                </div>
-                <Switch
-                  checked={defaultAnonymous}
-                  onCheckedChange={setDefaultAnonymous}
-                />
-              </div>
-
-              <div className="pt-2 space-y-2">
-                <Button
-                  type="submit"
-                  className="w-full h-10 font-medium text-sm"
-                  disabled={loading}
-                >
-                  {loading ? "Enregistrement..." : "Enregistrer"}
-                </Button>
-
-                {/* Bouton Déconnexion */}
-                <Button
-                  type="button"
-                  variant="ghost"
-                  className="w-full h-10 font-medium text-sm text-destructive hover:text-destructive hover:bg-destructive/10"
-                  onClick={handleSignOut}
-                >
-                  <LogOut className="h-4 w-4 mr-2" />
-                  Déconnexion
-                </Button>
-              </div>
-            </form>
-          </Card>
-
-          {/* Phone Verification */}
-          {formData.phone_e164 && (
+        {/* Vérification téléphone */}
+        {formData.phone_e164 && !phoneVerified && (
+          <div className="mt-4 px-4">
             <PhoneVerification
               phoneNumber={formData.phone_e164}
               isVerified={phoneVerified}
@@ -418,10 +354,56 @@ const Profile = () => {
                 loadProfile();
               }}
             />
-          )}
+          </div>
+        )}
 
-          {/* Push Notifications */}
-          <PushNotificationSettings />
+        {/* Préférences */}
+        <div className="mt-4 mx-4 bg-white rounded-2xl shadow-sm overflow-hidden">
+          <div className="px-4 py-3 bg-slate-50 border-b border-slate-100">
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+              Préférences
+            </p>
+          </div>
+
+          {/* Publication anonyme */}
+          <div className="px-4 py-4 border-b border-slate-100 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 bg-violet-100 rounded-xl flex items-center justify-center">
+                <EyeOff className="h-4.5 w-4.5 text-violet-600" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-slate-900">Publication anonyme</p>
+                <p className="text-xs text-slate-500">Cacher votre identité</p>
+              </div>
+            </div>
+            <Switch
+              checked={defaultAnonymous}
+              onCheckedChange={setDefaultAnonymous}
+            />
+          </div>
+
+          {/* Push Notifications intégré */}
+          <PushNotificationSettings compact />
+        </div>
+
+        {/* Boutons d'action */}
+        <div className="mt-6 px-4 space-y-3 pb-8">
+          <Button
+            onClick={handleSubmit}
+            className="w-full h-12 text-base font-semibold rounded-xl shadow-md shadow-primary/20"
+            disabled={loading}
+          >
+            {loading ? "Enregistrement..." : "Enregistrer les modifications"}
+          </Button>
+
+          <Button
+            variant="ghost"
+            onClick={handleSignOut}
+            className="w-full h-11 text-sm font-medium text-slate-500 hover:text-red-500 hover:bg-red-50/50 rounded-xl"
+          >
+            <LogOut className="h-4 w-4 mr-2" />
+            Se déconnecter
+          </Button>
         </div>
       </div>
     </ProtectedRoute>
