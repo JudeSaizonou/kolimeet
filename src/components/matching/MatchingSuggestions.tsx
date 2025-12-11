@@ -137,21 +137,10 @@ export const MatchingSuggestions = ({
         return;
       }
 
-      // Vérifier si un thread existe déjà
-      const { data: existingThread } = await supabase
-        .from("threads")
-        .select("id")
-        .eq("related_id", type === "parcel" ? matchTargetId : itemId)
-        .or(`and(created_by.eq.${user.id}),and(other_user_id.eq.${user.id})`)
-        .single();
-
-      if (existingThread) {
-        navigate(`/messages/${existingThread.id}`);
-        return;
-      }
-
-      // Récupérer l'ID de l'autre utilisateur
+      // Récupérer l'ID de l'autre utilisateur d'abord
       let otherUserId: string;
+      const relatedType = type === "parcel" ? "trip" : "parcel";
+      
       if (type === "parcel") {
         const { data: trip } = await supabase
           .from("trips")
@@ -170,10 +159,42 @@ export const MatchingSuggestions = ({
 
       if (!otherUserId) throw new Error("Utilisateur introuvable");
 
-      // Naviguer vers la page de nouveau message
-      const relatedType = type === "parcel" ? "trip" : "parcel";
-      navigate(`/messages/new?type=${relatedType}&id=${matchTargetId}&user=${otherUserId}`);
+      // Vérifier si un thread existe déjà pour cette annonce entre les deux utilisateurs
+      const { data: existingThreads } = await supabase
+        .from("threads")
+        .select("id, created_by, other_user_id")
+        .eq("related_id", matchTargetId)
+        .eq("related_type", relatedType);
+
+      // Filtrer pour trouver un thread entre les deux utilisateurs
+      const existingThread = existingThreads?.find(
+        (thread: any) =>
+          (thread.created_by === user.id && thread.other_user_id === otherUserId) ||
+          (thread.created_by === otherUserId && thread.other_user_id === user.id)
+      );
+
+      if (existingThread) {
+        navigate(`/messages/${existingThread.id}`);
+        return;
+      }
+
+      // Créer un nouveau thread directement
+      const { data: newThread, error: threadError } = await supabase
+        .from("threads")
+        .insert({
+          created_by: user.id,
+          other_user_id: otherUserId,
+          related_type: relatedType,
+          related_id: matchTargetId,
+        })
+        .select()
+        .single();
+
+      if (threadError) throw threadError;
+
+      navigate(`/messages/${newThread.id}`);
     } catch (error: any) {
+      console.error("Error creating thread:", error);
       toast({
         variant: "destructive",
         title: "Erreur",

@@ -33,9 +33,9 @@ All colors MUST be HSL.
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    /* Accent: Warm Amber for travel/packages */
-    --accent: 38 92% 50%;
-    --accent-foreground: 210 40% 98%;
+    /* Accent: Soft Violet for secondary elements - perfect harmony with primary */
+    --accent: 263 70% 95%;
+    --accent-foreground: 263 70% 40%;
 
     /* Destructive: Soft Red */
     --destructive: 0 84.2% 60.2%;

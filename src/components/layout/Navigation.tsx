@@ -87,14 +87,16 @@ const Navigation = () => {
         
         {/* Desktop Navigation Links */}
         <div className="hidden md:flex items-center gap-[30px] flex-1 justify-center" style={{ fontFamily: 'Figtree' }}>
-          <a 
-            href="https://kolimeet.framer.ai/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-muted-foreground hover:text-primary transition-all duration-200 text-base font-medium whitespace-nowrap"
-          >
-            Accueil
-          </a>
+          {!user && (
+            <a 
+              href="https://kolimeet.framer.ai/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-muted-foreground hover:text-primary transition-all duration-200 text-base font-medium whitespace-nowrap"
+            >
+              Accueil
+            </a>
+          )}
           
           {!user && (
             <>
@@ -118,15 +120,6 @@ const Navigation = () => {
             </>
           )}
           
-          <a 
-            href="https://kolimeet.framer.ai/blog"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-muted-foreground hover:text-primary transition-all duration-200 text-base font-medium whitespace-nowrap"
-          >
-            Blog
-          </a>
-          
           <Link 
             to="/explorer"
             className="text-muted-foreground hover:text-primary transition-all duration-200 text-base font-medium whitespace-nowrap"
@@ -147,6 +140,15 @@ const Navigation = () => {
               )}
             </Link>
           )}
+          
+          <a 
+            href="https://kolimeet.framer.ai/blog"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-muted-foreground hover:text-primary transition-all duration-200 text-base font-medium whitespace-nowrap"
+          >
+            Blog
+          </a>
         </div>
 
         {/* Desktop Actions */}

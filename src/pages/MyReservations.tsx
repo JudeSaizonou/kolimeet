@@ -35,7 +35,7 @@ const paymentStatusLabels = {
   processing: { label: 'En cours', color: 'bg-blue-100 text-blue-800' },
   paid: { label: 'Payé', color: 'bg-green-100 text-green-800' },
   failed: { label: 'Échoué', color: 'bg-red-100 text-red-800' },
-  refunded: { label: 'Remboursé', color: 'bg-orange-100 text-orange-800' },
+  refunded: { label: 'Remboursé', color: 'bg-violet-100 text-violet-800' },
 };
 
 interface ReservationCardProps {

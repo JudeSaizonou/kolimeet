@@ -9,17 +9,15 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowRight, Calendar, Package, Star, CreditCard, MessageCircle, Heart, MapPin, Weight, Info, Share2, Settings } from "lucide-react";
+import { ArrowRight, Calendar, Package, Star, CreditCard, MessageCircle, Heart, MapPin, Weight, Info, Share2, Settings, Plane, Clock, Shield, ChevronRight } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { MatchingSection } from "@/components/explorer/MatchingSection";
 import { ReviewDialog } from "@/components/reviews/ReviewDialog";
-import { BookingDialog } from "@/components/booking/BookingDialog";
+import { SimpleBookingDialog } from "@/components/booking/SimpleBookingDialog";
 import { GlassCard } from "@/components/LiquidGlass";
 import { MatchingSuggestions } from "@/components/matching/MatchingSuggestions";
 import { Separator } from "@/components/ui/separator";
 import { ShareButton } from "@/components/ShareButton";
-import { ShareStoryButton } from "@/components/ShareStoryButton";
 import { SEO } from "@/components/SEO";
 import { generateTripOGImage } from "@/lib/utils/ogImage";
 import { ReportButton } from "@/components/ReportButton";
@@ -78,22 +76,42 @@ const TripDetail = () => {
     }
 
     try {
-      // Vérifier si un thread existe déjà
-      const { data: existingThread } = await supabase
+      // Vérifier si un thread existe déjà pour cette annonce entre les deux utilisateurs
+      const { data: existingThreads } = await supabase
         .from("threads")
-        .select("id")
+        .select("id, created_by, other_user_id")
         .eq("related_id", id)
-        .or(`and(created_by.eq.${user.id},other_user_id.eq.${trip.user_id}),and(created_by.eq.${trip.user_id},other_user_id.eq.${user.id})`)
-        .single();
+        .eq("related_type", "trip");
+
+      // Filtrer pour trouver un thread entre les deux utilisateurs
+      const existingThread = existingThreads?.find(
+        (thread: any) =>
+          (thread.created_by === user.id && thread.other_user_id === trip.user_id) ||
+          (thread.created_by === trip.user_id && thread.other_user_id === user.id)
+      );
 
       if (existingThread) {
         navigate(`/messages/${existingThread.id}`);
         return;
       }
 
-      // Naviguer vers une URL temporaire qui créera le thread au premier message
-      navigate(`/messages/new?type=trip&id=${id}&user=${trip.user_id}`);
+      // Créer un nouveau thread directement
+      const { data: newThread, error: threadError } = await supabase
+        .from("threads")
+        .insert({
+          created_by: user.id,
+          other_user_id: trip.user_id,
+          related_type: "trip",
+          related_id: id,
+        })
+        .select()
+        .single();
+
+      if (threadError) throw threadError;
+
+      navigate(`/messages/${newThread.id}`);
     } catch (error: any) {
+      console.error("Error creating thread:", error);
       toast({
         title: "Erreur",
         description: "Impossible de démarrer la conversation.",
@@ -136,49 +154,25 @@ const TripDetail = () => {
         url={shareUrl}
         type="article"
       />
-      <div className="min-h-screen bg-secondary/30 pb-24 pt-20 md:pt-24">
+      <div className="min-h-screen bg-gradient-to-b from-slate-50 via-background to-background pb-24 pt-20 md:pt-24">
         <div className="container mx-auto px-4 max-w-3xl">
         
-        {/* Header Card */}
-        <GlassCard 
+        {/* Hero Card - Design épuré sur fond blanc */}
+        <div 
           ref={cardRef}
-          className="relative overflow-hidden mb-6"
-          intensity="medium"
-          rounded="2xl"
-          padding="sm"
+          className="relative overflow-hidden rounded-3xl bg-white border border-slate-200/60 mb-6 shadow-xl shadow-slate-200/50"
         >
-          {/* Gradient Background Header */}
-          <div className="h-32 bg-gradient-to-r from-primary/20 via-primary/10 to-transparent relative">
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="flex items-center gap-4 text-primary/80">
-                <span className="text-2xl font-bold">{trip.from_city}</span>
-                <ArrowRight className="h-6 w-6" />
-                <span className="text-2xl font-bold">{trip.to_city}</span>
-              </div>
-            </div>
-            
-            {/* Boutons d'action rapide */}
-            <div className="absolute top-4 right-4 flex gap-2">
-              <ShareStoryButton
-                type="trip"
-                data={{
-                  fromCity: trip.from_city || '',
-                  toCity: trip.to_city || '',
-                  fromCountry: trip.from_country || '',
-                  toCountry: trip.to_country || '',
-                  date: trip.date_departure ? format(new Date(trip.date_departure), "d MMM yyyy", { locale: fr }) : '',
-                  capacity: trip.available_weight || 0,
-                  price: trip.price_per_kg || 0,
-                }}
-                element={cardRef.current}
-              />
+          {/* Header coloré subtil */}
+          <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-6 pb-4">
+            {/* Boutons d'action */}
+            <div className="flex justify-end gap-2 mb-4">
               <ShareButton
                 title={`Trajet ${trip.from_city} → ${trip.to_city}`}
                 description={`${trip.capacity_available_kg}kg disponibles - Départ le ${format(new Date(trip.date_departure), "d MMM yyyy", { locale: fr })}`}
                 url={`/trajets/${trip.id}`}
                 variant="ghost"
                 size="icon"
-                className="bg-white/50 backdrop-blur-sm hover:bg-white/80 rounded-full"
+                className="bg-slate-100 hover:bg-slate-200 rounded-full text-slate-600"
                 storyShare={{
                   type: 'trip',
                   data: {
@@ -186,9 +180,7 @@ const TripDetail = () => {
                     toCity: trip.to_city || '',
                     fromCountry: trip.from_country || '',
                     toCountry: trip.to_country || '',
-                    date: trip.date_departure
-                      ? format(new Date(trip.date_departure), "d MMM yyyy", { locale: fr })
-                      : '',
+                    date: trip.date_departure ? format(new Date(trip.date_departure), "d MMM yyyy", { locale: fr }) : '',
                     capacity: trip.available_weight || trip.capacity_available_kg || 0,
                     price: trip.price_per_kg || trip.price_expect || 0,
                   },
@@ -198,10 +190,10 @@ const TripDetail = () => {
               <Button
                 variant="ghost"
                 size="icon"
-                className="bg-white/50 backdrop-blur-sm hover:bg-white/80 rounded-full"
+                className="bg-slate-100 hover:bg-slate-200 rounded-full text-slate-600"
                 onClick={toggleFavorite}
               >
-                <Heart className={`h-5 w-5 ${isFavorited ? "fill-red-500 text-red-500" : "text-gray-600"}`} />
+                <Heart className={`h-5 w-5 ${isFavorited ? "fill-red-500 text-red-500" : ""}`} />
               </Button>
               <ReportButton
                 targetType="trip"
@@ -210,81 +202,108 @@ const TripDetail = () => {
                 variant="ghost"
                 size="icon"
                 showText={false}
+                className="bg-slate-100 hover:bg-slate-200 rounded-full text-slate-600"
               />
             </div>
-          </div>
 
-          <div className="p-6 -mt-12 relative z-10">
-            <div className="flex justify-between items-end mb-6">
-              <div className="flex items-center gap-4">
-                <Avatar className="h-20 w-20 border-4 border-white shadow-lg">
-                  <AvatarImage src={trip.profiles?.avatar_url} />
-                  <AvatarFallback>{trip.profiles?.full_name?.[0]}</AvatarFallback>
-                </Avatar>
-                <div className="mb-2">
-                  <h1 className="text-xl font-bold text-foreground">{trip.profiles?.full_name}</h1>
-                  <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                    <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                    <span className="font-medium text-foreground">{trip.profiles?.rating_avg?.toFixed(1) || "Nouveau"}</span>
-                    {trip.profiles?.rating_count > 0 && <span>({trip.profiles?.rating_count})</span>}
-                  </div>
-                </div>
+            {/* Badge trajet */}
+            <div className="flex items-center gap-2 mb-4">
+              <Badge className="bg-primary/10 text-primary border-0">
+                <Plane className="h-3 w-3 mr-1" />
+                Trajet
+              </Badge>
+              <Badge variant={trip.status === "open" ? "default" : "secondary"} className="text-xs">
+                {trip.status === "open" ? "Disponible" : "Complet"}
+              </Badge>
+            </div>
+
+            {/* Itinéraire */}
+            <div className="flex items-center gap-4">
+              <div className="flex-1">
+                <p className="text-slate-400 text-xs uppercase tracking-wider mb-1">Départ</p>
+                <h2 className="text-2xl md:text-3xl font-bold text-slate-900">{trip.from_city}</h2>
+                <p className="text-slate-500 text-sm">{trip.from_country}</p>
               </div>
               
-              <div className="text-right mb-2">
-                <div className="text-2xl font-bold text-primary">
-                  {trip.price_expect ? `${trip.price_expect}€` : "Sur devis"}
+              <div className="flex flex-col items-center px-4">
+                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Plane className="h-6 w-6 text-primary transform rotate-45" />
                 </div>
-                <div className="text-xs text-muted-foreground uppercase font-semibold tracking-wider">par kg</div>
+                <div className="h-0.5 w-16 bg-slate-200 my-2" />
               </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4 mb-6">
-              <div className="bg-secondary/50 p-3 rounded-xl flex items-center gap-3">
-                <div className="bg-primary/10 p-2 rounded-lg">
-                  <Calendar className="h-5 w-5 text-primary" />
-                </div>
-                <div>
-                  <div className="text-[10px] uppercase text-muted-foreground font-bold tracking-wider">Départ</div>
-                  <div className="font-semibold text-sm">
-                    {format(new Date(trip.date_departure), "d MMM yyyy", { locale: fr })}
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-secondary/50 p-3 rounded-xl flex items-center gap-3">
-                <div className="bg-primary/10 p-2 rounded-lg">
-                  <Weight className="h-5 w-5 text-primary" />
-                </div>
-                <div>
-                  <div className="text-[10px] uppercase text-muted-foreground font-bold tracking-wider">Capacité</div>
-                  <div className="font-semibold text-sm">
-                    {trip.capacity_available_kg} kg dispo
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <div>
-                <h3 className="text-xs uppercase text-muted-foreground font-bold tracking-wider mb-2 flex items-center gap-2">
-                  <Info className="h-3 w-3" />
-                  Description
-                </h3>
-                <p className="text-sm text-foreground/80 leading-relaxed">
-                  {trip.notes || "Aucune description fournie pour ce trajet."}
-                </p>
+              
+              <div className="flex-1 text-right">
+                <p className="text-slate-400 text-xs uppercase tracking-wider mb-1">Arrivée</p>
+                <h2 className="text-2xl md:text-3xl font-bold text-slate-900">{trip.to_city}</h2>
+                <p className="text-slate-500 text-sm">{trip.to_country}</p>
               </div>
             </div>
           </div>
-        </GlassCard>
+
+          <div className="p-6 pt-4">
+            {/* Infos clés */}
+            <div className="grid grid-cols-3 gap-3 mb-6">
+              <div className="bg-slate-50 rounded-2xl p-3 text-center border border-slate-100">
+                <Calendar className="h-4 w-4 mx-auto mb-1 text-primary" />
+                <p className="text-[10px] text-slate-400 uppercase tracking-wider">Départ</p>
+                <p className="font-bold text-sm text-slate-900">
+                  {format(new Date(trip.date_departure), "d MMM", { locale: fr })}
+                </p>
+              </div>
+              <div className="bg-slate-50 rounded-2xl p-3 text-center border border-slate-100">
+                <Weight className="h-4 w-4 mx-auto mb-1 text-primary" />
+                <p className="text-[10px] text-slate-400 uppercase tracking-wider">Capacité</p>
+                <p className="font-bold text-sm text-slate-900">{trip.capacity_available_kg} kg</p>
+              </div>
+              <div className="bg-slate-50 rounded-2xl p-3 text-center border border-slate-100">
+                <CreditCard className="h-4 w-4 mx-auto mb-1 text-primary" />
+                <p className="text-[10px] text-slate-400 uppercase tracking-wider">Prix</p>
+                <p className="font-bold text-sm text-slate-900">{trip.price_expect || trip.price_per_kg}€/kg</p>
+              </div>
+            </div>
+
+            {/* Séparateur */}
+            <div className="h-px bg-slate-100 mb-5" />
+
+            {/* Profil du voyageur intégré */}
+            <Link 
+              to={`/u/${trip.user_id}`}
+              className="flex items-center gap-3 p-3 bg-slate-50 rounded-2xl hover:bg-slate-100 transition-colors border border-slate-100"
+            >
+              <Avatar className="h-12 w-12 ring-2 ring-primary/20">
+                <AvatarImage src={trip.profiles?.avatar_url} />
+                <AvatarFallback className="text-sm bg-primary/10 text-primary">
+                  {trip.profiles?.full_name?.[0]}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-semibold text-sm text-slate-900 truncate">{trip.profiles?.full_name}</h3>
+                <div className="flex items-center gap-1 text-xs text-slate-500">
+                  <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+                  <span>{trip.profiles?.rating_avg?.toFixed(1) || "Nouveau"}</span>
+                  {trip.profiles?.rating_count > 0 && (
+                    <span>• {trip.profiles?.rating_count} avis</span>
+                  )}
+                </div>
+              </div>
+              <ChevronRight className="h-4 w-4 text-slate-400" />
+            </Link>
+
+            {/* Description */}
+            {trip.notes && (
+              <div className="mt-4 p-3 bg-slate-50 rounded-2xl border border-slate-100">
+                <p className="text-sm text-slate-600 leading-relaxed">{trip.notes}</p>
+              </div>
+            )}
+          </div>
+        </div>
 
         {/* Action Buttons */}
-        <div className="fixed bottom-0 left-0 right-0 p-4 bg-white/80 backdrop-blur-xl border-t border-white/20 z-40 md:relative md:bg-transparent md:border-0 md:p-0 md:backdrop-blur-none">
+        <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/80 backdrop-blur-xl border-t z-40 md:relative md:bg-transparent md:border-0 md:p-0 md:backdrop-blur-none">
           <div className="container max-w-3xl mx-auto flex gap-3">
             {user?.id === trip.user_id ? (
               <Button 
-                className="flex-1 h-12 rounded-xl font-semibold text-base shadow-lg shadow-primary/20"
+                className="flex-1 h-14 rounded-2xl font-semibold text-base shadow-lg shadow-primary/20"
                 onClick={() => navigate(`/publier/trajet/${trip.id}`)}
               >
                 <Settings className="mr-2 h-5 w-5" />
@@ -293,18 +312,18 @@ const TripDetail = () => {
             ) : (
               <>
                 <Button 
-                  className="flex-1 h-12 rounded-xl font-semibold text-base shadow-lg shadow-primary/20"
+                  className="flex-1 h-14 rounded-2xl font-semibold text-base shadow-lg shadow-primary/20 bg-gradient-to-r from-primary to-primary/90"
                   onClick={() => setBookingDialogOpen(true)}
                 >
                   <Package className="mr-2 h-5 w-5" />
-                  Réserver
+                  Réserver des kilos
                 </Button>
                 <Button 
                   variant="outline" 
-                  className="h-12 w-12 rounded-xl p-0 border-2"
+                  className="h-14 w-14 rounded-2xl p-0 border-2"
                   onClick={handleContact}
                 >
-                  <MessageCircle className="h-5 w-5" />
+                  <MessageCircle className="h-6 w-6" />
                 </Button>
               </>
             )}
@@ -312,17 +331,8 @@ const TripDetail = () => {
         </div>
 
         {/* Suggestions de colis compatibles */}
-        <div className="mt-8 mb-6">
+        <div className="mt-8 mb-24 md:mb-8">
           <MatchingSuggestions type="trip" itemId={trip.id} maxSuggestions={5} />
-        </div>
-
-        {/* Matching Section */}
-        <div className="mb-24 md:mb-8">
-          <h2 className="text-lg font-bold mb-4 px-2">Autres colis disponibles</h2>
-          <MatchingSection 
-            type="trip" 
-            item={trip} 
-          />
         </div>
 
         <ReviewDialog
@@ -332,7 +342,7 @@ const TripDetail = () => {
           targetUserName={trip.profiles?.full_name || "ce voyageur"}
         />
 
-        <BookingDialog
+        <SimpleBookingDialog
           open={bookingDialogOpen}
           onOpenChange={setBookingDialogOpen}
           trip={trip}

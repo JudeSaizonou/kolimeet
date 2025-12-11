@@ -31,13 +31,19 @@ const NewMessageThread = () => {
       }
 
       try {
-        // Vérifier si un thread existe déjà
-        const { data: existingThread } = await supabase
+        // Vérifier si un thread existe déjà pour cette annonce entre les deux utilisateurs
+        const { data: existingThreads } = await supabase
           .from("threads")
-          .select("id")
+          .select("id, created_by, other_user_id")
           .eq("related_id", relatedId)
-          .or(`and(created_by.eq.${user.id},other_user_id.eq.${otherUserId}),and(created_by.eq.${otherUserId},other_user_id.eq.${user.id})`)
-          .single();
+          .eq("related_type", type);
+
+        // Filtrer pour trouver un thread entre les deux utilisateurs
+        const existingThread = existingThreads?.find(
+          (thread: any) =>
+            (thread.created_by === user.id && thread.other_user_id === otherUserId) ||
+            (thread.created_by === otherUserId && thread.other_user_id === user.id)
+        );
 
         if (existingThread) {
           navigate(`/messages/${existingThread.id}`);

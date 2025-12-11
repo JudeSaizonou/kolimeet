@@ -14,8 +14,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { ArrowLeft, ExternalLink, AlertTriangle, ShoppingCart } from "lucide-react";
-import { AnimatePresence } from "framer-motion";
+import { Badge } from "@/components/ui/badge";
+import { ArrowLeft, ExternalLink, AlertTriangle, ShoppingCart, MapPin, Calendar, Package, Weight, Plane, ChevronDown, ChevronUp } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { format } from "date-fns";
+import { fr } from "date-fns/locale";
 
 const MessageThread = () => {
   const { id } = useParams();
@@ -27,7 +30,9 @@ const MessageThread = () => {
   const [thread, setThread] = useState<any>(null);
   const [otherUser, setOtherUser] = useState<any>(null);
   const [trip, setTrip] = useState<any>(null);
+  const [parcel, setParcel] = useState<any>(null);
   const [reservationDrawerOpen, setReservationDrawerOpen] = useState(false);
+  const [showAnnouncementDetails, setShowAnnouncementDetails] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -59,7 +64,7 @@ const MessageThread = () => {
 
       setOtherUser(profile);
 
-      // Récupérer les infos du trip si c'est un thread lié à un trajet
+      // Récupérer les infos du trip ou du parcel selon le type
       if (data.related_type === "trip") {
         const { data: tripData } = await supabase
           .from("trips")
@@ -69,6 +74,16 @@ const MessageThread = () => {
 
         if (tripData) {
           setTrip(tripData);
+        }
+      } else if (data.related_type === "parcel") {
+        const { data: parcelData } = await supabase
+          .from("parcels")
+          .select("*")
+          .eq("id", data.related_id)
+          .single();
+
+        if (parcelData) {
+          setParcel(parcelData);
         }
       }
     };
@@ -126,17 +141,134 @@ const MessageThread = () => {
             <h1 className="font-semibold text-base md:text-lg truncate">
               {otherUser.full_name}
             </h1>
-            <Button
-              variant="link"
-              size="sm"
-              className="h-auto p-0 text-xs text-muted-foreground hover:text-primary"
-              onClick={() => navigate(getRelatedLink()!)}
+            <button
+              onClick={() => setShowAnnouncementDetails(!showAnnouncementDetails)}
+              className="flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors"
             >
-              Voir l'annonce
-              <ExternalLink className="h-3 w-3 ml-1" />
-            </Button>
+              {thread?.related_type === "trip" ? (
+                <span className="flex items-center gap-1">
+                  <Plane className="h-3 w-3" />
+                  {trip ? `${trip.from_city} → ${trip.to_city}` : "Trajet"}
+                </span>
+              ) : (
+                <span className="flex items-center gap-1">
+                  <Package className="h-3 w-3" />
+                  {parcel?.title || "Colis"}
+                </span>
+              )}
+              {showAnnouncementDetails ? (
+                <ChevronUp className="h-3 w-3" />
+              ) : (
+                <ChevronDown className="h-3 w-3" />
+              )}
+            </button>
           </div>
+
+          {/* Bouton réserver sur desktop */}
+          {canReserve && (
+            <Button
+              onClick={() => setReservationDrawerOpen(true)}
+              size="sm"
+              className="hidden md:flex"
+            >
+              <ShoppingCart className="h-4 w-4 mr-2" />
+              Réserver
+            </Button>
+          )}
         </div>
+
+        {/* Aperçu de l'annonce (dépliable) */}
+        <AnimatePresence>
+          {showAnnouncementDetails && (trip || parcel) && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="overflow-hidden"
+            >
+              <div className="px-4 pb-3 md:px-6">
+                {thread?.related_type === "trip" && trip && (
+                  <div className="bg-primary/5 rounded-lg p-3 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Badge variant="secondary" className="text-xs">
+                          <Plane className="h-3 w-3 mr-1" />
+                          Trajet
+                        </Badge>
+                        <span className="text-sm font-medium">
+                          {trip.from_city} → {trip.to_city}
+                        </span>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => navigate(getRelatedLink()!)}
+                        className="h-7 text-xs"
+                      >
+                        <ExternalLink className="h-3 w-3 mr-1" />
+                        Voir
+                      </Button>
+                    </div>
+                    <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
+                      <span className="flex items-center gap-1">
+                        <Calendar className="h-3 w-3" />
+                        {format(new Date(trip.date_departure), "d MMM yyyy", { locale: fr })}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Weight className="h-3 w-3" />
+                        {trip.available_weight || trip.capacity_available_kg || 0} kg dispo
+                      </span>
+                      <span className="font-medium text-primary">
+                        {trip.price_per_kg}€/kg
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                {thread?.related_type === "parcel" && parcel && (
+                  <div className="bg-primary/5 rounded-lg p-3 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Badge variant="secondary" className="text-xs">
+                          <Package className="h-3 w-3 mr-1" />
+                          Colis
+                        </Badge>
+                        <span className="text-sm font-medium truncate max-w-[200px]">
+                          {parcel.title}
+                        </span>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => navigate(getRelatedLink()!)}
+                        className="h-7 text-xs"
+                      >
+                        <ExternalLink className="h-3 w-3 mr-1" />
+                        Voir
+                      </Button>
+                    </div>
+                    <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
+                      <span className="flex items-center gap-1">
+                        <MapPin className="h-3 w-3" />
+                        {parcel.from_city} → {parcel.to_city}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Weight className="h-3 w-3" />
+                        {parcel.weight} kg
+                      </span>
+                      {parcel.proposed_price && (
+                        <span className="font-medium text-primary">
+                          {parcel.proposed_price}€ proposé
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Safety Warning - Collapsible sur mobile */}
         <Alert className="mx-4 mb-3 border-yellow-500 bg-yellow-50 dark:bg-yellow-950/20 md:mx-6">
@@ -210,9 +342,9 @@ const MessageThread = () => {
         )}
       </div>
 
-      {/* Bouton de réservation (sticky, au-dessus de l'input) */}
+      {/* Bouton de réservation mobile uniquement (sticky, au-dessus de l'input) */}
       {canReserve && (
-        <div className="sticky bottom-[72px] md:bottom-[80px] px-4 pb-2 bg-gradient-to-t from-background via-background to-transparent pointer-events-none">
+        <div className="md:hidden sticky bottom-[72px] px-4 pb-2 bg-gradient-to-t from-background via-background to-transparent pointer-events-none">
           <Button
             onClick={() => setReservationDrawerOpen(true)}
             className="w-full h-12 shadow-lg pointer-events-auto"

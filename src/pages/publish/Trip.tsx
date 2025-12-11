@@ -21,6 +21,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { countries, citiesByCountry } from "@/lib/data/countries";
 import { AcceptTermsCheckbox } from "@/components/AcceptTermsCheckbox";
+import { TripBookings } from "@/components/booking/TripBookings";
 
 const PublishTrip = () => {
   const { id } = useParams();
@@ -31,6 +32,7 @@ const PublishTrip = () => {
   const [defaultAnonymous, setDefaultAnonymous] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [termsError, setTermsError] = useState<string>();
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const form = useForm<CreateTripInput>({
     resolver: zodResolver(createTripSchema),
@@ -415,6 +417,20 @@ const PublishTrip = () => {
             </Form>
           </CardContent>
         </Card>
+
+        {/* Afficher les réservations si on est en mode édition */}
+        {id && (
+          <div className="mt-6">
+            <TripBookings 
+              tripId={id} 
+              onCapacityUpdate={() => {
+                // Recharger les données du trajet pour mettre à jour la capacité
+                setRefreshKey(prev => prev + 1);
+                loadTrip(id);
+              }}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

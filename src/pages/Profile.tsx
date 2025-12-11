@@ -185,68 +185,68 @@ const Profile = () => {
 
   return (
     <ProtectedRoute>
-      <div className="bg-secondary py-12 px-4">
-        <div className="max-w-2xl mx-auto space-y-6">
+      <div className="bg-secondary min-h-screen py-6 px-3 sm:py-12 sm:px-4">
+        <div className="max-w-md mx-auto space-y-4">
           {/* Profile Header */}
-          <Card className="p-6 border-2">
-            <div className="flex items-start gap-6">
-              <Avatar className="h-24 w-24">
-                <AvatarImage src={avatarUrl} alt="Avatar" />
-                <AvatarFallback className="bg-primary/10">
-                  <User className="h-12 w-12 text-primary" />
-                </AvatarFallback>
-              </Avatar>
+          <Card className="p-4 sm:p-6 border shadow-sm">
+            <div className="flex flex-col items-center text-center gap-3">
+              <div className="relative">
+                <Avatar className="h-20 w-20 sm:h-24 sm:w-24">
+                  <AvatarImage src={avatarUrl} alt="Avatar" />
+                  <AvatarFallback className="bg-primary/10">
+                    <User className="h-10 w-10 sm:h-12 sm:w-12 text-primary" />
+                  </AvatarFallback>
+                </Avatar>
+                <Label
+                  htmlFor="avatar-upload"
+                  className="absolute -bottom-1 -right-1 cursor-pointer inline-flex items-center justify-center h-8 w-8 bg-primary text-primary-foreground rounded-full hover:bg-primary/90 transition-colors shadow-md"
+                >
+                  <Upload className="h-4 w-4" />
+                </Label>
+                <Input
+                  id="avatar-upload"
+                  type="file"
+                  accept="image/*"
+                  onChange={uploadAvatar}
+                  disabled={uploading}
+                  className="hidden"
+                />
+              </div>
 
-              <div className="flex-1">
-                <h1 className="text-2xl font-bold text-foreground mb-2">
+              <div>
+                <h1 className="text-lg sm:text-xl font-bold text-foreground">
                   {formData.full_name || "Votre profil"}
                 </h1>
-                <p className="text-muted-foreground mb-3">
+                <p className="text-sm text-muted-foreground">
                   {formData.city && formData.country
                     ? `${formData.city}, ${formData.country}`
                     : "Aucune localisation"}
                 </p>
 
                 {rating.count > 0 && (
-                  <div className="flex items-center gap-2">
-                    <Star className="h-5 w-5 text-warning fill-warning" />
-                    <span className="font-medium text-foreground">
+                  <div className="flex items-center justify-center gap-1.5 mt-2">
+                    <Star className="h-4 w-4 text-warning fill-warning" />
+                    <span className="font-medium text-sm text-foreground">
                       {rating.avg.toFixed(1)}
                     </span>
-                    <span className="text-sm text-muted-foreground">
+                    <span className="text-xs text-muted-foreground">
                       ({rating.count} avis)
                     </span>
                   </div>
                 )}
               </div>
-
-              <Label
-                htmlFor="avatar-upload"
-                className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
-              >
-                <Upload className="h-4 w-4" />
-                {uploading ? "..." : "Modifier"}
-              </Label>
-              <Input
-                id="avatar-upload"
-                type="file"
-                accept="image/*"
-                onChange={uploadAvatar}
-                disabled={uploading}
-                className="hidden"
-              />
             </div>
           </Card>
 
           {/* Profile Form */}
-          <Card className="p-6 border-2">
-            <h2 className="text-xl font-bold text-foreground mb-6">
+          <Card className="p-4 sm:p-6 border shadow-sm">
+            <h2 className="text-base sm:text-lg font-bold text-foreground mb-4">
               Informations personnelles
             </h2>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="full_name" className="text-xs uppercase text-muted-foreground font-semibold tracking-wider">
+            <form onSubmit={handleSubmit} className="space-y-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="full_name" className="text-xs text-muted-foreground font-medium">
                   Nom complet <span className="text-destructive">*</span>
                 </Label>
                 <Input
@@ -256,75 +256,81 @@ const Profile = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, full_name: e.target.value })
                   }
+                  className="h-10"
                   required
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="country" className="text-xs uppercase text-muted-foreground font-semibold tracking-wider">
-                  Pays <span className="text-destructive">*</span>
-                </Label>
-                <Select
-                  value={formData.country}
-                  onValueChange={(value) => {
-                    setFormData({ ...formData, country: value, city: "" });
-                    setSelectedCountry(value);
-                  }}
-                  required
-                >
-                  <SelectTrigger id="country">
-                    <SelectValue placeholder="Sélectionnez un pays" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {countries.map((country) => (
-                      <SelectItem key={country} value={country}>
-                        {country}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="city" className="text-xs uppercase text-muted-foreground font-semibold tracking-wider">
-                  Ville <span className="text-destructive">*</span>
-                </Label>
-                {selectedCountry && citiesByCountry[selectedCountry] ? (
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label htmlFor="country" className="text-xs text-muted-foreground font-medium">
+                    Pays <span className="text-destructive">*</span>
+                  </Label>
                   <Select
-                    value={formData.city}
-                    onValueChange={(value) =>
-                      setFormData({ ...formData, city: value })
-                    }
+                    value={formData.country}
+                    onValueChange={(value) => {
+                      setFormData({ ...formData, country: value, city: "" });
+                      setSelectedCountry(value);
+                    }}
                     required
                   >
-                    <SelectTrigger id="city">
-                      <SelectValue placeholder="Sélectionnez une ville" />
+                    <SelectTrigger id="country" className="h-10">
+                      <SelectValue placeholder="Pays" />
                     </SelectTrigger>
                     <SelectContent>
-                      {citiesByCountry[selectedCountry].map((city) => (
-                        <SelectItem key={city} value={city}>
-                          {city}
+                      {countries.map((country) => (
+                        <SelectItem key={country} value={country}>
+                          {country}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
-                ) : (
-                  <Input
-                    id="city"
-                    type="text"
-                    value={formData.city}
-                    onChange={(e) =>
-                      setFormData({ ...formData, city: e.target.value })
-                    }
-                    placeholder={selectedCountry ? "Entrez votre ville" : "Sélectionnez d'abord un pays"}
-                    disabled={!selectedCountry}
-                    required
-                  />
-                )}
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="city" className="text-xs text-muted-foreground font-medium">
+                    Ville <span className="text-destructive">*</span>
+                  </Label>
+                  {selectedCountry && citiesByCountry[selectedCountry] ? (
+                    <Select
+                      value={formData.city}
+                      onValueChange={(value) =>
+                        setFormData({ ...formData, city: value })
+                      }
+                      required
+                    >
+                      <SelectTrigger id="city" className="h-10">
+                        <SelectValue placeholder="Ville" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {citiesByCountry[selectedCountry].map((city) => (
+                          <SelectItem key={city} value={city}>
+                            {city}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <Input
+                      id="city"
+                      type="text"
+                      value={formData.city}
+                      onChange={(e) =>
+                        setFormData({ ...formData, city: e.target.value })
+                      }
+                      placeholder="Ville"
+                      disabled={!selectedCountry}
+                      className="h-10"
+                      required
+                    />
+                  )}
+                </div>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="phone_e164" className="text-xs uppercase text-muted-foreground font-semibold tracking-wider">Téléphone</Label>
+              <div className="space-y-1.5">
+                <Label htmlFor="phone_e164" className="text-xs text-muted-foreground font-medium">
+                  Téléphone
+                </Label>
                 <Input
                   id="phone_e164"
                   type="tel"
@@ -333,21 +339,22 @@ const Profile = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, phone_e164: e.target.value })
                   }
+                  className="h-10"
                 />
-                <p className="text-xs text-muted-foreground">
-                  Format : +33612345678 (avec indicatif pays)
+                <p className="text-[11px] text-muted-foreground">
+                  Avec indicatif pays (ex: +33)
                 </p>
               </div>
 
               {/* Paramètre publication anonyme */}
-              <div className="flex items-center justify-between rounded-lg border p-4">
-                <div className="space-y-0.5">
-                  <Label className="text-base flex items-center gap-2">
-                    <EyeOff className="h-4 w-4" />
-                    Publier anonymement par défaut
+              <div className="flex items-center justify-between rounded-lg border p-3 bg-muted/30">
+                <div className="space-y-0.5 flex-1 mr-3">
+                  <Label className="text-sm flex items-center gap-1.5 font-medium">
+                    <EyeOff className="h-3.5 w-3.5" />
+                    Publier anonymement
                   </Label>
-                  <p className="text-sm text-muted-foreground">
-                    Vos futures annonces seront anonymes par défaut
+                  <p className="text-[11px] text-muted-foreground leading-tight">
+                    Vos annonces seront anonymes par défaut
                   </p>
                 </div>
                 <Switch
@@ -356,24 +363,26 @@ const Profile = () => {
                 />
               </div>
 
-              <Button
-                type="submit"
-                className="w-full font-semibold"
-                disabled={loading}
-              >
-                {loading ? "Enregistrement..." : "Enregistrer les modifications"}
-              </Button>
+              <div className="pt-2 space-y-2">
+                <Button
+                  type="submit"
+                  className="w-full h-10 font-medium text-sm"
+                  disabled={loading}
+                >
+                  {loading ? "Enregistrement..." : "Enregistrer"}
+                </Button>
 
-              {/* Bouton Déconnexion */}
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full font-semibold text-destructive border-destructive hover:bg-destructive hover:text-destructive-foreground"
-                onClick={handleSignOut}
-              >
-                <LogOut className="h-4 w-4 mr-2" />
-                Déconnexion
-              </Button>
+                {/* Bouton Déconnexion */}
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="w-full h-10 font-medium text-sm text-destructive hover:text-destructive hover:bg-destructive/10"
+                  onClick={handleSignOut}
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Déconnexion
+                </Button>
+              </div>
             </form>
           </Card>
 

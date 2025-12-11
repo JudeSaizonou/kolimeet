@@ -30,7 +30,7 @@ export const ParcelCard = ({ parcel }: ParcelCardProps) => {
       onClick={() => navigate(`/colis/${parcel.id}`)}
     >
       {/* Header Image / Map Placeholder */}
-      <div className="h-24 md:h-32 bg-gradient-to-br from-orange-500/5 to-orange-500/10 relative">
+      <div className="h-24 md:h-32 bg-gradient-to-br from-violet-500/5 to-violet-500/10 relative">
         <div className="absolute top-2 right-2 z-10">
           <Button
             variant="secondary"
@@ -96,7 +96,7 @@ export const ParcelCard = ({ parcel }: ParcelCardProps) => {
               </span>
             </>
           )}
-          <span className="ml-auto text-xs font-medium text-orange-600 bg-orange-50 px-1.5 py-0.5 rounded">
+          <span className="ml-auto text-xs font-medium text-violet-600 bg-violet-50 px-1.5 py-0.5 rounded">
             {parcel.weight_kg}kg
           </span>
         </div>

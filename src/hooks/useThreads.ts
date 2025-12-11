@@ -139,8 +139,11 @@ export const useThreads = () => {
           };
         });
 
-        console.log('[useThreads] ✅ Processed threads:', processedThreads.map(t => ({ id: t.id, unread: t.unread_count })));
-        setThreads(processedThreads);
+        // Filtrer les threads qui n'ont aucun message (conversations vides)
+        const threadsWithMessages = processedThreads.filter(t => t.last_message !== undefined);
+
+        console.log('[useThreads] ✅ Processed threads:', threadsWithMessages.map(t => ({ id: t.id, unread: t.unread_count })));
+        setThreads(threadsWithMessages);
       } catch (error) {
         console.error("Error fetching threads:", error);
       } finally {

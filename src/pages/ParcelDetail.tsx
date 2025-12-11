@@ -4,19 +4,17 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useFavorite } from "@/hooks/useFavorite";
 import { useToast } from "@/hooks/use-toast";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowRight, Calendar, Package, Star, Weight, MessageCircle, Heart, Share2, Settings } from "lucide-react";
+import { Calendar, Package, Star, Weight, MessageCircle, Heart, Settings, Box, Clock, ChevronRight } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { MatchingSection } from "@/components/explorer/MatchingSection";
 import { ReviewDialog } from "@/components/reviews/ReviewDialog";
 import { MatchingSuggestions } from "@/components/matching/MatchingSuggestions";
 import { ShareButton } from "@/components/ShareButton";
-import { ShareStoryButton } from "@/components/ShareStoryButton";
 import { SEO } from "@/components/SEO";
 import { generateParcelOGImage } from "@/lib/utils/ogImage";
 import { ReportButton } from "@/components/ReportButton";
@@ -30,6 +28,7 @@ const ParcelDetail = () => {
   const [parcel, setParcel] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
+  const [validPhotos, setValidPhotos] = useState<string[]>([]);
 
   const typeLabels: Record<string, string> = {
     documents: "Documents",
@@ -64,6 +63,18 @@ const ParcelDetail = () => {
     fetchParcel();
   }, [id, navigate, toast]);
 
+  // Valider les photos après le chargement
+  useEffect(() => {
+    if (parcel?.photos && parcel.photos.length > 0) {
+      const photos = parcel.photos.filter((photo: string) => 
+        photo && typeof photo === 'string' && photo.startsWith('http')
+      );
+      setValidPhotos(photos);
+    } else {
+      setValidPhotos([]);
+    }
+  }, [parcel?.photos]);
+
   const handleContact = async () => {
     if (!user) {
       navigate("/auth/login");
@@ -80,22 +91,42 @@ const ParcelDetail = () => {
     }
 
     try {
-      // Vérifier si un thread existe déjà
-      const { data: existingThread } = await supabase
+      // Vérifier si un thread existe déjà pour cette annonce entre les deux utilisateurs
+      const { data: existingThreads } = await supabase
         .from("threads")
-        .select("id")
+        .select("id, created_by, other_user_id")
         .eq("related_id", id)
-        .or(`and(created_by.eq.${user.id},other_user_id.eq.${parcel.user_id}),and(created_by.eq.${parcel.user_id},other_user_id.eq.${user.id})`)
-        .single();
+        .eq("related_type", "parcel");
+
+      // Filtrer pour trouver un thread entre les deux utilisateurs
+      const existingThread = existingThreads?.find(
+        (thread: any) =>
+          (thread.created_by === user.id && thread.other_user_id === parcel.user_id) ||
+          (thread.created_by === parcel.user_id && thread.other_user_id === user.id)
+      );
 
       if (existingThread) {
         navigate(`/messages/${existingThread.id}`);
         return;
       }
 
-      // Naviguer vers une URL temporaire qui créera le thread au premier message
-      navigate(`/messages/new?type=parcel&id=${id}&user=${parcel.user_id}`);
+      // Créer un nouveau thread directement
+      const { data: newThread, error: threadError } = await supabase
+        .from("threads")
+        .insert({
+          created_by: user.id,
+          other_user_id: parcel.user_id,
+          related_type: "parcel",
+          related_id: id,
+        })
+        .select()
+        .single();
+
+      if (threadError) throw threadError;
+
+      navigate(`/messages/${newThread.id}`);
     } catch (error: any) {
+      console.error("Error creating thread:", error);
       toast({
         title: "Erreur",
         description: "Impossible de démarrer la conversation.",
@@ -141,27 +172,25 @@ const ParcelDetail = () => {
         url={shareUrl}
         type="article"
       />
-      <div className="container mx-auto px-3 md:px-4 py-4 md:py-8">
-        <Card className="mb-4 md:mb-6 overflow-hidden">
-          <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-background p-4 md:p-6 border-b">
-            <div className="flex items-start justify-between gap-3">
-              <div className="space-y-2 flex-1">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <div className="flex items-center gap-2 text-base md:text-xl font-bold">
-                    <span className="text-foreground">{parcel.from_city}</span>
-                    <ArrowRight className="h-4 md:h-5 w-4 md:w-5 text-primary" />
-                    <span className="text-foreground">{parcel.to_city}</span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-1.5 text-xs md:text-sm text-muted-foreground">
-                  <Calendar className="h-3.5 md:h-4 w-3.5 md:w-4" />
-                  <span>Avant le {format(new Date(parcel.deadline), "d MMMM yyyy", { locale: fr })}</span>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <ShareStoryButton
-                  type="parcel"
-                  data={{
+      <div className="min-h-screen bg-gradient-to-b from-slate-50 via-background to-background pb-24 pt-20 md:pt-24">
+        <div className="container mx-auto px-4 max-w-3xl">
+        
+        {/* Hero Card - Design épuré sur fond blanc */}
+        <div className="relative overflow-hidden rounded-3xl bg-white border border-slate-200/60 mb-6 shadow-xl shadow-slate-200/50">
+          {/* Header coloré subtil */}
+          <div className="bg-gradient-to-r from-violet-500/10 via-violet-500/5 to-transparent p-6 pb-4">
+            {/* Boutons d'action */}
+            <div className="flex justify-end gap-2 mb-4">
+              <ShareButton
+                title={`Colis ${parcel.from_city} → ${parcel.to_city}`}
+                description={`${parcel.weight_kg}kg - ${typeLabels[parcel.type]} - Avant le ${format(new Date(parcel.deadline), "d MMM yyyy", { locale: fr })}`}
+                url={`/colis/${parcel.id}`}
+                variant="ghost"
+                size="icon"
+                className="bg-slate-100 hover:bg-slate-200 rounded-full text-slate-600"
+                storyShare={{
+                  type: 'parcel',
+                  data: {
                     fromCity: parcel.from_city || '',
                     toCity: parcel.to_city || '',
                     fromCountry: parcel.from_country || '',
@@ -170,152 +199,194 @@ const ParcelDetail = () => {
                     parcelType: parcel.type || 'colis',
                     deadline: parcel.deadline ? format(new Date(parcel.deadline), "d MMM yyyy", { locale: fr }) : '',
                     reward: parcel.reward || 0,
-                  }}
-                />
-                <ShareButton
-                  title={`Colis ${parcel.from_city} → ${parcel.to_city}`}
-                  description={`${parcel.weight_kg}kg - ${typeLabels[parcel.type]} - Avant le ${format(new Date(parcel.deadline), "d MMM yyyy", { locale: fr })}`}
-                  url={`/colis/${parcel.id}`}
-                  variant="outline"
-                  size="icon"
-                  className="h-9 w-9 md:h-10 md:w-10 shrink-0"
-                />
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={toggleFavorite}
-                  className="h-9 w-9 md:h-10 md:w-10 shrink-0"
-                  title={isFavorited ? "Retirer des favoris" : "Ajouter aux favoris"}
-                >
-                  <Heart className={`h-4 w-4 md:h-5 md:w-5 ${isFavorited ? 'fill-red-500 text-red-500' : ''}` } />
-                </Button>
-                <ReportButton
-                  targetType="parcel"
-                  targetId={parcel.id}
-                  targetUserId={parcel.user_id}
-                  variant="outline"
-                  size="icon"
-                  showText={false}
-                />
-                <Badge 
-                  variant={parcel.status === "open" ? "default" : "secondary"} 
-                  className="text-xs shrink-0"
-                >
-                  {parcel.status === "open" ? "Ouvert" : "Fermé"}
-                </Badge>
+                  },
+                }}
+              />
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={toggleFavorite}
+                className="bg-slate-100 hover:bg-slate-200 rounded-full text-slate-600"
+              >
+                <Heart className={`h-5 w-5 ${isFavorited ? 'fill-red-500 text-red-500' : ''}`} />
+              </Button>
+              <ReportButton
+                targetType="parcel"
+                targetId={parcel.id}
+                targetUserId={parcel.user_id}
+                variant="ghost"
+                size="icon"
+                showText={false}
+                className="bg-slate-100 hover:bg-slate-200 rounded-full text-slate-600"
+              />
+            </div>
+
+            {/* Badge colis */}
+            <div className="flex items-center gap-2 mb-4">
+              <Badge className="bg-violet-500/10 text-violet-600 border-0">
+                <Package className="h-3 w-3 mr-1" />
+                Colis
+              </Badge>
+              <Badge variant={parcel.status === "open" ? "default" : "secondary"} className="text-xs">
+                {parcel.status === "open" ? "Recherche transporteur" : "Fermé"}
+              </Badge>
+            </div>
+
+            {/* Titre du colis */}
+            <h1 className="text-xl md:text-2xl font-bold text-slate-900 mb-4 line-clamp-2">
+              {parcel.title || `${typeLabels[parcel.type]} à envoyer`}
+            </h1>
+
+            {/* Itinéraire */}
+            <div className="flex items-center gap-4">
+              <div className="flex-1">
+                <p className="text-slate-400 text-xs uppercase tracking-wider mb-1">Expédition</p>
+                <h2 className="text-xl md:text-2xl font-bold text-slate-900">{parcel.from_city}</h2>
+                <p className="text-slate-500 text-sm">{parcel.from_country}</p>
+              </div>
+              
+              <div className="flex flex-col items-center px-4">
+                <div className="w-12 h-12 rounded-full bg-violet-500/10 flex items-center justify-center">
+                  <Box className="h-6 w-6 text-violet-600" />
+                </div>
+                <div className="h-0.5 w-16 bg-slate-200 my-2" />
+              </div>
+              
+              <div className="flex-1 text-right">
+                <p className="text-slate-400 text-xs uppercase tracking-wider mb-1">Destination</p>
+                <h2 className="text-xl md:text-2xl font-bold text-slate-900">{parcel.to_city}</h2>
+                <p className="text-slate-500 text-sm">{parcel.to_country}</p>
               </div>
             </div>
           </div>
 
-          <CardContent className="space-y-4 md:space-y-5 p-4 md:p-6">
+          <div className="p-6 pt-4">
+            {/* Infos clés */}
+            <div className="grid grid-cols-3 gap-3 mb-6">
+              <div className="bg-slate-50 rounded-2xl p-3 text-center border border-slate-100">
+                <Weight className="h-4 w-4 mx-auto mb-1 text-violet-600" />
+                <p className="text-[10px] text-slate-400 uppercase tracking-wider">Poids</p>
+                <p className="font-bold text-sm text-slate-900">{parcel.weight_kg} kg</p>
+              </div>
+              <div className="bg-slate-50 rounded-2xl p-3 text-center border border-slate-100">
+                <Package className="h-4 w-4 mx-auto mb-1 text-violet-600" />
+                <p className="text-[10px] text-slate-400 uppercase tracking-wider">Type</p>
+                <p className="font-bold text-sm text-slate-900">{typeLabels[parcel.type]}</p>
+              </div>
+              <div className="bg-slate-50 rounded-2xl p-3 text-center border border-slate-100">
+                <Clock className="h-4 w-4 mx-auto mb-1 text-violet-600" />
+                <p className="text-[10px] text-slate-400 uppercase tracking-wider">Avant le</p>
+                <p className="font-bold text-sm text-slate-900">
+                  {format(new Date(parcel.deadline), "d MMM", { locale: fr })}
+                </p>
+              </div>
+            </div>
+
+            {/* Séparateur */}
+            <div className="h-px bg-slate-100 mb-5" />
+
+            {/* Profil de l'expéditeur intégré */}
             <Link 
               to={`/u/${parcel.user_id}`}
-              className="flex items-center gap-3 md:gap-4 p-3 md:p-4 border rounded-xl hover:border-primary/50 hover:shadow-sm transition-all duration-200 bg-card"
+              className="flex items-center gap-3 p-3 bg-slate-50 rounded-2xl hover:bg-slate-100 transition-colors border border-slate-100"
             >
-              <Avatar className="h-12 md:h-16 w-12 md:w-16 ring-2 ring-primary/10">
+              <Avatar className="h-12 w-12 ring-2 ring-violet-500/20">
                 <AvatarImage src={profile?.avatar_url} />
-                <AvatarFallback className="text-base md:text-lg bg-primary/10">{profile?.full_name?.[0] || "U"}</AvatarFallback>
+                <AvatarFallback className="text-sm bg-violet-500/10 text-violet-600">
+                  {profile?.full_name?.[0] || "U"}
+                </AvatarFallback>
               </Avatar>
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-sm md:text-base truncate">{profile?.full_name || "Utilisateur"}</p>
-                {profile?.rating_avg > 0 && (
-                  <div className="flex items-center gap-1 text-xs md:text-sm text-muted-foreground">
-                    <Star className="h-3 md:h-4 w-3 md:w-4 fill-amber-400 text-amber-400" />
-                    <span className="font-medium">{Number(profile.rating_avg).toFixed(1)}</span>
-                    <span className="text-muted-foreground/70">({profile.rating_count})</span>
-                  </div>
-                )}
+                <h3 className="font-semibold text-sm text-slate-900 truncate">{profile?.full_name || "Utilisateur"}</h3>
+                <div className="flex items-center gap-1 text-xs text-slate-500">
+                  {profile?.rating_avg > 0 ? (
+                    <>
+                      <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+                      <span>{Number(profile.rating_avg).toFixed(1)}</span>
+                      <span>• {profile.rating_count} avis</span>
+                    </>
+                  ) : (
+                    <span>Nouvel utilisateur</span>
+                  )}
+                </div>
               </div>
+              <ChevronRight className="h-4 w-4 text-slate-400" />
             </Link>
 
-            <div className="grid grid-cols-3 gap-2 md:gap-3">
-              <div className="p-2 md:p-4 border rounded-xl bg-gradient-to-br from-blue-500/5 to-background">
-                <div className="flex items-center gap-1 mb-1.5 md:mb-2">
-                  <Package className="h-3 md:h-4 w-3 md:w-4 text-blue-600" />
-                  <h3 className="font-semibold text-xs md:text-sm text-muted-foreground">Type</h3>
-                </div>
-                <p className="text-xs md:text-sm font-bold text-foreground">{typeLabels[parcel.type]}</p>
-              </div>
-
-              <div className="p-2 md:p-4 border rounded-xl bg-gradient-to-br from-purple-500/5 to-background">
-                <div className="flex items-center gap-1 mb-1.5 md:mb-2">
-                  <Weight className="h-3 md:h-4 w-3 md:w-4 text-purple-600" />
-                  <h3 className="font-semibold text-xs md:text-sm text-muted-foreground">Poids</h3>
-                </div>
-                <p className="text-sm md:text-xl font-bold text-foreground">{parcel.weight_kg}kg</p>
-              </div>
-
-              <div className="p-2 md:p-4 border rounded-xl bg-gradient-to-br from-orange-500/5 to-background">
-                <div className="flex items-center gap-1 mb-1.5 md:mb-2">
-                  <Package className="h-3 md:h-4 w-3 md:w-4 text-orange-600" />
-                  <h3 className="font-semibold text-xs md:text-sm text-muted-foreground">Taille</h3>
-                </div>
-                <p className="text-sm md:text-xl font-bold text-foreground">{parcel.size}</p>
-              </div>
-            </div>
-
+            {/* Description */}
             {parcel.description && (
-              <div className="p-3 md:p-4 bg-muted/20 border rounded-xl">
-                <h3 className="font-semibold mb-2 text-xs md:text-sm text-muted-foreground">Description</h3>
-                <p className="text-sm md:text-base text-foreground/90 whitespace-pre-wrap leading-relaxed">{parcel.description}</p>
+              <div className="mt-4 p-3 bg-slate-50 rounded-2xl border border-slate-100">
+                <p className="text-sm text-slate-600 leading-relaxed">{parcel.description}</p>
               </div>
             )}
-
-            {parcel.photos && parcel.photos.length > 0 && (
-              <div>
-                <h3 className="font-semibold mb-2 md:mb-3 text-xs md:text-sm text-muted-foreground">Photos</h3>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3">
-                  {parcel.photos.map((photo: string, index: number) => (
-                    <div key={index} className="relative overflow-hidden rounded-xl border hover:border-primary/50 transition-colors">
-                      <img
-                        src={photo}
-                        alt={`Photo ${index + 1}`}
-                        className="w-full h-32 md:h-48 object-cover"
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <div className="space-y-2.5 md:space-y-3 pt-2">
-              {user?.id === parcel.user_id ? (
-                <Button 
-                  onClick={() => navigate(`/publier/colis/${parcel.id}`)}
-                  className="w-full h-11 md:h-12 shadow-sm font-medium"
-                >
-                  <Settings className="w-4 h-4 mr-2" />
-                  <span className="text-sm md:text-base">Gérer l'annonce</span>
-                </Button>
-              ) : (
-                <>
-                  <Button onClick={handleContact} className="w-full h-11 md:h-12 shadow-sm font-medium">
-                    <MessageCircle className="w-4 h-4 mr-2" />
-                    <span className="text-sm md:text-base">Contacter l'expéditeur</span>
-                  </Button>
-
-                  {user && parcel.status === "closed" && (
-                    <Button 
-                      onClick={() => setReviewDialogOpen(true)} 
-                      variant="outline" 
-                      className="w-full h-11 md:h-12 border-2 hover:bg-accent font-medium"
-                    >
-                      <Star className="w-4 h-4 mr-2" />
-                      <span className="text-sm md:text-base">Laisser un avis</span>
-                    </Button>
-                  )}
-                </>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Suggestions de trajets compatibles */}
-        <div className="mb-6">
-          <MatchingSuggestions type="parcel" itemId={parcel.id} maxSuggestions={5} />
+          </div>
         </div>
 
-        <MatchingSection type="parcel" item={parcel} />
+        {/* Photos (en dehors de la card principale) */}
+        {validPhotos.length > 0 && (
+          <Card className="mb-6 border-0 shadow-lg">
+            <CardContent className="p-5">
+              <h3 className="font-semibold mb-4">Photos du colis</h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {validPhotos.map((photo: string, index: number) => (
+                  <div key={index} className="relative overflow-hidden rounded-xl aspect-square group cursor-pointer bg-muted">
+                    <img
+                      src={photo}
+                      alt={`Photo ${index + 1}`}
+                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      onError={(e) => {
+                        // Masquer le conteneur si l'image ne charge pas
+                        const container = (e.target as HTMLImageElement).parentElement;
+                        if (container) container.style.display = 'none';
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Action Buttons */}
+        <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/80 backdrop-blur-xl border-t z-40 md:relative md:bg-transparent md:border-0 md:p-0 md:backdrop-blur-none">
+          <div className="container max-w-3xl mx-auto flex gap-3">
+            {user?.id === parcel.user_id ? (
+              <Button 
+                onClick={() => navigate(`/publier/colis/${parcel.id}`)}
+                className="flex-1 h-14 rounded-2xl font-semibold text-base shadow-lg shadow-violet-500/20 bg-gradient-to-r from-violet-500 to-indigo-500 hover:from-violet-600 hover:to-indigo-600"
+              >
+                <Settings className="w-5 h-5 mr-2" />
+                Gérer l'annonce
+              </Button>
+            ) : (
+              <>
+                <Button 
+                  onClick={handleContact} 
+                  className="flex-1 h-14 rounded-2xl font-semibold text-base shadow-lg shadow-violet-500/20 bg-gradient-to-r from-violet-500 to-indigo-500 hover:from-violet-600 hover:to-indigo-600"
+                >
+                  <MessageCircle className="w-5 h-5 mr-2" />
+                  Contacter l'expéditeur
+                </Button>
+
+                {user && parcel.status === "closed" && (
+                  <Button 
+                    onClick={() => setReviewDialogOpen(true)} 
+                    variant="outline" 
+                    className="h-14 w-14 rounded-2xl p-0 border-2"
+                  >
+                    <Star className="w-5 h-5" />
+                  </Button>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* Suggestions de trajets compatibles */}
+        <div className="mt-8 mb-24 md:mb-8">
+          <MatchingSuggestions type="parcel" itemId={parcel.id} maxSuggestions={5} />
+        </div>
+      </div>
       </div>
 
       {user && user.id !== parcel.user_id && (

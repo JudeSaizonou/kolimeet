@@ -86,17 +86,17 @@ export const MobileMenu = ({ user, profile, isAdmin, onSignOut }: MobileMenuProp
         className={cn(
           "fixed top-24 left-1/2 -translate-x-1/2 z-[201]",
           "w-[90vw] max-w-[350px] max-h-[calc(100vh-7rem)] overflow-y-auto",
-          "bg-[#F2F2F2] rounded-[20px] p-10",
-          "flex flex-col justify-end items-center gap-[15px]",
-          "transition-all duration-300 md:hidden",
+          "bg-white rounded-2xl p-8 shadow-xl border border-gray-100",
+          "flex flex-col justify-end items-center gap-4",
+          "transition-all duration-300 md:hidden font-sans",
           isOpen ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4 pointer-events-none"
         )}
       >
         {/* Navigation Links */}
-        <div className="flex flex-col items-center gap-[15px] w-full">
+        <div className="flex flex-col items-center gap-3 w-full">
           <Link 
             to="/explorer" 
-            className="text-[#333333] text-lg font-medium hover:opacity-70 transition-opacity"
+            className="text-slate-700 text-base font-medium hover:text-primary transition-colors py-2"
             onClick={handleLinkClick}
           >
             Explorer
@@ -105,10 +105,10 @@ export const MobileMenu = ({ user, profile, isAdmin, onSignOut }: MobileMenuProp
           {user ? (
             <>
               {/* Dépliant Publier */}
-              <div className="w-full flex flex-col items-center gap-[15px]">
+              <div className="w-full flex flex-col items-center gap-2">
                 <button
                   onClick={() => setIsPublishOpen(!isPublishOpen)}
-                  className="text-[#333333] text-lg font-medium hover:opacity-70 transition-opacity flex items-center gap-2"
+                  className="text-slate-700 text-base font-medium hover:text-primary transition-colors flex items-center gap-2 py-2"
                 >
                   Publier
                   <ChevronDown className={cn(
@@ -118,10 +118,10 @@ export const MobileMenu = ({ user, profile, isAdmin, onSignOut }: MobileMenuProp
                 </button>
                 
                 {isPublishOpen && (
-                  <div className="flex flex-col items-center gap-[15px] w-full bg-white/50 rounded-xl py-4">
+                  <div className="flex flex-col items-center gap-2 w-full bg-violet-50 rounded-xl py-3 px-4">
                     <Link 
                       to="/publier/colis" 
-                      className="text-[#333333] text-base hover:opacity-70 transition-opacity"
+                      className="text-slate-600 text-sm font-medium hover:text-primary transition-colors py-1.5"
                       onClick={handleLinkClick}
                     >
                       Un colis
@@ -129,7 +129,7 @@ export const MobileMenu = ({ user, profile, isAdmin, onSignOut }: MobileMenuProp
                     
                     <Link 
                       to="/publier/trajet" 
-                      className="text-[#333333] text-base hover:opacity-70 transition-opacity"
+                      className="text-slate-600 text-sm font-medium hover:text-primary transition-colors py-1.5"
                       onClick={handleLinkClick}
                     >
                       Une annonce
@@ -140,7 +140,7 @@ export const MobileMenu = ({ user, profile, isAdmin, onSignOut }: MobileMenuProp
               
               <Link 
                 to="/messages" 
-                className="text-[#333333] text-lg font-medium hover:opacity-70 transition-opacity relative inline-flex items-center gap-2"
+                className="text-slate-700 text-base font-medium hover:text-primary transition-colors relative inline-flex items-center gap-2 py-2"
                 onClick={handleLinkClick}
               >
                 Messagerie
@@ -153,7 +153,7 @@ export const MobileMenu = ({ user, profile, isAdmin, onSignOut }: MobileMenuProp
 
               <Link 
                 to="/mes-annonces" 
-                className="text-[#333333] text-lg font-medium hover:opacity-70 transition-opacity"
+                className="text-slate-700 text-base font-medium hover:text-primary transition-colors py-2"
                 onClick={handleLinkClick}
               >
                 Mes annonces
@@ -161,7 +161,7 @@ export const MobileMenu = ({ user, profile, isAdmin, onSignOut }: MobileMenuProp
               
               <Link 
                 to="/favoris" 
-                className="text-[#333333] text-lg font-medium hover:opacity-70 transition-opacity inline-flex items-center gap-2"
+                className="text-slate-700 text-base font-medium hover:text-primary transition-colors inline-flex items-center gap-2 py-2"
                 onClick={handleLinkClick}
               >
                 <span>Favoris</span>
@@ -169,7 +169,7 @@ export const MobileMenu = ({ user, profile, isAdmin, onSignOut }: MobileMenuProp
               
               <Link 
                 to="/profil" 
-                className="text-[#333333] text-lg font-medium hover:opacity-70 transition-opacity"
+                className="text-slate-700 text-base font-medium hover:text-primary transition-colors py-2"
                 onClick={handleLinkClick}
               >
                 Mon profil
@@ -178,7 +178,7 @@ export const MobileMenu = ({ user, profile, isAdmin, onSignOut }: MobileMenuProp
               {isAdmin && (
                 <Link 
                   to="/admin" 
-                  className="text-[#333333] text-lg font-medium hover:opacity-70 transition-opacity"
+                  className="text-slate-700 text-base font-medium hover:text-primary transition-colors py-2"
                   onClick={handleLinkClick}
                 >
                   Administration
@@ -190,45 +190,13 @@ export const MobileMenu = ({ user, profile, isAdmin, onSignOut }: MobileMenuProp
               {/* CTA Button - Login */}
               <Link 
                 to="/auth/login"
-                className="px-6 py-3 bg-primary text-white rounded-full font-medium hover:bg-primary/90 transition-colors w-full text-center"
+                className="px-6 py-3 bg-primary text-white rounded-full font-medium hover:bg-primary/90 transition-colors w-full text-center mt-2"
                 onClick={handleLinkClick}
               >
                 Connexion
               </Link>
             </>
           )}
-
-          <div className="w-full h-px bg-gray-200 my-2" />
-
-          <a 
-            href="https://kolimeet.framer.ai/blog"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-muted-foreground text-base hover:text-primary transition-colors"
-            onClick={handleLinkClick}
-          >
-            Blog
-          </a>
-          
-          <a 
-            href="https://kolimeet.framer.ai/services"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-muted-foreground text-base hover:text-primary transition-colors"
-            onClick={handleLinkClick}
-          >
-            Nos services
-          </a>
-          
-          <a 
-            href="https://kolimeet.framer.ai/about-us"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-muted-foreground text-base hover:text-primary transition-colors"
-            onClick={handleLinkClick}
-          >
-            À propos de nous
-          </a>
         </div>
       </div>
     </>

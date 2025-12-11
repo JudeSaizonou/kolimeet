@@ -83,9 +83,9 @@ const ProhibitedItems = () => {
                 </CardContent>
               </Card>
 
-              <Card className="border-orange-200 dark:border-orange-900">
+              <Card className="border-amber-200 dark:border-amber-900">
                 <CardHeader className="pb-3">
-                  <CardTitle className="flex items-center gap-2 text-orange-600 dark:text-orange-400">
+                  <CardTitle className="flex items-center gap-2 text-amber-600 dark:text-amber-400">
                     <AlertTriangle className="h-5 w-5" />
                     Produits réglementés
                   </CardTitle>
@@ -102,9 +102,9 @@ const ProhibitedItems = () => {
                 </CardContent>
               </Card>
 
-              <Card className="border-orange-200 dark:border-orange-900">
+              <Card className="border-amber-200 dark:border-amber-900">
                 <CardHeader className="pb-3">
-                  <CardTitle className="flex items-center gap-2 text-orange-600 dark:text-orange-400">
+                  <CardTitle className="flex items-center gap-2 text-amber-600 dark:text-amber-400">
                     <AlertTriangle className="h-5 w-5" />
                     Contrefaçons
                   </CardTitle>

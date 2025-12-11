@@ -30,6 +30,7 @@ interface ReportButtonProps {
   variant?: 'default' | 'ghost' | 'outline';
   size?: 'default' | 'sm' | 'lg' | 'icon';
   showText?: boolean;
+  className?: string;
 }
 
 const REPORT_REASONS = [
@@ -50,7 +51,8 @@ export function ReportButton({
   targetUserId,
   variant = 'ghost',
   size = 'sm',
-  showText = true
+  showText = true,
+  className
 }: ReportButtonProps) {
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
@@ -113,7 +115,7 @@ export function ReportButton({
         <Button 
           variant={variant} 
           size={size} 
-          className="text-muted-foreground hover:text-destructive"
+          className={className || "text-muted-foreground hover:text-destructive"}
         >
           <Flag className="h-4 w-4" />
           {showText && <span className="ml-1">Signaler</span>}

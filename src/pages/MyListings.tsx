@@ -310,7 +310,7 @@ const MyListings = () => {
                         <span className="px-2 py-1 rounded-md bg-purple-500/10 text-purple-700 dark:text-purple-300 font-medium">
                           {parcel.weight_kg}kg
                         </span>
-                        <span className="px-2 py-1 rounded-md bg-orange-500/10 text-orange-700 dark:text-orange-300 font-medium">
+                        <span className="px-2 py-1 rounded-md bg-violet-500/10 text-violet-700 dark:text-violet-300 font-medium">
                           {parcel.size}
                         </span>
                       </div>
