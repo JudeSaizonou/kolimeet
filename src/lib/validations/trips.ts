@@ -15,6 +15,7 @@ const baseTripSchema = z.object({
   capacity_available_kg: z.number().int().min(0).max(1000),
   price_expect: z.number().min(0, "Le prix ne peut pas être négatif").optional(),
   notes: z.string().max(1000, "Notes limitées à 1000 caractères").optional(),
+  is_anonymous: z.boolean().optional().default(false),
 });
 
 export const createTripSchema = baseTripSchema.refine(

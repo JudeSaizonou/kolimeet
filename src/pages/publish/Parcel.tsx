@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CalendarIcon, Upload, X } from "lucide-react";
+import { CalendarIcon, Upload, X, EyeOff } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { useParams, useNavigate } from "react-router-dom";
@@ -12,14 +12,16 @@ import { Calendar } from "@/components/ui/calendar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Combobox } from "@/components/ui/combobox";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
 import { createParcelSchema, CreateParcelInput } from "@/lib/validations/parcels";
 import { useParcels } from "@/hooks/useParcels";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { countries, citiesByCountry } from "@/lib/data/countries";
+import { AcceptTermsCheckbox } from "@/components/AcceptTermsCheckbox";
 
 const PublishParcel = () => {
   const { id } = useParams();
@@ -28,6 +30,8 @@ const PublishParcel = () => {
   const [date, setDate] = useState<Date>();
   const [files, setFiles] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [termsError, setTermsError] = useState<string>();
   const [isLoading, setIsLoading] = useState(!!id);
 
   const form = useForm<CreateParcelInput>({
@@ -42,8 +46,28 @@ const PublishParcel = () => {
       to_city: "",
       deadline: "",
       description: "",
+      is_anonymous: false,
     },
   });
+
+  // Charger les préférences utilisateur
+  useEffect(() => {
+    const loadUserPreferences = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("default_anonymous_posting")
+          .eq("user_id", user.id)
+          .single();
+        
+        if (profile?.default_anonymous_posting) {
+          form.setValue("is_anonymous", true);
+        }
+      }
+    };
+    loadUserPreferences();
+  }, []);
 
   useEffect(() => {
     if (id) {
@@ -73,6 +97,7 @@ const PublishParcel = () => {
           to_city: data.to_city,
           deadline: data.deadline,
           description: data.description || "",
+          is_anonymous: data.is_anonymous || false,
         });
         setDate(new Date(data.deadline));
         if (data.photos && data.photos.length > 0) {
@@ -250,7 +275,7 @@ const PublishParcel = () => {
                               field.onChange(value);
                               form.setValue("from_city", "");
                             }}
-                            placeholder="France"
+                            placeholder="Sélectionner un pays"
                             searchPlaceholder="Rechercher un pays..."
                             emptyText="Aucun pays trouvé."
                           />
@@ -271,12 +296,12 @@ const PublishParcel = () => {
                               options={citiesByCountry[form.watch("from_country")]}
                               value={field.value}
                               onValueChange={field.onChange}
-                              placeholder="Paris"
+                              placeholder="Sélectionner une ville"
                               searchPlaceholder="Rechercher une ville..."
                               emptyText="Aucune ville trouvée."
                             />
                           ) : (
-                            <Input placeholder="Paris" {...field} />
+                            <Input placeholder="Entrez la ville de départ" {...field} />
                           )}
                         </FormControl>
                         <FormMessage />
@@ -300,7 +325,7 @@ const PublishParcel = () => {
                               field.onChange(value);
                               form.setValue("to_city", "");
                             }}
-                            placeholder="Bénin"
+                            placeholder="Sélectionner un pays"
                             searchPlaceholder="Rechercher un pays..."
                             emptyText="Aucun pays trouvé."
                           />
@@ -321,12 +346,12 @@ const PublishParcel = () => {
                               options={citiesByCountry[form.watch("to_country")]}
                               value={field.value}
                               onValueChange={field.onChange}
-                              placeholder="Cotonou"
+                              placeholder="Sélectionner une ville"
                               searchPlaceholder="Rechercher une ville..."
                               emptyText="Aucune ville trouvée."
                             />
                           ) : (
-                            <Input placeholder="Cotonou" {...field} />
+                            <Input placeholder="Entrez la ville d'arrivée" {...field} />
                           )}
                         </FormControl>
                         <FormMessage />
@@ -431,7 +456,55 @@ const PublishParcel = () => {
                   </p>
                 </div>
 
-                <Button type="submit" className="w-full" disabled={loading}>
+                {/* Option anonyme */}
+                <FormField
+                  control={form.control}
+                  name="is_anonymous"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                      <div className="space-y-0.5">
+                        <FormLabel className="text-base flex items-center gap-2">
+                          <EyeOff className="h-4 w-4" />
+                          Publication anonyme
+                        </FormLabel>
+                        <FormDescription>
+                          Votre identité sera masquée dans l'annonce
+                        </FormDescription>
+                      </div>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+
+                {/* Acceptation des CGU - uniquement pour nouvelle publication */}
+                {!id && (
+                  <AcceptTermsCheckbox
+                    checked={acceptedTerms}
+                    onCheckedChange={(checked) => {
+                      setAcceptedTerms(checked);
+                      if (checked) setTermsError(undefined);
+                    }}
+                    type="parcel"
+                    error={termsError}
+                  />
+                )}
+
+                <Button 
+                  type="submit" 
+                  className="w-full" 
+                  disabled={loading}
+                  onClick={(e) => {
+                    if (!id && !acceptedTerms) {
+                      e.preventDefault();
+                      setTermsError("Vous devez accepter les conditions pour publier");
+                    }
+                  }}
+                >
                   {loading ? (id ? "Mise à jour..." : "Publication...") : (id ? "Mettre à jour" : "Publier le colis")}
                 </Button>
               </form>

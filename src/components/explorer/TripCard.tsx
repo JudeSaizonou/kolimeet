@@ -2,7 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Heart, Calendar } from "lucide-react";
+import { ArrowRight, Heart, Calendar, EyeOff } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { useNavigate } from "react-router-dom";
@@ -71,13 +71,26 @@ export const TripCard = ({ trip }: TripCardProps) => {
 
         {/* User Info (Compact) */}
         <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-100">
-          <Avatar className="h-5 w-5 md:h-6 md:w-6">
-            <AvatarImage src={profile?.avatar_url} />
-            <AvatarFallback className="text-[10px]">{profile?.full_name?.[0] || "U"}</AvatarFallback>
-          </Avatar>
-          <span className="text-xs text-muted-foreground truncate max-w-[100px]">
-            {profile?.full_name || "Utilisateur"}
-          </span>
+          {trip.is_anonymous ? (
+            <>
+              <div className="h-5 w-5 md:h-6 md:w-6 rounded-full bg-muted flex items-center justify-center">
+                <EyeOff className="h-3 w-3 text-muted-foreground" />
+              </div>
+              <span className="text-xs text-muted-foreground italic">
+                Anonyme
+              </span>
+            </>
+          ) : (
+            <>
+              <Avatar className="h-5 w-5 md:h-6 md:w-6">
+                <AvatarImage src={profile?.avatar_url} />
+                <AvatarFallback className="text-[10px]">{profile?.full_name?.[0] || "U"}</AvatarFallback>
+              </Avatar>
+              <span className="text-xs text-muted-foreground truncate max-w-[100px]">
+                {profile?.full_name || "Utilisateur"}
+              </span>
+            </>
+          )}
           <span className="ml-auto text-xs font-medium text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">
             {trip.capacity_available_kg}kg
           </span>

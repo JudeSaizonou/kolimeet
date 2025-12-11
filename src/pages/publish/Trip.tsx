@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, EyeOff } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { useParams, useNavigate } from "react-router-dom";
@@ -11,14 +11,16 @@ import { Textarea } from "@/components/ui/textarea";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Combobox } from "@/components/ui/combobox";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
 import { createTripSchema, CreateTripInput } from "@/lib/validations/trips";
 import { useTrips } from "@/hooks/useTrips";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { countries, citiesByCountry } from "@/lib/data/countries";
+import { AcceptTermsCheckbox } from "@/components/AcceptTermsCheckbox";
 
 const PublishTrip = () => {
   const { id } = useParams();
@@ -26,6 +28,9 @@ const PublishTrip = () => {
   const { createTrip, updateTrip, loading } = useTrips();
   const [date, setDate] = useState<Date>();
   const [isLoading, setIsLoading] = useState(!!id);
+  const [defaultAnonymous, setDefaultAnonymous] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [termsError, setTermsError] = useState<string>();
 
   const form = useForm<CreateTripInput>({
     resolver: zodResolver(createTripSchema),
@@ -39,8 +44,29 @@ const PublishTrip = () => {
       capacity_available_kg: 20,
       price_expect: undefined,
       notes: "",
+      is_anonymous: false,
     },
   });
+
+  // Charger les préférences utilisateur
+  useEffect(() => {
+    const loadUserPreferences = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("default_anonymous_posting")
+          .eq("user_id", user.id)
+          .single();
+        
+        if (profile?.default_anonymous_posting) {
+          setDefaultAnonymous(true);
+          form.setValue("is_anonymous", true);
+        }
+      }
+    };
+    loadUserPreferences();
+  }, []);
 
   useEffect(() => {
     if (id) {
@@ -70,6 +96,7 @@ const PublishTrip = () => {
           capacity_available_kg: data.capacity_available_kg,
           price_expect: data.price_expect || undefined,
           notes: data.notes || "",
+          is_anonymous: data.is_anonymous || false,
         });
         setDate(new Date(data.date_departure));
       }
@@ -132,7 +159,7 @@ const PublishTrip = () => {
                               field.onChange(value);
                               form.setValue("from_city", "");
                             }}
-                            placeholder="France"
+                            placeholder="Sélectionner un pays"
                             searchPlaceholder="Rechercher un pays..."
                             emptyText="Aucun pays trouvé."
                           />
@@ -153,12 +180,12 @@ const PublishTrip = () => {
                               options={citiesByCountry[form.watch("from_country")]}
                               value={field.value}
                               onValueChange={field.onChange}
-                              placeholder="Paris"
+                              placeholder="Sélectionner une ville"
                               searchPlaceholder="Rechercher une ville..."
                               emptyText="Aucune ville trouvée."
                             />
                           ) : (
-                            <Input placeholder="Paris" {...field} />
+                            <Input placeholder="Entrez la ville de départ" {...field} />
                           )}
                         </FormControl>
                         <FormMessage />
@@ -182,7 +209,7 @@ const PublishTrip = () => {
                               field.onChange(value);
                               form.setValue("to_city", "");
                             }}
-                            placeholder="Bénin"
+                            placeholder="Sélectionner un pays"
                             searchPlaceholder="Rechercher un pays..."
                             emptyText="Aucun pays trouvé."
                           />
@@ -203,12 +230,12 @@ const PublishTrip = () => {
                               options={citiesByCountry[form.watch("to_country")]}
                               value={field.value}
                               onValueChange={field.onChange}
-                              placeholder="Cotonou"
+                              placeholder="Sélectionner une ville"
                               searchPlaceholder="Rechercher une ville..."
                               emptyText="Aucune ville trouvée."
                             />
                           ) : (
-                            <Input placeholder="Cotonou" {...field} />
+                            <Input placeholder="Entrez la ville d'arrivée" {...field} />
                           )}
                         </FormControl>
                         <FormMessage />
@@ -333,7 +360,55 @@ const PublishTrip = () => {
                   )}
                 />
 
-                <Button type="submit" className="w-full" disabled={loading}>
+                {/* Option Annonce Anonyme */}
+                <FormField
+                  control={form.control}
+                  name="is_anonymous"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 bg-muted/50">
+                      <div className="space-y-0.5">
+                        <FormLabel className="text-base flex items-center gap-2">
+                          <EyeOff className="h-4 w-4" />
+                          Publier anonymement
+                        </FormLabel>
+                        <FormDescription>
+                          Votre nom et photo de profil seront masqués sur l'annonce
+                        </FormDescription>
+                      </div>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+
+                {/* Acceptation des CGU - uniquement pour nouvelle publication */}
+                {!id && (
+                  <AcceptTermsCheckbox
+                    checked={acceptedTerms}
+                    onCheckedChange={(checked) => {
+                      setAcceptedTerms(checked);
+                      if (checked) setTermsError(undefined);
+                    }}
+                    type="trip"
+                    error={termsError}
+                  />
+                )}
+
+                <Button 
+                  type="submit" 
+                  className="w-full" 
+                  disabled={loading}
+                  onClick={(e) => {
+                    if (!id && !acceptedTerms) {
+                      e.preventDefault();
+                      setTermsError("Vous devez accepter les conditions pour publier");
+                    }
+                  }}
+                >
                   {loading ? (id ? "Mise à jour..." : "Publication...") : (id ? "Mettre à jour" : "Publier le trajet")}
                 </Button>
               </form>

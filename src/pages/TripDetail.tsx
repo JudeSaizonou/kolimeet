@@ -9,7 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowRight, Calendar, Package, Star, CreditCard, MessageCircle, Heart, MapPin, Weight, Info, Share2 } from "lucide-react";
+import { ArrowRight, Calendar, Package, Star, CreditCard, MessageCircle, Heart, MapPin, Weight, Info, Share2, Settings } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { MatchingSection } from "@/components/explorer/MatchingSection";
@@ -22,6 +22,7 @@ import { ShareButton } from "@/components/ShareButton";
 import { ShareStoryButton } from "@/components/ShareStoryButton";
 import { SEO } from "@/components/SEO";
 import { generateTripOGImage } from "@/lib/utils/ogImage";
+import { ReportButton } from "@/components/ReportButton";
 
 const TripDetail = () => {
   const { id } = useParams();
@@ -202,6 +203,14 @@ const TripDetail = () => {
               >
                 <Heart className={`h-5 w-5 ${isFavorited ? "fill-red-500 text-red-500" : "text-gray-600"}`} />
               </Button>
+              <ReportButton
+                targetType="trip"
+                targetId={trip.id}
+                targetUserId={trip.user_id}
+                variant="ghost"
+                size="icon"
+                showText={false}
+              />
             </div>
           </div>
 
@@ -273,20 +282,32 @@ const TripDetail = () => {
         {/* Action Buttons */}
         <div className="fixed bottom-0 left-0 right-0 p-4 bg-white/80 backdrop-blur-xl border-t border-white/20 z-40 md:relative md:bg-transparent md:border-0 md:p-0 md:backdrop-blur-none">
           <div className="container max-w-3xl mx-auto flex gap-3">
-            <Button 
-              className="flex-1 h-12 rounded-xl font-semibold text-base shadow-lg shadow-primary/20"
-              onClick={() => setBookingDialogOpen(true)}
-            >
-              <Package className="mr-2 h-5 w-5" />
-              Réserver
-            </Button>
-            <Button 
-              variant="outline" 
-              className="h-12 w-12 rounded-xl p-0 border-2"
-              onClick={handleContact}
-            >
-              <MessageCircle className="h-5 w-5" />
-            </Button>
+            {user?.id === trip.user_id ? (
+              <Button 
+                className="flex-1 h-12 rounded-xl font-semibold text-base shadow-lg shadow-primary/20"
+                onClick={() => navigate(`/publier/trajet/${trip.id}`)}
+              >
+                <Settings className="mr-2 h-5 w-5" />
+                Gérer l'annonce
+              </Button>
+            ) : (
+              <>
+                <Button 
+                  className="flex-1 h-12 rounded-xl font-semibold text-base shadow-lg shadow-primary/20"
+                  onClick={() => setBookingDialogOpen(true)}
+                >
+                  <Package className="mr-2 h-5 w-5" />
+                  Réserver
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="h-12 w-12 rounded-xl p-0 border-2"
+                  onClick={handleContact}
+                >
+                  <MessageCircle className="h-5 w-5" />
+                </Button>
+              </>
+            )}
           </div>
         </div>
 

@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Switch } from "@/components/ui/switch";
 import {
   Select,
   SelectContent,
@@ -14,7 +15,7 @@ import {
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
-import { Upload, User, Star, LogOut } from "lucide-react";
+import { Upload, User, Star, LogOut, EyeOff } from "lucide-react";
 import { PhoneVerification } from "@/components/profile/PhoneVerification";
 import { useNavigate } from "react-router-dom";
 import { countries, citiesByCountry } from "@/lib/data/countries";
@@ -33,6 +34,7 @@ const Profile = () => {
   const [phoneVerified, setPhoneVerified] = useState(false);
   const [rating, setRating] = useState({ avg: 0, count: 0 });
   const [selectedCountry, setSelectedCountry] = useState("");
+  const [defaultAnonymous, setDefaultAnonymous] = useState(false);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -68,6 +70,7 @@ const Profile = () => {
           avg: profile.rating_avg || 0,
           count: profile.rating_count || 0,
         });
+        setDefaultAnonymous(profile.default_anonymous_posting || false);
       }
     } catch (error: any) {
       console.error("Error loading profile:", error);
@@ -159,6 +162,7 @@ const Profile = () => {
           country: formData.country,
           city: formData.city,
           phone_e164: formData.phone_e164 || null,
+          default_anonymous_posting: defaultAnonymous,
         })
         .eq("user_id", user.id);
 
@@ -333,6 +337,23 @@ const Profile = () => {
                 <p className="text-xs text-muted-foreground">
                   Format : +33612345678 (avec indicatif pays)
                 </p>
+              </div>
+
+              {/* Paramètre publication anonyme */}
+              <div className="flex items-center justify-between rounded-lg border p-4">
+                <div className="space-y-0.5">
+                  <Label className="text-base flex items-center gap-2">
+                    <EyeOff className="h-4 w-4" />
+                    Publier anonymement par défaut
+                  </Label>
+                  <p className="text-sm text-muted-foreground">
+                    Vos futures annonces seront anonymes par défaut
+                  </p>
+                </div>
+                <Switch
+                  checked={defaultAnonymous}
+                  onCheckedChange={setDefaultAnonymous}
+                />
               </div>
 
               <Button

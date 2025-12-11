@@ -35,8 +35,10 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import CGU from "./pages/CGU";
 import FAQ from "./pages/FAQ";
 import Contact from "./pages/Contact";
+import ProhibitedItems from "./pages/ProhibitedItems";
 import PaymentTest from "./pages/PaymentTest";
 import AwwwardsLanding from "./pages/AwwwardsLanding";
+import Notifications from "./pages/Notifications";
 
 // Import admin utilities for console access (development only)
 if (import.meta.env.DEV) {
@@ -167,6 +169,14 @@ const App = () => (
                 }
               />
               <Route
+                path="/notifications"
+                element={
+                  <ProtectedRoute>
+                    <Notifications />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/mes-reservations"
                 element={
                   <ProtectedRoute>
@@ -183,6 +193,7 @@ const App = () => (
                 }
               />
               <Route path="/cgu" element={<CGU />} />
+              <Route path="/articles-interdits" element={<ProhibitedItems />} />
               <Route path="/faq" element={<FAQ />} />
               <Route path="/contact" element={<Contact />} />
               <Route

@@ -135,25 +135,17 @@ const Navigation = () => {
           </Link>
           
           {user && (
-            <>
-              <Link 
-                to="/explorer"
-                className="text-muted-foreground hover:text-primary transition-all duration-200 text-base font-medium whitespace-nowrap"
-              >
-                Explorer
-              </Link>
-              <Link 
-                to="/messages"
-                className="text-muted-foreground hover:text-primary transition-all duration-200 text-base font-medium whitespace-nowrap relative"
-              >
-                Messagerie
-                {unreadCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
-                    {unreadCount > 9 ? '9+' : unreadCount}
-                  </span>
-                )}
-              </Link>
-            </>
+            <Link 
+              to="/messages"
+              className="text-muted-foreground hover:text-primary transition-all duration-200 text-base font-medium whitespace-nowrap relative"
+            >
+              Messagerie
+              {unreadCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </span>
+              )}
+            </Link>
           )}
         </div>
 
@@ -188,127 +180,120 @@ const Navigation = () => {
 
           {user && <NotificationBell />}
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              {user ? (
-                <button className="flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-transparent rounded-full">
-                  <Avatar className="h-9 w-9 border-2 border-white/30">
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-transparent rounded-full">
+                  <Avatar className="h-9 w-9 border-2 border-primary/30">
                     <AvatarImage src={profile?.avatar_url} alt="Avatar" />
-                    <AvatarFallback className="bg-white/10">
-                      <User className="h-5 w-5 text-white" />
+                    <AvatarFallback className="bg-primary/10">
+                      <User className="h-5 w-5 text-primary" />
                     </AvatarFallback>
                   </Avatar>
                 </button>
-              ) : (
-                <Button 
-                  variant="outline"
-                  className="px-6 py-2.5 bg-transparent border border-white/50 rounded-full text-white text-sm font-medium hover:bg-white/10 hover:border-white/80 transition-all duration-300 whitespace-nowrap"
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <div className="px-2 py-1.5">
+                  <p className="text-sm font-medium text-foreground">
+                    {profile?.full_name || "Utilisateur"}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {user.email}
+                  </p>
+                </div>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link
+                    to="/profil"
+                    className="flex items-center gap-2 cursor-pointer"
+                  >
+                    <User className="h-4 w-4" />
+                    Mon profil
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link
+                    to="/mes-annonces"
+                    className="flex items-center gap-2 cursor-pointer"
+                  >
+                    <FileText className="h-4 w-4" />
+                    Mes annonces
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link
+                    to="/favoris"
+                    className="flex items-center gap-2 cursor-pointer"
+                  >
+                    <Heart className="h-4 w-4" />
+                    Favoris
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link
+                    to="/mes-reservations"
+                    className="flex items-center gap-2 cursor-pointer"
+                  >
+                    <CreditCard className="h-4 w-4" />
+                    Mes réservations
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link
+                    to="/messages"
+                    className="flex items-center gap-2 cursor-pointer"
+                  >
+                    <MessageSquare className="h-4 w-4" />
+                    <span>Messagerie</span>
+                    {unreadCount > 0 && (
+                      <span className="ml-auto bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center shrink-0">
+                        {unreadCount > 9 ? '9+' : unreadCount}
+                      </span>
+                    )}
+                  </Link>
+                </DropdownMenuItem>
+                {isAdmin && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link
+                        to="/admin"
+                        className="flex items-center gap-2 cursor-pointer text-primary"
+                      >
+                        <Shield className="h-4 w-4" />
+                        Administration
+                      </Link>
+                    </DropdownMenuItem>
+                  </>
+                )}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem 
+                  onClick={signOut}
+                  className="flex items-center gap-2 cursor-pointer text-destructive"
                 >
-                  Mon profil
-                </Button>
-              )}
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              {user ? (
-                <>
-                  <div className="px-2 py-1.5">
-                    <p className="text-sm font-medium text-foreground">
-                      {profile?.full_name || "Utilisateur"}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {user.email}
-                    </p>
-                  </div>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link
-                      to="/profil"
-                      className="flex items-center gap-2 cursor-pointer"
-                    >
-                      <User className="h-4 w-4" />
-                      Mon profil
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link
-                      to="/mes-annonces"
-                      className="flex items-center gap-2 cursor-pointer"
-                    >
-                      <FileText className="h-4 w-4" />
-                      Mes annonces
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link
-                      to="/favoris"
-                      className="flex items-center gap-2 cursor-pointer"
-                    >
-                      <Heart className="h-4 w-4" />
-                      Favoris
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link
-                      to="/mes-reservations"
-                      className="flex items-center gap-2 cursor-pointer"
-                    >
-                      <CreditCard className="h-4 w-4" />
-                      Mes réservations
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link
-                      to="/messages"
-                      className="flex items-center gap-2 cursor-pointer"
-                    >
-                      <MessageSquare className="h-4 w-4" />
-                      <span>Messagerie</span>
-                      {unreadCount > 0 && (
-                        <span className="ml-auto bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center shrink-0">
-                          {unreadCount > 9 ? '9+' : unreadCount}
-                        </span>
-                      )}
-                    </Link>
-                  </DropdownMenuItem>
-                  {isAdmin && (
-                    <>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem asChild>
-                        <Link
-                          to="/admin"
-                          className="flex items-center gap-2 cursor-pointer text-primary"
-                        >
-                          <Shield className="h-4 w-4" />
-                          Administration
-                        </Link>
-                      </DropdownMenuItem>
-                    </>
-                  )}
-                </>
-              ) : (
-                <>
-                  <DropdownMenuItem asChild>
-                    <Link
-                      to="/auth/login"
-                      className="flex items-center gap-2 cursor-pointer"
-                    >
-                      <User className="h-4 w-4" />
-                      Connexion
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link
-                      to="/auth/register"
-                      className="flex items-center gap-2 cursor-pointer"
-                    >
-                      <User className="h-4 w-4" />
-                      Créer un compte
-                    </Link>
-                  </DropdownMenuItem>
-                </>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
+                  <LogOut className="h-4 w-4" />
+                  Déconnexion
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            /* Boutons Connexion et Inscription pour les non-connectés */
+            <div className="flex items-center gap-3">
+              <Button 
+                variant="ghost"
+                asChild
+                className="text-foreground hover:text-primary hover:bg-primary/5 transition-all duration-200"
+              >
+                <Link to="/auth/login">Connexion</Link>
+              </Button>
+              <Button 
+                asChild
+                className="bg-primary hover:bg-primary/90 text-white rounded-full px-6"
+              >
+                <Link to="/auth/register">Inscription</Link>
+              </Button>
+            </div>
+          )}
         </div>
 
         {/* Mobile Menu */}

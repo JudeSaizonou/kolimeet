@@ -9,7 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowRight, Calendar, Package, Star, Weight, MessageCircle, Heart, Share2 } from "lucide-react";
+import { ArrowRight, Calendar, Package, Star, Weight, MessageCircle, Heart, Share2, Settings } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { MatchingSection } from "@/components/explorer/MatchingSection";
@@ -19,6 +19,7 @@ import { ShareButton } from "@/components/ShareButton";
 import { ShareStoryButton } from "@/components/ShareStoryButton";
 import { SEO } from "@/components/SEO";
 import { generateParcelOGImage } from "@/lib/utils/ogImage";
+import { ReportButton } from "@/components/ReportButton";
 
 const ParcelDetail = () => {
   const { id } = useParams();
@@ -188,6 +189,14 @@ const ParcelDetail = () => {
                 >
                   <Heart className={`h-4 w-4 md:h-5 md:w-5 ${isFavorited ? 'fill-red-500 text-red-500' : ''}` } />
                 </Button>
+                <ReportButton
+                  targetType="parcel"
+                  targetId={parcel.id}
+                  targetUserId={parcel.user_id}
+                  variant="outline"
+                  size="icon"
+                  showText={false}
+                />
                 <Badge 
                   variant={parcel.status === "open" ? "default" : "secondary"} 
                   className="text-xs shrink-0"
@@ -270,20 +279,32 @@ const ParcelDetail = () => {
             )}
 
             <div className="space-y-2.5 md:space-y-3 pt-2">
-              <Button onClick={handleContact} className="w-full h-11 md:h-12 shadow-sm font-medium">
-                <MessageCircle className="w-4 h-4 mr-2" />
-                <span className="text-sm md:text-base">Contacter l'expéditeur</span>
-              </Button>
-
-              {user && user.id !== parcel.user_id && parcel.status === "closed" && (
+              {user?.id === parcel.user_id ? (
                 <Button 
-                  onClick={() => setReviewDialogOpen(true)} 
-                  variant="outline" 
-                  className="w-full h-11 md:h-12 border-2 hover:bg-accent font-medium"
+                  onClick={() => navigate(`/publier/colis/${parcel.id}`)}
+                  className="w-full h-11 md:h-12 shadow-sm font-medium"
                 >
-                  <Star className="w-4 h-4 mr-2" />
-                  <span className="text-sm md:text-base">Laisser un avis</span>
+                  <Settings className="w-4 h-4 mr-2" />
+                  <span className="text-sm md:text-base">Gérer l'annonce</span>
                 </Button>
+              ) : (
+                <>
+                  <Button onClick={handleContact} className="w-full h-11 md:h-12 shadow-sm font-medium">
+                    <MessageCircle className="w-4 h-4 mr-2" />
+                    <span className="text-sm md:text-base">Contacter l'expéditeur</span>
+                  </Button>
+
+                  {user && parcel.status === "closed" && (
+                    <Button 
+                      onClick={() => setReviewDialogOpen(true)} 
+                      variant="outline" 
+                      className="w-full h-11 md:h-12 border-2 hover:bg-accent font-medium"
+                    >
+                      <Star className="w-4 h-4 mr-2" />
+                      <span className="text-sm md:text-base">Laisser un avis</span>
+                    </Button>
+                  )}
+                </>
               )}
             </div>
           </CardContent>

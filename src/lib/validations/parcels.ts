@@ -20,6 +20,7 @@ export const createParcelSchema = z.object({
   }, "La date limite doit être dans le futur"),
   description: z.string().max(2000, "Description limitée à 2000 caractères").optional(),
   photos: z.array(z.string().url()).max(5, "Maximum 5 photos").optional(),
+  is_anonymous: z.boolean().optional().default(false),
 });
 
 export const updateParcelSchema = createParcelSchema.partial().extend({
