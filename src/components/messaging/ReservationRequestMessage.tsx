@@ -22,6 +22,13 @@ export function ReservationRequestMessage({ request, onUpdate }: ReservationRequ
 
   const isDriver = user?.id === request.driver_id;
   const isRequester = user?.id === request.requester_id;
+  
+  // Log pour debug
+  console.log('[ReservationRequest] User:', user?.id);
+  console.log('[ReservationRequest] Driver ID:', request.driver_id);
+  console.log('[ReservationRequest] Requester ID:', request.requester_id);
+  console.log('[ReservationRequest] isDriver:', isDriver, 'isRequester:', isRequester);
+  console.log('[ReservationRequest] Status:', request.status);
 
   // Fonctions d'action
   const handleAccept = async () => {
