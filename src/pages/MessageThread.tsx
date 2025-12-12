@@ -296,7 +296,30 @@ const MessageThread = () => {
           </div>
         ) : (
           <>
-            {messages.map((message) => {
+            {messages.map((message, index) => {
+              // Vérifier si on doit afficher un séparateur de date
+              const messageDate = new Date(message.created_at);
+              const prevMessage = index > 0 ? messages[index - 1] : null;
+              const prevMessageDate = prevMessage ? new Date(prevMessage.created_at) : null;
+              
+              const showDateSeparator = !prevMessageDate || 
+                messageDate.toDateString() !== prevMessageDate.toDateString();
+              
+              // Formater la date pour l'affichage
+              const formatDateSeparator = (date: Date) => {
+                const today = new Date();
+                const yesterday = new Date(today);
+                yesterday.setDate(yesterday.getDate() - 1);
+                
+                if (date.toDateString() === today.toDateString()) {
+                  return "Aujourd'hui";
+                } else if (date.toDateString() === yesterday.toDateString()) {
+                  return "Hier";
+                } else {
+                  return format(date, "EEEE d MMMM yyyy", { locale: fr });
+                }
+              };
+
               // Vérifier si le message est lié à une demande de réservation
               const relatedRequest = requests.find(
                 (req) => req.message_id === message.id
@@ -309,24 +332,40 @@ const MessageThread = () => {
                 }
 
                 return (
-                  <ReservationRequestMessage
-                    key={message.id}
-                    request={relatedRequest}
-                    onUpdate={refetchRequests}
-                  />
+                  <div key={message.id}>
+                    {showDateSeparator && (
+                      <div className="flex items-center justify-center my-4">
+                        <div className="bg-muted/60 text-muted-foreground text-xs px-3 py-1 rounded-full capitalize">
+                          {formatDateSeparator(messageDate)}
+                        </div>
+                      </div>
+                    )}
+                    <ReservationRequestMessage
+                      request={relatedRequest}
+                      onUpdate={refetchRequests}
+                    />
+                  </div>
                 );
               }
 
               // Message normal
               return (
-                <MessageBubble
-                  key={message.id}
-                  content={message.content}
-                  createdAt={message.created_at}
-                  isOwn={message.sender_id === user?.id}
-                  deliveredAt={message.delivered_at}
-                  readAt={message.read_at}
-                />
+                <div key={message.id}>
+                  {showDateSeparator && (
+                    <div className="flex items-center justify-center my-4">
+                      <div className="bg-muted/60 text-muted-foreground text-xs px-3 py-1 rounded-full capitalize">
+                        {formatDateSeparator(messageDate)}
+                      </div>
+                    </div>
+                  )}
+                  <MessageBubble
+                    content={message.content}
+                    createdAt={message.created_at}
+                    isOwn={message.sender_id === user?.id}
+                    deliveredAt={message.delivered_at}
+                    readAt={message.read_at}
+                  />
+                </div>
               );
             })}
             
