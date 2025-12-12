@@ -39,6 +39,10 @@ serve(async (req) => {
     console.log("Title:", title);
     console.log("Message:", message);
 
+    // Construire l'URL complète
+    const baseUrl = "https://kolimeet.vercel.app";
+    const fullUrl = url ? `${baseUrl}${url}` : undefined;
+
     // Envoyer la notification via l'API OneSignal
     const response = await fetch("https://onesignal.com/api/v1/notifications", {
       method: "POST",
@@ -53,21 +57,17 @@ serve(async (req) => {
         // Contenu de la notification
         headings: { en: title, fr: title },
         contents: { en: message, fr: message },
-        // URL à ouvrir quand on clique
-        url: url || undefined,
-        web_url: url || undefined,
-        app_url: url || undefined,
+        // URL à ouvrir quand on clique (une seule URL)
+        web_url: fullUrl,
         // Données additionnelles
         data: data || {},
         // Options iOS
         ios_badgeType: "Increase",
         ios_badgeCount: 1,
-        // Options Android
-        android_channel_id: "messages",
         // Options Web
-        chrome_web_badge: "/icon-192.png",
-        chrome_web_icon: "/icon-192.png",
-        firefox_icon: "/icon-192.png",
+        chrome_web_badge: `${baseUrl}/icon-192.png`,
+        chrome_web_icon: `${baseUrl}/icon-192.png`,
+        firefox_icon: `${baseUrl}/icon-192.png`,
       }),
     });
 

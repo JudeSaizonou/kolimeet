@@ -1,4 +1,4 @@
-const CACHE_NAME = 'Kolimeet-v3';
+const CACHE_NAME = 'Kolimeet-v4';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -91,22 +91,27 @@ self.addEventListener('push', (event) => {
 // Clic sur une notification
 self.addEventListener('notificationclick', (event) => {
   console.log('[SW] Notification clicked', event.notification.tag);
+  console.log('[SW] Notification data:', event.notification.data);
   
   event.notification.close();
   
-  const urlToOpen = event.notification.data?.url || '/';
+  // Récupérer l'URL depuis les données de la notification
+  let urlToOpen = '/';
+  if (event.notification.data) {
+    urlToOpen = event.notification.data.url || event.notification.data.web_url || '/';
+  }
+  
+  // S'assurer que l'URL est absolue
+  if (urlToOpen.startsWith('/')) {
+    urlToOpen = self.registration.scope.replace(/\/$/, '') + urlToOpen;
+  }
+  
+  console.log('[SW] Opening URL:', urlToOpen);
   
   // Gérer les actions (boutons dans la notification)
   if (event.action) {
     console.log('[SW] Action clicked:', event.action);
-    // Les actions peuvent avoir leurs propres URLs
-    if (event.action === 'reply') {
-      // Ouvrir la conversation
-      event.waitUntil(clients.openWindow(urlToOpen));
-      return;
-    }
     if (event.action === 'dismiss') {
-      // Juste fermer
       return;
     }
   }
@@ -115,15 +120,31 @@ self.addEventListener('notificationclick', (event) => {
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true })
       .then((windowClients) => {
+        console.log('[SW] Found', windowClients.length, 'window clients');
+        
         // Chercher une fenêtre déjà ouverte sur le même domaine
         for (const client of windowClients) {
-          if (client.url.includes(self.registration.scope) && 'focus' in client) {
-            // Naviguer vers l'URL et focus
-            client.postMessage({ type: 'NOTIFICATION_CLICK', url: urlToOpen });
-            return client.focus();
+          const clientOrigin = new URL(client.url).origin;
+          const swOrigin = new URL(self.registration.scope).origin;
+          
+          if (clientOrigin === swOrigin && 'focus' in client) {
+            console.log('[SW] Found existing window, navigating to:', urlToOpen);
+            // Naviguer vers l'URL
+            return client.navigate(urlToOpen).then((client) => {
+              if (client) {
+                return client.focus();
+              }
+            }).catch((err) => {
+              console.log('[SW] Navigate failed, posting message:', err);
+              // Fallback: envoyer un message pour naviguer
+              client.postMessage({ type: 'NAVIGATE_TO', url: urlToOpen });
+              return client.focus();
+            });
           }
         }
+        
         // Sinon ouvrir une nouvelle fenêtre
+        console.log('[SW] Opening new window:', urlToOpen);
         return clients.openWindow(urlToOpen);
       })
   );
