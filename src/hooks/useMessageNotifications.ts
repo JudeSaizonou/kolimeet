@@ -109,14 +109,11 @@ export function useMessageNotifications() {
 
           console.log('[MessageNotifications] 🔔 Affichage notification pour message de', senderName);
 
-          // Vérifier la permission avant d'afficher
+          // Vérifier la permission - NE PAS demander ici (doit être fait via geste utilisateur)
           if (Notification.permission !== 'granted') {
-            console.log('[MessageNotifications] Permission non accordée, demande...');
-            const permission = await Notification.requestPermission();
-            if (permission !== 'granted') {
-              console.log('[MessageNotifications] Permission refusée');
-              return;
-            }
+            console.log('[MessageNotifications] Permission non accordée:', Notification.permission);
+            console.log('[MessageNotifications] L\'utilisateur doit activer les notifications depuis son profil');
+            return;
           }
 
           // Afficher la notification via le Service Worker si disponible
