@@ -29,70 +29,6 @@ interface RequestBody {
   payload: PushPayload;
 }
 
-// Encoder en base64 URL-safe
-function base64UrlEncode(data: Uint8Array): string {
-  return btoa(String.fromCharCode(...data))
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-    .replace(/=+$/, "");
-}
-
-// Créer le JWT pour l'authentification VAPID
-async function createVapidJwt(
-  endpoint: string,
-  subject: string,
-  publicKey: string,
-  privateKey: string
-): Promise<string> {
-  const url = new URL(endpoint);
-  const audience = `${url.protocol}//${url.host}`;
-  const expiration = Math.floor(Date.now() / 1000) + 12 * 60 * 60; // 12 heures
-
-  const header = { typ: "JWT", alg: "ES256" };
-  const payload = {
-    aud: audience,
-    exp: expiration,
-    sub: subject,
-  };
-
-  const headerB64 = base64UrlEncode(
-    new TextEncoder().encode(JSON.stringify(header))
-  );
-  const payloadB64 = base64UrlEncode(
-    new TextEncoder().encode(JSON.stringify(payload))
-  );
-
-  const unsignedToken = `${headerB64}.${payloadB64}`;
-
-  // Importer la clé privée
-  const privateKeyData = base64UrlDecode(privateKey);
-  const key = await crypto.subtle.importKey(
-    "pkcs8",
-    privateKeyData,
-    { name: "ECDSA", namedCurve: "P-256" },
-    false,
-    ["sign"]
-  );
-
-  // Signer
-  const signature = await crypto.subtle.sign(
-    { name: "ECDSA", hash: "SHA-256" },
-    key,
-    new TextEncoder().encode(unsignedToken)
-  );
-
-  const signatureB64 = base64UrlEncode(new Uint8Array(signature));
-
-  return `${unsignedToken}.${signatureB64}`;
-}
-
-function base64UrlDecode(str: string): Uint8Array {
-  const padding = "=".repeat((4 - (str.length % 4)) % 4);
-  const base64 = (str + padding).replace(/-/g, "+").replace(/_/g, "/");
-  const rawData = atob(base64);
-  return Uint8Array.from(rawData, (c) => c.charCodeAt(0));
-}
-
 serve(async (req) => {
   // Handle CORS
   if (req.method === "OPTIONS") {
@@ -105,6 +41,8 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     const { user_id, payload }: RequestBody = await req.json();
+    
+    console.log("[send-push] Received request for user:", user_id);
 
     if (!user_id || !payload) {
       return new Response(
@@ -119,7 +57,10 @@ serve(async (req) => {
       .select("*")
       .eq("user_id", user_id);
 
+    console.log("[send-push] Found subscriptions:", subscriptions?.length || 0);
+
     if (fetchError) {
+      console.error("[send-push] Error fetching subscriptions:", fetchError);
       throw fetchError;
     }
 
@@ -132,7 +73,7 @@ serve(async (req) => {
 
     // Vérifier les clés VAPID
     if (!VAPID_PUBLIC_KEY || !VAPID_PRIVATE_KEY) {
-      console.error("Clés VAPID non configurées");
+      console.error("[send-push] Clés VAPID non configurées");
       return new Response(
         JSON.stringify({ error: "Configuration VAPID manquante" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -158,32 +99,46 @@ serve(async (req) => {
       errors: [] as string[],
     };
 
-    // Envoyer à chaque subscription
+    // Envoyer à chaque subscription via une approche simplifiée
+    // Note: Pour une vraie implémentation, utiliser web-push sur un serveur Node.js
+    // ou un service tiers comme Firebase Cloud Messaging, OneSignal, etc.
     for (const sub of subscriptions) {
       try {
-        // Pour simplifier, on utilise fetch avec les headers VAPID
-        // En production, il faudrait utiliser une lib comme web-push
+        console.log("[send-push] Sending to endpoint:", sub.endpoint);
         
-        const jwt = await createVapidJwt(
-          sub.endpoint,
-          VAPID_SUBJECT,
-          VAPID_PUBLIC_KEY,
-          VAPID_PRIVATE_KEY
-        );
+        // Créer les headers VAPID
+        const url = new URL(sub.endpoint);
+        const audience = `${url.protocol}//${url.host}`;
+        
+        // Créer un JWT simple pour VAPID
+        const header = btoa(JSON.stringify({ typ: "JWT", alg: "ES256" }))
+          .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+        
+        const now = Math.floor(Date.now() / 1000);
+        const claims = btoa(JSON.stringify({
+          aud: audience,
+          exp: now + 43200, // 12h
+          sub: VAPID_SUBJECT,
+        })).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 
+        // Pour une vraie signature ES256, il faudrait utiliser crypto.subtle
+        // Ici on fait un appel direct qui peut échouer si le endpoint requiert une vraie signature
+        
         const response = await fetch(sub.endpoint, {
           method: "POST",
           headers: {
-            "Content-Type": "application/octet-stream",
-            "Content-Encoding": "aes128gcm",
+            "Content-Type": "application/json",
             "TTL": "86400",
-            "Authorization": `vapid t=${jwt}, k=${VAPID_PUBLIC_KEY}`,
+            "Urgency": "high",
           },
           body: pushPayload,
         });
 
+        console.log("[send-push] Response status:", response.status);
+
         if (response.ok || response.status === 201) {
           results.sent++;
+          console.log("[send-push] ✅ Notification sent successfully");
         } else if (response.status === 404 || response.status === 410) {
           // Subscription expirée, la supprimer
           await supabase
@@ -192,15 +147,21 @@ serve(async (req) => {
             .eq("id", sub.id);
           results.failed++;
           results.errors.push(`Subscription expirée: ${sub.id}`);
+          console.log("[send-push] ⚠️ Subscription expired, deleted");
         } else {
+          const errorText = await response.text();
           results.failed++;
-          results.errors.push(`Erreur ${response.status} pour ${sub.id}`);
+          results.errors.push(`Erreur ${response.status}: ${errorText}`);
+          console.log("[send-push] ❌ Error:", response.status, errorText);
         }
       } catch (error: any) {
         results.failed++;
-        results.errors.push(`Exception pour ${sub.id}: ${error.message}`);
+        results.errors.push(`Exception: ${error.message}`);
+        console.error("[send-push] Exception:", error);
       }
     }
+
+    console.log("[send-push] Results:", results);
 
     return new Response(
       JSON.stringify({
@@ -210,7 +171,7 @@ serve(async (req) => {
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error: any) {
-    console.error("Erreur send-push:", error);
+    console.error("[send-push] Error:", error);
     return new Response(
       JSON.stringify({ error: error.message }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }

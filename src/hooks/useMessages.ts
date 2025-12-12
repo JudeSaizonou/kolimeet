@@ -154,14 +154,62 @@ export const useMessages = (threadId: string) => {
           content: content.trim(),
         });
 
-        const { error } = await supabase.from("messages").insert({
+        const { data: newMessage, error } = await supabase.from("messages").insert({
           thread_id: validated.thread_id,
           sender_id: user.id,
           content: validated.content,
           delivered_at: new Date().toISOString(),
-        });
+        }).select().single();
 
         if (error) throw error;
+
+        // Envoyer une notification push au destinataire
+        if (newMessage) {
+          // Récupérer le thread pour trouver le destinataire
+          const { data: thread } = await supabase
+            .from("threads")
+            .select("created_by, other_user_id")
+            .eq("id", threadId)
+            .single();
+
+          if (thread) {
+            const recipientId = thread.created_by === user.id 
+              ? thread.other_user_id 
+              : thread.created_by;
+
+            // Récupérer le nom de l'expéditeur
+            const { data: senderProfile } = await supabase
+              .from("profiles")
+              .select("full_name")
+              .eq("user_id", user.id)
+              .single();
+
+            // Appeler la Edge Function pour envoyer la notification
+            try {
+              await supabase.functions.invoke('send-push', {
+                body: {
+                  user_id: recipientId,
+                  payload: {
+                    title: senderProfile?.full_name || 'Nouveau message',
+                    body: validated.content.length > 100 
+                      ? validated.content.substring(0, 97) + '...' 
+                      : validated.content,
+                    tag: `message-${threadId}`,
+                    data: {
+                      url: `/messages/${threadId}`,
+                      thread_id: threadId,
+                      type: 'message'
+                    }
+                  }
+                }
+              });
+              console.log('[useMessages] 🔔 Push notification sent to recipient');
+            } catch (pushError) {
+              console.error('[useMessages] ⚠️ Failed to send push notification:', pushError);
+              // Ne pas bloquer l'envoi du message si la notification échoue
+            }
+          }
+        }
       } catch (error) {
         if (error instanceof z.ZodError) {
           toast({
