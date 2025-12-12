@@ -12,6 +12,7 @@ import Footer from "./components/layout/Footer";
 import { SuspensionBanner } from "@/components/SuspensionBanner";
 import { PWAInstallBanner } from "@/components/PWAInstallBanner";
 import { OfflineBanner } from "@/components/OfflineBanner";
+import { MessageNotificationListener } from "@/components/notifications/MessageNotificationListener";
 import { useAuth } from "@/hooks/useAuth";
 import Home from "./pages/Home";
 import Explorer from "./pages/Explorer";
@@ -108,6 +109,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <MessageNotificationListener />
         <div className="flex flex-col min-h-screen overflow-x-hidden">
           <Navigation />
           <MobileHeader />
