@@ -20,23 +20,24 @@ export function useMessageNotifications() {
   }, [location.pathname]);
 
   useEffect(() => {
-    if (!user) return;
-
-    // Vérifier si les notifications sont supportées et autorisées
-    const canNotify = 
-      'Notification' in window && 
-      Notification.permission === 'granted';
-
-    if (!canNotify) {
-      console.log('[MessageNotifications] Notifications non disponibles ou non autorisées');
+    if (!user) {
+      console.log('[MessageNotifications] Pas d\'utilisateur connecté');
       return;
     }
 
+    // Vérifier si les notifications sont supportées
+    const isSupported = 'Notification' in window;
+    if (!isSupported) {
+      console.log('[MessageNotifications] Notifications non supportées par ce navigateur');
+      return;
+    }
+
+    console.log('[MessageNotifications] Permission actuelle:', Notification.permission);
     console.log('[MessageNotifications] Démarrage de l\'écoute des messages pour', user.id);
 
     // Écouter tous les nouveaux messages
     const channel = supabase
-      .channel('message-notifications')
+      .channel(`user-messages-${user.id}`)
       .on(
         'postgres_changes',
         {
@@ -45,6 +46,8 @@ export function useMessageNotifications() {
           table: 'messages',
         },
         async (payload) => {
+          console.log('[MessageNotifications] 📨 Nouveau message reçu:', payload);
+          
           const newMessage = payload.new as {
             id: string;
             thread_id: string;
@@ -55,24 +58,36 @@ export function useMessageNotifications() {
 
           // Ignorer si c'est notre propre message
           if (newMessage.sender_id === user.id) {
+            console.log('[MessageNotifications] Message de nous-même, ignoré');
             return;
           }
 
           // Vérifier si on est destinataire de ce thread
-          const { data: thread } = await supabase
+          const { data: thread, error: threadError } = await supabase
             .from('threads')
             .select('created_by, other_user_id')
             .eq('id', newMessage.thread_id)
             .single();
 
-          if (!thread) return;
+          if (threadError) {
+            console.error('[MessageNotifications] Erreur récupération thread:', threadError);
+            return;
+          }
+
+          if (!thread) {
+            console.log('[MessageNotifications] Thread non trouvé');
+            return;
+          }
 
           // Vérifier si l'utilisateur fait partie de ce thread
           const isRecipient = 
             thread.created_by === user.id || 
             thread.other_user_id === user.id;
 
-          if (!isRecipient) return;
+          if (!isRecipient) {
+            console.log('[MessageNotifications] Pas destinataire de ce thread');
+            return;
+          }
 
           // Ne pas notifier si on est déjà dans cette conversation
           if (currentThreadRef.current === newMessage.thread_id) {
@@ -92,34 +107,54 @@ export function useMessageNotifications() {
             ? newMessage.content.substring(0, 47) + '...'
             : newMessage.content;
 
-          console.log('[MessageNotifications] 🔔 Nouveau message de', senderName);
+          console.log('[MessageNotifications] 🔔 Affichage notification pour message de', senderName);
 
-          // Afficher la notification via le Service Worker
+          // Vérifier la permission avant d'afficher
+          if (Notification.permission !== 'granted') {
+            console.log('[MessageNotifications] Permission non accordée, demande...');
+            const permission = await Notification.requestPermission();
+            if (permission !== 'granted') {
+              console.log('[MessageNotifications] Permission refusée');
+              return;
+            }
+          }
+
+          // Afficher la notification via le Service Worker si disponible
           try {
-            const registration = await navigator.serviceWorker.ready;
-            await registration.showNotification(senderName, {
-              body: messagePreview,
-              icon: senderProfile?.avatar_url || '/icon-192.png',
-              badge: '/icon-192.png',
-              tag: `message-${newMessage.thread_id}`,
-              data: {
-                url: `/messages/${newMessage.thread_id}`,
-                thread_id: newMessage.thread_id,
-                type: 'message'
-              },
-              vibrate: [200, 100, 200],
-              requireInteraction: false,
-              silent: false,
-            } as NotificationOptions);
-          } catch (error) {
-            console.error('[MessageNotifications] Erreur affichage notification:', error);
-            
-            // Fallback: notification via l'API Notification standard
-            try {
+            if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+              const registration = await navigator.serviceWorker.ready;
+              await registration.showNotification(senderName, {
+                body: messagePreview,
+                icon: senderProfile?.avatar_url || '/icon-192.png',
+                badge: '/icon-192.png',
+                tag: `message-${newMessage.thread_id}`,
+                data: {
+                  url: `/messages/${newMessage.thread_id}`,
+                  thread_id: newMessage.thread_id,
+                  type: 'message'
+                },
+                vibrate: [200, 100, 200],
+                requireInteraction: false,
+              } as NotificationOptions);
+              console.log('[MessageNotifications] ✅ Notification affichée via SW');
+            } else {
+              // Fallback: notification via l'API Notification standard
+              console.log('[MessageNotifications] SW non disponible, utilisation de Notification API');
               new Notification(senderName, {
                 body: messagePreview,
                 icon: '/icon-192.png',
                 tag: `message-${newMessage.thread_id}`,
+              });
+              console.log('[MessageNotifications] ✅ Notification affichée via Notification API');
+            }
+          } catch (error) {
+            console.error('[MessageNotifications] Erreur affichage notification:', error);
+            
+            // Dernier fallback
+            try {
+              new Notification(senderName, {
+                body: messagePreview,
+                icon: '/icon-192.png',
               });
             } catch (fallbackError) {
               console.error('[MessageNotifications] Fallback échoué:', fallbackError);
@@ -127,8 +162,14 @@ export function useMessageNotifications() {
           }
         }
       )
-      .subscribe((status) => {
+      .subscribe((status, err) => {
         console.log('[MessageNotifications] 📡 Subscription status:', status);
+        if (err) {
+          console.error('[MessageNotifications] ❌ Subscription error:', err);
+        }
+        if (status === 'SUBSCRIBED') {
+          console.log('[MessageNotifications] ✅ Connecté à Realtime, prêt à recevoir des messages');
+        }
       });
 
     return () => {
