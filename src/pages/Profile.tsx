@@ -16,7 +16,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { Camera, Star, LogOut, EyeOff, ChevronRight, Shield, Settings, HelpCircle, Phone, MapPin, Bell } from "lucide-react";
 import { PhoneVerification } from "@/components/profile/PhoneVerification";
-import { NotificationToggle } from "@/components/notifications/NotificationToggle";
+import { OneSignalNotificationToggle } from "@/components/notifications/OneSignalNotificationToggle";
 import { useNavigate } from "react-router-dom";
 import { countries, citiesByCountry } from "@/lib/data/countries";
 import { TrustBadge, MyReferralsSection } from "@/components/trust";
@@ -383,7 +383,7 @@ const Profile = () => {
           </div>
 
           {/* Notifications intégré */}
-          <NotificationToggle />
+          <OneSignalNotificationToggle />
         </div>
 
         {/* Boutons d'action */}

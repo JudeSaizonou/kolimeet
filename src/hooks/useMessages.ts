@@ -154,6 +154,13 @@ export const useMessages = (threadId: string) => {
           content: content.trim(),
         });
 
+        // Récupérer les infos du thread pour connaître le destinataire
+        const { data: thread } = await supabase
+          .from("threads")
+          .select("created_by, other_user_id")
+          .eq("id", threadId)
+          .single();
+
         const { error } = await supabase.from("messages").insert({
           thread_id: validated.thread_id,
           sender_id: user.id,
@@ -163,7 +170,46 @@ export const useMessages = (threadId: string) => {
 
         if (error) throw error;
         
-        // Les notifications sont gérées via Realtime dans useMessageNotifications
+        // Envoyer la notification push via OneSignal
+        if (thread) {
+          const recipientId = thread.created_by === user.id 
+            ? thread.other_user_id 
+            : thread.created_by;
+          
+          if (recipientId) {
+            // Récupérer le nom de l'expéditeur
+            const { data: senderProfile } = await supabase
+              .from("profiles")
+              .select("full_name")
+              .eq("user_id", user.id)
+              .single();
+            
+            const senderName = senderProfile?.full_name || "Quelqu'un";
+            const messagePreview = validated.content.length > 50 
+              ? validated.content.substring(0, 47) + "..." 
+              : validated.content;
+            
+            // Appeler l'Edge Function OneSignal
+            supabase.functions.invoke("send-onesignal-notification", {
+              body: {
+                recipientUserId: recipientId,
+                title: senderName,
+                message: messagePreview,
+                url: `/messages/${threadId}`,
+                data: {
+                  type: "message",
+                  thread_id: threadId,
+                },
+              },
+            }).then(({ error: notifError }) => {
+              if (notifError) {
+                console.log("[useMessages] Push notification error (non-blocking):", notifError);
+              } else {
+                console.log("[useMessages] ✅ Push notification sent to:", recipientId);
+              }
+            });
+          }
+        }
       } catch (error) {
         if (error instanceof z.ZodError) {
           toast({
