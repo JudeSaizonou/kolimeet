@@ -14,6 +14,8 @@ interface Message {
   is_read: boolean;
   delivered_at?: string | null;
   read_at?: string | null;
+  message_type?: string | null;
+  reservation_request_id?: string | null;
 }
 
 export const useMessages = (threadId: string) => {

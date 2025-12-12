@@ -283,6 +283,10 @@ const MessageThread = () => {
 
       {/* Messages scrollables - Full-screen mobile, auto desktop */}
       <div className="flex-1 overflow-y-auto overscroll-contain px-4 py-4 md:px-6 md:max-h-[calc(100vh-20rem)]">
+        {/* Debug logs */}
+        {console.log('[MessageThread] Messages:', messages.map(m => ({ id: m.id, type: m.message_type, reqId: m.reservation_request_id })))}
+        {console.log('[MessageThread] Requests:', requests.map(r => ({ id: r.id, messageId: r.message_id, status: r.status })))}
+        
         {messages.length === 0 ? (
           <div className="flex items-center justify-center h-full">
             <div className="text-center space-y-2">
@@ -321,9 +325,21 @@ const MessageThread = () => {
               };
 
               // Vérifier si le message est lié à une demande de réservation
-              const relatedRequest = requests.find(
-                (req) => req.message_id === message.id
-              );
+              // Option 1: Le message a un reservation_request_id
+              // Option 2: Une request a ce message_id
+              let relatedRequest = null;
+              
+              if (message.reservation_request_id) {
+                relatedRequest = requests.find(
+                  (req) => req.id === message.reservation_request_id
+                );
+              }
+              
+              if (!relatedRequest) {
+                relatedRequest = requests.find(
+                  (req) => req.message_id === message.id
+                );
+              }
 
               if (relatedRequest) {
                 // Ne pas afficher les demandes annulées
