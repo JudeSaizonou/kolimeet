@@ -3,6 +3,18 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useLocation } from 'react-router-dom';
 
+// Détecter si on est sur iOS
+const isIOS = () => {
+  return /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+};
+
+// Détecter si on est en mode PWA (standalone)
+const isPWA = () => {
+  return window.matchMedia('(display-mode: standalone)').matches ||
+    (window.navigator as any).standalone === true;
+};
+
 /**
  * Hook pour recevoir des notifications locales quand un nouveau message arrive
  * Utilise Supabase Realtime pour écouter les nouveaux messages
@@ -27,6 +39,17 @@ export function useMessageNotifications() {
 
     // Vérifier si les notifications sont supportées
     const isSupported = 'Notification' in window;
+    const onIOS = isIOS();
+    const inPWA = isPWA();
+    
+    console.log('[MessageNotifications] Configuration:', {
+      isSupported,
+      isIOS: onIOS,
+      isPWA: inPWA,
+      serviceWorker: 'serviceWorker' in navigator,
+      swController: navigator.serviceWorker?.controller ? 'yes' : 'no'
+    });
+    
     if (!isSupported) {
       console.log('[MessageNotifications] Notifications non supportées par ce navigateur');
       return;
@@ -116,27 +139,41 @@ export function useMessageNotifications() {
             return;
           }
 
-          // Afficher la notification via le Service Worker si disponible
+          // Afficher la notification
           try {
-            if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-              const registration = await navigator.serviceWorker.ready;
-              await registration.showNotification(senderName, {
-                body: messagePreview,
-                icon: senderProfile?.avatar_url || '/icon-192.png',
-                badge: '/icon-192.png',
-                tag: `message-${newMessage.thread_id}`,
-                data: {
-                  url: `/messages/${newMessage.thread_id}`,
-                  thread_id: newMessage.thread_id,
-                  type: 'message'
-                },
-                vibrate: [200, 100, 200],
-                requireInteraction: false,
-              } as NotificationOptions);
-              console.log('[MessageNotifications] ✅ Notification affichée via SW');
-            } else {
-              // Fallback: notification via l'API Notification standard
-              console.log('[MessageNotifications] SW non disponible, utilisation de Notification API');
+            // Sur iOS PWA, on doit utiliser le Service Worker
+            const swReady = 'serviceWorker' in navigator;
+            let notificationShown = false;
+            
+            if (swReady) {
+              try {
+                const registration = await navigator.serviceWorker.ready;
+                console.log('[MessageNotifications] SW ready, showing notification via SW');
+                
+                await registration.showNotification(senderName, {
+                  body: messagePreview,
+                  icon: '/icon-192.png',
+                  badge: '/icon-192.png',
+                  tag: `message-${newMessage.thread_id}`,
+                  data: {
+                    url: `/messages/${newMessage.thread_id}`,
+                    thread_id: newMessage.thread_id,
+                    type: 'message'
+                  },
+                  vibrate: [200, 100, 200],
+                  requireInteraction: false,
+                } as NotificationOptions);
+                
+                notificationShown = true;
+                console.log('[MessageNotifications] ✅ Notification affichée via SW');
+              } catch (swError) {
+                console.error('[MessageNotifications] Erreur SW notification:', swError);
+              }
+            }
+            
+            // Fallback: notification via l'API Notification standard (ne fonctionne pas sur iOS PWA)
+            if (!notificationShown && !isIOS()) {
+              console.log('[MessageNotifications] Fallback: Notification API standard');
               new Notification(senderName, {
                 body: messagePreview,
                 icon: '/icon-192.png',
@@ -146,16 +183,6 @@ export function useMessageNotifications() {
             }
           } catch (error) {
             console.error('[MessageNotifications] Erreur affichage notification:', error);
-            
-            // Dernier fallback
-            try {
-              new Notification(senderName, {
-                body: messagePreview,
-                icon: '/icon-192.png',
-              });
-            } catch (fallbackError) {
-              console.error('[MessageNotifications] Fallback échoué:', fallbackError);
-            }
           }
         }
       )

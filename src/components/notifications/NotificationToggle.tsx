@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Bell, BellOff, Loader2, AlertCircle } from 'lucide-react';
+import { Bell, BellOff, Loader2, AlertCircle, Info } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
@@ -7,6 +7,27 @@ import { cn } from '@/lib/utils';
 interface NotificationToggleProps {
   compact?: boolean;
 }
+
+// Détecter si on est sur iOS
+const isIOS = () => {
+  return /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+};
+
+// Détecter si on est en mode PWA (standalone)
+const isPWA = () => {
+  return window.matchMedia('(display-mode: standalone)').matches ||
+    (window.navigator as any).standalone === true;
+};
+
+// Vérifier si iOS supporte les notifications (iOS 16.4+)
+const getIOSVersion = () => {
+  const match = navigator.userAgent.match(/OS (\d+)_(\d+)/);
+  if (match) {
+    return { major: parseInt(match[1]), minor: parseInt(match[2]) };
+  }
+  return null;
+};
 
 /**
  * Composant simple pour activer/désactiver les notifications locales
@@ -17,15 +38,43 @@ export function NotificationToggle({ compact = false }: NotificationToggleProps)
   const [isSupported, setIsSupported] = useState(false);
   const [permission, setPermission] = useState<NotificationPermission>('default');
   const [loading, setLoading] = useState(false);
+  const [iosInfo, setIosInfo] = useState<{ isIOS: boolean; isPWA: boolean; version: { major: number; minor: number } | null }>({
+    isIOS: false,
+    isPWA: false,
+    version: null
+  });
 
   useEffect(() => {
     // Vérifier le support
     const supported = 'Notification' in window;
-    setIsSupported(supported);
+    const iosDevice = isIOS();
+    const pwaMode = isPWA();
+    const iosVer = getIOSVersion();
+    
+    setIosInfo({ isIOS: iosDevice, isPWA: pwaMode, version: iosVer });
+    
+    // Sur iOS en PWA, les notifications ne sont supportées qu'à partir d'iOS 16.4
+    if (iosDevice && pwaMode) {
+      if (iosVer && (iosVer.major > 16 || (iosVer.major === 16 && iosVer.minor >= 4))) {
+        setIsSupported(supported);
+      } else {
+        setIsSupported(false);
+      }
+    } else {
+      setIsSupported(supported);
+    }
     
     if (supported) {
       setPermission(Notification.permission);
     }
+    
+    console.log('[NotificationToggle] Setup:', {
+      supported,
+      isIOS: iosDevice,
+      isPWA: pwaMode,
+      iosVersion: iosVer,
+      permission: supported ? Notification.permission : 'N/A'
+    });
   }, []);
 
   const requestPermission = useCallback(async () => {
@@ -88,6 +137,21 @@ export function NotificationToggle({ compact = false }: NotificationToggleProps)
   };
 
   const isEnabled = permission === 'granted';
+  
+  // Message d'information pour iOS
+  const getStatusMessage = () => {
+    if (!isSupported) {
+      if (iosInfo.isIOS && iosInfo.isPWA) {
+        if (!iosInfo.version || iosInfo.version.major < 16 || (iosInfo.version.major === 16 && iosInfo.version.minor < 4)) {
+          return 'iOS 16.4+ requis';
+        }
+      }
+      return 'Non supportées';
+    }
+    if (isEnabled) return 'Activées';
+    if (permission === 'denied') return 'Bloquées';
+    return 'Désactivées';
+  };
 
   // Mode compact pour intégration dans la page profil
   if (compact) {
@@ -109,13 +173,7 @@ export function NotificationToggle({ compact = false }: NotificationToggleProps)
           <div>
             <p className="text-sm font-medium text-slate-900">Notifications</p>
             <p className="text-xs text-slate-500">
-              {!isSupported 
-                ? 'Non supportées' 
-                : isEnabled 
-                  ? 'Activées' 
-                  : permission === 'denied' 
-                    ? 'Bloquées' 
-                    : 'Désactivées'}
+              {getStatusMessage()}
             </p>
           </div>
         </div>
