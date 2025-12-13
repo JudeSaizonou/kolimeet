@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -90,19 +90,7 @@ export function useReferrals() {
   const [pendingRequests, setPendingRequests] = useState<PendingRequest[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (!user) {
-      setReferrers([]);
-      setReferrals([]);
-      setPendingRequests([]);
-      setLoading(false);
-      return;
-    }
-
-    fetchReferrals();
-  }, [user]);
-
-  const fetchReferrals = async () => {
+  const fetchReferrals = useCallback(async () => {
     if (!user) return;
 
     setLoading(true);
@@ -233,7 +221,40 @@ export function useReferrals() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
+
+  useEffect(() => {
+    if (!user) {
+      setReferrers([]);
+      setReferrals([]);
+      setPendingRequests([]);
+      setLoading(false);
+      return;
+    }
+
+    fetchReferrals();
+
+    // Temps réel : écouter les changements de parrainages
+    const channel = supabase
+      .channel(`referrals-${user.id}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'referrals' },
+        (payload) => {
+          const ref = payload.new as any;
+          // Rafraîchir si le parrainage concerne l'utilisateur
+          if (ref?.referrer_id === user.id || ref?.referred_id === user.id) {
+            console.log('[useReferrals] 🔔 Referral changed, refetching...');
+            fetchReferrals();
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user, fetchReferrals]);
 
   const sendReferralRequest = async (
     referredId: string, 

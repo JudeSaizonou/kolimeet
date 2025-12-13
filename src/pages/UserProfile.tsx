@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -33,13 +33,9 @@ export default function UserProfile() {
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
   const [referrers, setReferrers] = useState<any[]>([]);
 
-  useEffect(() => {
-    if (userId) {
-      loadProfile();
-    }
-  }, [userId]);
-
-  async function loadProfile() {
+  const loadProfile = useCallback(async () => {
+    if (!userId) return;
+    
     try {
       setLoading(true);
       const { data, error } = await supabase
@@ -61,7 +57,48 @@ export default function UserProfile() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [userId, getReferrersForUser]);
+
+  useEffect(() => {
+    if (userId) {
+      loadProfile();
+
+      // Temps réel : écouter les changements du profil de cet utilisateur
+      const channel = supabase
+        .channel(`user-profile-${userId}`)
+        .on(
+          'postgres_changes',
+          { 
+            event: '*', 
+            schema: 'public', 
+            table: 'profiles',
+            filter: `user_id=eq.${userId}`
+          },
+          () => {
+            console.log('[UserProfile] 🔔 User profile changed, reloading...');
+            loadProfile();
+          }
+        )
+        .on(
+          'postgres_changes',
+          { 
+            event: '*', 
+            schema: 'public', 
+            table: 'reviews',
+            filter: `target_user_id=eq.${userId}`
+          },
+          () => {
+            console.log('[UserProfile] 🔔 Reviews changed, reloading...');
+            loadProfile();
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    }
+  }, [userId, loadProfile]);
 
   if (loading) {
     return (

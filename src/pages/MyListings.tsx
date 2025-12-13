@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -53,7 +53,7 @@ const MyListings = () => {
   const { deleteParcel, toggleParcelStatus } = useParcels();
   const navigate = useNavigate();
 
-  const fetchMyListings = async () => {
+  const fetchMyListings = useCallback(async () => {
     setLoading(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -71,11 +71,53 @@ const MyListings = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchMyListings();
-  }, []);
+
+    // Temps réel : écouter les changements de mes annonces
+    const setupRealtime = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const channel = supabase
+        .channel(`my-listings-${user.id}`)
+        .on(
+          'postgres_changes',
+          { 
+            event: '*', 
+            schema: 'public', 
+            table: 'trips',
+            filter: `user_id=eq.${user.id}`
+          },
+          () => {
+            console.log('[MyListings] 🔔 My trips changed, refreshing...');
+            fetchMyListings();
+          }
+        )
+        .on(
+          'postgres_changes',
+          { 
+            event: '*', 
+            schema: 'public', 
+            table: 'parcels',
+            filter: `user_id=eq.${user.id}`
+          },
+          () => {
+            console.log('[MyListings] 🔔 My parcels changed, refreshing...');
+            fetchMyListings();
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    };
+
+    setupRealtime();
+  }, [fetchMyListings]);
 
   const handleDeleteTrip = async (id: string) => {
     await deleteTrip(id);

@@ -92,6 +92,22 @@ All colors MUST be HSL.
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Empêcher le zoom sur iOS lors du focus sur les inputs */
+  /* Tous les éléments de formulaire doivent avoir au moins 16px sur mobile */
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+
+  @media (min-width: 768px) {
+    input,
+    textarea,
+    select {
+      font-size: 14px !important;
+    }
+  }
 }
 
 /* Animations 3D pour la landing page */

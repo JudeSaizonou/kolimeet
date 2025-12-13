@@ -2,9 +2,10 @@
 -- Quand un message est inséré, on appelle l'Edge Function send-onesignal-notification
 -- Utilise supabase_functions.http_request (méthode officielle)
 
--- Supprimer l'ancien trigger et fonction s'ils existent
+-- Supprimer l'ancien trigger et fonction s'ils existent (CASCADE pour supprimer les dépendances)
 DROP TRIGGER IF EXISTS on_new_message_notify ON messages;
-DROP FUNCTION IF EXISTS notify_new_message();
+DROP TRIGGER IF EXISTS on_new_message_push_notification ON messages;
+DROP FUNCTION IF EXISTS notify_new_message() CASCADE;
 
 -- Fonction qui prépare le payload et appelle l'Edge Function
 CREATE OR REPLACE FUNCTION notify_new_message()

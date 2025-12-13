@@ -1580,3 +1580,7 @@ export const Constants = {
     },
   },
 } as const
+
+// Types utilitaires pour les composants
+export type ReservationRequest = Database["public"]["Tables"]["reservation_requests"]["Row"];
+export type ReservationRequestStatus = Database["public"]["Enums"]["reservation_request_status"];

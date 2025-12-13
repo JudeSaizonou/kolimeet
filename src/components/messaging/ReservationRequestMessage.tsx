@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Package, DollarSign, CheckCircle, XCircle, MessageSquare } from "lucide-react";
+import { Package, DollarSign, CheckCircle, XCircle, MessageSquare, Wallet, AlertCircle, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -30,21 +30,29 @@ export function ReservationRequestMessage({ request, onUpdate }: ReservationRequ
   console.log('[ReservationRequest] isDriver:', isDriver, 'isRequester:', isRequester);
   console.log('[ReservationRequest] Status:', request.status);
 
+  // Déterminer si c'est une contre-offre
+  const isCounterOffer = request.status === 'counter_offered';
+
   // Fonctions d'action
   const handleAccept = async () => {
     if (!user) return;
     setLoading(true);
 
     try {
+      // Utiliser la bonne fonction selon le cas
+      // - Pour une demande normale (pending) : seul le driver peut accepter
+      // - Pour une contre-offre : seul le requester peut accepter
+      const rpcFunction = isCounterOffer ? "accept_counter_offer" : "accept_reservation_request";
+      
       // @ts-ignore - Function exists in DB but not in types yet
-      const { error } = await supabase.rpc("accept_reservation_request", {
+      const { error } = await supabase.rpc(rpcFunction, {
         p_request_id: request.id,
       });
 
       if (error) throw error;
 
       toast({
-        title: "Demande acceptée",
+        title: isCounterOffer ? "Contre-offre acceptée" : "Demande acceptée",
         description: "Une réservation a été créée",
       });
 
@@ -65,16 +73,19 @@ export function ReservationRequestMessage({ request, onUpdate }: ReservationRequ
     setLoading(true);
 
     try {
+      // Utiliser la bonne fonction selon le cas
+      const rpcFunction = isCounterOffer ? "decline_counter_offer" : "decline_reservation_request";
+      
       // @ts-ignore - Function exists in DB but not in types yet
-      const { error } = await supabase.rpc("decline_reservation_request", {
+      const { error } = await supabase.rpc(rpcFunction, {
         p_request_id: request.id,
       });
 
       if (error) throw error;
 
       toast({
-        title: "Demande refusée",
-        description: "Le demandeur a été notifié",
+        title: isCounterOffer ? "Contre-offre refusée" : "Demande refusée",
+        description: isCounterOffer ? "Le voyageur a été notifié" : "Le demandeur a été notifié",
       });
 
       onUpdate?.();
@@ -132,8 +143,8 @@ export function ReservationRequestMessage({ request, onUpdate }: ReservationRequ
     return <Badge variant={badge.variant}>{badge.label}</Badge>;
   };
 
-  // Type de demande
-  const isCounterOffer = !!request.parent_request_id;
+  // Type de demande (pour l'affichage - basé sur parent_request_id)
+  const isCounterOfferMessage = !!request.parent_request_id;
 
   return (
     <div
@@ -145,19 +156,21 @@ export function ReservationRequestMessage({ request, onUpdate }: ReservationRequ
           ? "bg-green-50 border-green-500"
           : request.status === "declined"
           ? "bg-red-50 border-red-500"
+          : request.status === "counter_offered"
+          ? "bg-amber-50 border-amber-500"
           : "bg-muted/50 border-muted"
       )}
     >
       {/* Header */}
       <div className="flex items-start justify-between gap-2 mb-3">
         <div className="flex items-center gap-2">
-          {isCounterOffer ? (
+          {isCounterOfferMessage ? (
             <MessageSquare className="h-5 w-5 text-primary" />
           ) : (
             <Package className="h-5 w-5 text-primary" />
           )}
           <span className="font-semibold text-sm uppercase tracking-wide text-muted-foreground">
-            {isCounterOffer ? "Contre-proposition" : "Demande de réservation"}
+            {isCounterOfferMessage ? "Contre-proposition" : "Demande de réservation"}
           </span>
         </div>
         {getStatusBadge()}
@@ -206,9 +219,13 @@ export function ReservationRequestMessage({ request, onUpdate }: ReservationRequ
                 onClick={handleAccept}
                 disabled={loading}
                 size="sm"
-                className="flex-1 min-w-[100px] h-11"
+                className="flex-1 min-w-[100px] h-11 bg-green-600 hover:bg-green-700"
               >
-                <CheckCircle className="h-4 w-4 mr-2" />
+                {loading ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                )}
                 Accepter
               </Button>
               <Button
@@ -228,46 +245,144 @@ export function ReservationRequestMessage({ request, onUpdate }: ReservationRequ
                 size="sm"
                 className="flex-1 min-w-[100px] h-11"
               >
-                <XCircle className="h-4 w-4 mr-2" />
+                {loading ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <XCircle className="h-4 w-4 mr-2" />
+                )}
                 Refuser
               </Button>
             </>
           )}
 
           {isRequester && (
-            <Button
-              onClick={handleCancel}
-              disabled={loading}
-              variant="outline"
-              size="sm"
-              className="w-full h-11"
-            >
-              <XCircle className="h-4 w-4 mr-2" />
-              Annuler la demande
-            </Button>
+            <div className="w-full space-y-2">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground bg-muted/50 rounded-lg p-2">
+                <AlertCircle className="h-4 w-4 shrink-0" />
+                <span>En attente de réponse du voyageur</span>
+              </div>
+              <Button
+                onClick={handleCancel}
+                disabled={loading}
+                variant="outline"
+                size="sm"
+                className="w-full h-11"
+              >
+                {loading ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <XCircle className="h-4 w-4 mr-2" />
+                )}
+                Annuler la demande
+              </Button>
+            </div>
+          )}
+
+          {/* Si l'utilisateur n'est ni le driver ni le requester, afficher un message */}
+          {!isDriver && !isRequester && (
+            <div className="text-sm text-muted-foreground">
+              Demande en cours de traitement
+            </div>
           )}
         </div>
       )}
 
-      {/* Messages de statut final */}
+      {/* Boutons d'action pour les contre-offres */}
+      {request.status === "counter_offered" && (
+        <div className="flex gap-2 flex-wrap">
+          {/* L'expéditeur peut accepter ou refuser la contre-offre */}
+          {isRequester && (
+            <>
+              <Button
+                onClick={handleAccept}
+                disabled={loading}
+                size="sm"
+                className="flex-1 min-w-[100px] h-11 bg-green-600 hover:bg-green-700"
+              >
+                {loading ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                )}
+                Accepter l'offre
+              </Button>
+              <Button
+                onClick={handleDecline}
+                disabled={loading}
+                variant="destructive"
+                size="sm"
+                className="flex-1 min-w-[100px] h-11"
+              >
+                {loading ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <XCircle className="h-4 w-4 mr-2" />
+                )}
+                Refuser
+              </Button>
+            </>
+          )}
+
+          {/* Le voyageur voit un message d'attente */}
+          {isDriver && (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground bg-muted/50 rounded-lg p-2 w-full">
+              <AlertCircle className="h-4 w-4 shrink-0" />
+              <span>En attente de réponse de l'expéditeur à votre contre-offre</span>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Messages de statut final - ACCEPTÉE */}
       {request.status === "accepted" && (
-        <div className="flex items-center gap-2 text-green-700 font-medium">
-          <CheckCircle className="h-5 w-5" />
-          <span>Réservation créée avec succès</span>
+        <div className="space-y-3">
+          <div className="flex items-center gap-2 text-green-700 font-medium">
+            <CheckCircle className="h-5 w-5" />
+            <span>Réservation confirmée !</span>
+          </div>
+          
+          {/* Récapitulatif de la réservation */}
+          <div className="bg-green-50 dark:bg-green-950/30 rounded-lg p-3 space-y-2">
+            <div className="text-sm font-medium text-green-800 dark:text-green-200">
+              Récapitulatif de la réservation
+            </div>
+            <div className="grid grid-cols-2 gap-2 text-sm">
+              <div className="text-muted-foreground">Poids réservé :</div>
+              <div className="font-medium">{request.kilos_requested} kg</div>
+              <div className="text-muted-foreground">Prix total :</div>
+              <div className="font-medium text-green-700">{request.price_offered} €</div>
+            </div>
+          </div>
+
+          {/* Information sur la consignation */}
+          <div className="flex items-start gap-2 text-sm bg-blue-50 dark:bg-blue-950/30 rounded-lg p-3">
+            <Wallet className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
+            <div className="space-y-1">
+              <p className="font-medium text-blue-800 dark:text-blue-200">
+                {isRequester ? "Prochaine étape : consignation" : "En attente de consignation"}
+              </p>
+              <p className="text-blue-600 dark:text-blue-300">
+                {isRequester 
+                  ? "Vous devrez effectuer la consignation du montant avant le transport. L'argent sera sécurisé et libéré au voyageur après la livraison."
+                  : "L'expéditeur doit effectuer la consignation du montant. Vous serez notifié une fois le paiement sécurisé."
+                }
+              </p>
+            </div>
+          </div>
         </div>
       )}
 
       {request.status === "declined" && (
         <div className="flex items-center gap-2 text-red-700 font-medium">
           <XCircle className="h-5 w-5" />
-          <span>Demande refusée</span>
+          <span>Demande refusée par le voyageur</span>
         </div>
       )}
 
       {request.status === "cancelled" && (
         <div className="flex items-center gap-2 text-muted-foreground font-medium">
           <XCircle className="h-5 w-5" />
-          <span>Demande annulée</span>
+          <span>Demande annulée par l'expéditeur</span>
         </div>
       )}
 

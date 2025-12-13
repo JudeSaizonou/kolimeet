@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -38,37 +38,63 @@ const TripDetail = () => {
   const [ownerReferrers, setOwnerReferrers] = useState<any[]>([]);
   const cardRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const fetchTrip = async () => {
-      try {
-        const { data, error } = await supabase
-          .from("trips")
-          .select("*, profiles!trips_user_id_fkey(full_name, avatar_url, rating_avg, rating_count, trust_score, is_verified)")
-          .eq("id", id)
-          .single();
+  const fetchTrip = useCallback(async () => {
+    if (!id) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from("trips")
+        .select("*, profiles!trips_user_id_fkey(full_name, avatar_url, rating_avg, rating_count, trust_score, is_verified)")
+        .eq("id", id)
+        .single();
 
-        if (error) throw error;
-        setTrip(data);
-        
-        // Charger les parrains du propriétaire du trajet
-        if (data?.user_id) {
-          const referrers = await getReferrersForUser(data.user_id);
-          setOwnerReferrers(referrers);
-        }
-      } catch (error: any) {
-        toast({
-          variant: "destructive",
-          title: "Erreur",
-          description: "Impossible de charger ce trajet.",
-        });
-        navigate("/explorer");
-      } finally {
-        setLoading(false);
+      if (error) throw error;
+      setTrip(data);
+      
+      // Charger les parrains du propriétaire du trajet
+      if (data?.user_id) {
+        const referrers = await getReferrersForUser(data.user_id);
+        setOwnerReferrers(referrers);
       }
-    };
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: "Impossible de charger ce trajet.",
+      });
+      navigate("/explorer");
+    } finally {
+      setLoading(false);
+    }
+  }, [id, navigate, toast, getReferrersForUser]);
 
+  useEffect(() => {
     fetchTrip();
-  }, [id, navigate, toast]);
+
+    // Temps réel : écouter les changements de ce trajet
+    if (id) {
+      const channel = supabase
+        .channel(`trip-detail-${id}`)
+        .on(
+          'postgres_changes',
+          { 
+            event: '*', 
+            schema: 'public', 
+            table: 'trips',
+            filter: `id=eq.${id}`
+          },
+          () => {
+            console.log('[TripDetail] 🔔 Trip changed, reloading...');
+            fetchTrip();
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    }
+  }, [id, fetchTrip]);
 
   const handleContact = async () => {
     if (!user) {
@@ -291,8 +317,8 @@ const TripDetail = () => {
                   <div className="flex items-center gap-2">
                     <h3 className="font-semibold text-sm text-slate-900 truncate">{trip.profiles?.full_name}</h3>
                     <TrustBadge 
-                      score={trip.profiles?.trust_score || 50} 
-                      referrerCount={ownerReferrers.length}
+                      trustScore={trip.profiles?.trust_score || 50} 
+                      referredByCount={ownerReferrers.length}
                       isVerified={trip.profiles?.is_verified}
                       size="sm"
                     />

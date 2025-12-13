@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,6 +15,7 @@ import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { Camera, Star, LogOut, EyeOff, ChevronRight, Shield, Settings, HelpCircle, Phone, MapPin, Bell } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { PhoneVerification } from "@/components/profile/PhoneVerification";
 import { OneSignalNotificationToggle } from "@/components/notifications/OneSignalNotificationToggle";
 import { useNavigate } from "react-router-dom";
@@ -22,6 +23,7 @@ import { countries, citiesByCountry } from "@/lib/data/countries";
 import { TrustBadge, MyReferralsSection } from "@/components/trust";
 
 const Profile = () => {
+  const [initialLoading, setInitialLoading] = useState(true);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState("");
@@ -45,11 +47,7 @@ const Profile = () => {
     navigate("/");
   };
 
-  useEffect(() => {
-    loadProfile();
-  }, []);
-
-  const loadProfile = async () => {
+  const loadProfile = useCallback(async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
@@ -81,8 +79,43 @@ const Profile = () => {
       }
     } catch (error: any) {
       console.error("Error loading profile:", error);
+    } finally {
+      setInitialLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    loadProfile();
+
+    // Temps réel : écouter les changements du profil
+    const setupRealtimeProfile = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const channel = supabase
+        .channel(`profile-${user.id}`)
+        .on(
+          'postgres_changes',
+          { 
+            event: '*', 
+            schema: 'public', 
+            table: 'profiles',
+            filter: `user_id=eq.${user.id}`
+          },
+          () => {
+            console.log('[Profile] 🔔 Profile changed, reloading...');
+            loadProfile();
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    };
+
+    setupRealtimeProfile();
+  }, [loadProfile]);
 
   const uploadAvatar = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -198,37 +231,52 @@ const Profile = () => {
           {/* Avatar centré */}
           <div className="flex flex-col items-center">
             <div className="relative mb-4">
-              <Avatar className="h-24 w-24 ring-4 ring-white shadow-lg">
-                <AvatarImage src={avatarUrl} alt="Avatar" />
-                <AvatarFallback className="bg-primary/10 text-primary text-3xl font-semibold">
-                  {formData.full_name?.charAt(0)?.toUpperCase() || "?"}
-                </AvatarFallback>
-              </Avatar>
-              <label
-                htmlFor="avatar-upload"
-                className="absolute bottom-0 right-0 cursor-pointer w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center shadow-lg active:scale-95 transition-transform border-2 border-white"
-              >
-                <Camera className="h-4 w-4" />
-              </label>
-              <Input
-                id="avatar-upload"
-                type="file"
-                accept="image/*"
-                onChange={uploadAvatar}
-                disabled={uploading}
-                className="hidden"
-              />
+              {initialLoading ? (
+                <Skeleton className="h-24 w-24 rounded-full ring-4 ring-white shadow-lg" />
+              ) : (
+                <>
+                  <Avatar className="h-24 w-24 ring-4 ring-white shadow-lg">
+                    <AvatarImage src={avatarUrl} alt="Avatar" />
+                    <AvatarFallback className="bg-primary/10 text-primary text-3xl font-semibold">
+                      {formData.full_name?.charAt(0)?.toUpperCase() || "?"}
+                    </AvatarFallback>
+                  </Avatar>
+                  <label
+                    htmlFor="avatar-upload"
+                    className="absolute bottom-0 right-0 cursor-pointer w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center shadow-lg active:scale-95 transition-transform border-2 border-white"
+                  >
+                    <Camera className="h-4 w-4" />
+                  </label>
+                  <Input
+                    id="avatar-upload"
+                    type="file"
+                    accept="image/*"
+                    onChange={uploadAvatar}
+                    disabled={uploading}
+                    className="hidden"
+                  />
+                </>
+              )}
             </div>
 
             {/* Nom et localisation */}
-            <h1 className="text-2xl font-bold text-slate-900 text-center">
-              {formData.full_name || "Votre nom"}
-            </h1>
-            {formData.city && formData.country && (
-              <p className="text-sm text-slate-500 flex items-center gap-1 mt-1">
-                <MapPin className="h-4 w-4" />
-                {formData.city}, {formData.country}
-              </p>
+            {initialLoading ? (
+              <>
+                <Skeleton className="h-7 w-40 mt-1" />
+                <Skeleton className="h-4 w-32 mt-2" />
+              </>
+            ) : (
+              <>
+                <h1 className="text-2xl font-bold text-slate-900 text-center">
+                  {formData.full_name || "Votre nom"}
+                </h1>
+                {formData.city && formData.country && (
+                  <p className="text-sm text-slate-500 flex items-center gap-1 mt-1">
+                    <MapPin className="h-4 w-4" />
+                    {formData.city}, {formData.country}
+                  </p>
+                )}
+              </>
             )}
 
             {/* Stats */}

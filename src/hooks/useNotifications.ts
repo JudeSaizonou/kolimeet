@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 
@@ -19,13 +19,9 @@ export const useNotifications = () => {
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (user) {
-      loadMatchNotifications();
-    }
-  }, [user]);
-
-  const loadMatchNotifications = async () => {
+  const loadMatchNotifications = useCallback(async () => {
+    if (!user) return;
+    
     try {
       setLoading(true);
       
@@ -33,15 +29,14 @@ export const useNotifications = () => {
       const { data: allMatches, error } = await supabase
         .from('parcel_matches_detailed')
         .select('*')
-        .or(`parcel_user_id.eq.${user!.id},trip_user_id.eq.${user!.id}`)
+        .or(`parcel_user_id.eq.${user.id},trip_user_id.eq.${user.id}`)
         .eq('status', 'pending')
         .gte('match_score', 50)
         .order('created_at', { ascending: false })
         .limit(20);
 
       if (error) {
-        // Ne pas logger les erreurs 400 (bad request) - souvent dues à des paramètres invalides
-        if (error.code !== 'PGRST116' && error.status !== 400) {
+        if (error.code !== 'PGRST116' && (error as any).status !== 400) {
           console.error('Error loading match notifications:', error);
         }
         return;
@@ -49,13 +44,11 @@ export const useNotifications = () => {
 
       const allNotifications: Notification[] = [];
 
-      // Convertir les correspondances en notifications
       if (allMatches) {
         allMatches.forEach((match: any) => {
-          const isParcelOwner = match.parcel_user_id === user!.id;
+          const isParcelOwner = match.parcel_user_id === user.id;
           
           if (isParcelOwner) {
-            // Notification pour le propriétaire du colis
             allNotifications.push({
               id: match.id,
               type: 'match',
@@ -67,7 +60,6 @@ export const useNotifications = () => {
               created_at: match.created_at,
             });
           } else {
-            // Notification pour le propriétaire du trajet
             allNotifications.push({
               id: match.id,
               type: 'match',
@@ -82,7 +74,6 @@ export const useNotifications = () => {
         });
       }
 
-      // Trier par date
       allNotifications.sort((a, b) => 
         new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
       );
@@ -94,7 +85,41 @@ export const useNotifications = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
+
+  useEffect(() => {
+    if (user) {
+      loadMatchNotifications();
+
+      // Temps réel : écouter les nouvelles correspondances
+      const channel = supabase
+        .channel(`notifications-${user.id}`)
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'parcel_trip_matches' },
+          () => {
+            console.log('[useNotifications] 🔔 Match changed, refetching...');
+            loadMatchNotifications();
+          }
+        )
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'notifications' },
+          (payload) => {
+            const notif = payload.new as any;
+            if (notif && notif.user_id === user.id) {
+              console.log('[useNotifications] 🔔 New notification, refetching...');
+              loadMatchNotifications();
+            }
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    }
+  }, [user, loadMatchNotifications]);
 
   const markAsRead = async (notificationId: string) => {
     // Marquer la correspondance comme vue (acceptée ou rejetée)

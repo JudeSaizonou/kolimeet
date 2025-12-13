@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -41,37 +41,63 @@ const ParcelDetail = () => {
     autre: "Autre",
   };
 
-  useEffect(() => {
-    const fetchParcel = async () => {
-      try {
-        const { data, error } = await supabase
-          .from("parcels")
-          .select("*, profiles!parcels_user_id_fkey(full_name, avatar_url, rating_avg, rating_count, trust_score, is_verified)")
-          .eq("id", id)
-          .single();
+  const fetchParcel = useCallback(async () => {
+    if (!id) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from("parcels")
+        .select("*, profiles!parcels_user_id_fkey(full_name, avatar_url, rating_avg, rating_count, trust_score, is_verified)")
+        .eq("id", id)
+        .single();
 
-        if (error) throw error;
-        setParcel(data);
-        
-        // Charger les parrains du propriétaire du colis
-        if (data?.user_id) {
-          const referrers = await getReferrersForUser(data.user_id);
-          setOwnerReferrers(referrers);
-        }
-      } catch (error: any) {
-        toast({
-          variant: "destructive",
-          title: "Erreur",
-          description: "Impossible de charger ce colis.",
-        });
-        navigate("/explorer");
-      } finally {
-        setLoading(false);
+      if (error) throw error;
+      setParcel(data);
+      
+      // Charger les parrains du propriétaire du colis
+      if (data?.user_id) {
+        const referrers = await getReferrersForUser(data.user_id);
+        setOwnerReferrers(referrers);
       }
-    };
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: "Impossible de charger ce colis.",
+      });
+      navigate("/explorer");
+    } finally {
+      setLoading(false);
+    }
+  }, [id, navigate, toast, getReferrersForUser]);
 
+  useEffect(() => {
     fetchParcel();
-  }, [id, navigate, toast]);
+
+    // Temps réel : écouter les changements de ce colis
+    if (id) {
+      const channel = supabase
+        .channel(`parcel-detail-${id}`)
+        .on(
+          'postgres_changes',
+          { 
+            event: '*', 
+            schema: 'public', 
+            table: 'parcels',
+            filter: `id=eq.${id}`
+          },
+          () => {
+            console.log('[ParcelDetail] 🔔 Parcel changed, reloading...');
+            fetchParcel();
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    }
+  }, [id, fetchParcel]);
 
   // Valider les photos après le chargement
   useEffect(() => {

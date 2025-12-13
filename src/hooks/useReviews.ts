@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 
@@ -16,15 +16,9 @@ export function useReviews(targetUserId: string | null) {
   const [hasMore, setHasMore] = useState(true);
   const ITEMS_PER_PAGE = 10;
 
-  useEffect(() => {
-    if (!targetUserId) {
-      setLoading(false);
-      return;
-    }
-    loadReviews();
-  }, [targetUserId, page]);
-
-  async function loadReviews() {
+  const loadReviews = useCallback(async () => {
+    if (!targetUserId) return;
+    
     try {
       setLoading(true);
       const from = page * ITEMS_PER_PAGE;
@@ -54,7 +48,40 @@ export function useReviews(targetUserId: string | null) {
     } finally {
       setLoading(false);
     }
-  }
+  }, [targetUserId, page]);
+
+  useEffect(() => {
+    if (!targetUserId) {
+      setLoading(false);
+      return;
+    }
+    loadReviews();
+
+    // Temps réel : écouter les nouveaux avis pour cet utilisateur
+    const channel = supabase
+      .channel(`reviews-${targetUserId}`)
+      .on(
+        'postgres_changes',
+        { 
+          event: '*', 
+          schema: 'public', 
+          table: 'reviews',
+          filter: `target_user_id=eq.${targetUserId}`
+        },
+        () => {
+          console.log('[useReviews] 🔔 Review changed, refreshing...');
+          setPage(0);
+          setHasMore(true);
+          setReviews([]);
+          loadReviews();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [targetUserId, loadReviews]);
 
   async function createReview(
     targetUserId: string,
