@@ -369,7 +369,7 @@ const TripDetail = () => {
         </div>
 
         {/* Action Buttons */}
-        <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/95 backdrop-blur-xl border-t z-50 md:relative md:bg-transparent md:border-0 md:p-0 md:backdrop-blur-none safe-area-bottom">
+        <div className="fixed bottom-0 left-0 right-0 p-4 pb-24 bg-gradient-to-t from-background via-background to-transparent md:relative md:bg-transparent md:p-0 md:pb-0 z-40 md:z-auto">
           <div className="container max-w-3xl mx-auto flex gap-3">
             {user?.id === trip.user_id ? (
               <Button 
@@ -390,7 +390,7 @@ const TripDetail = () => {
                 </Button>
                 <Button 
                   variant="outline" 
-                  className="h-14 w-14 rounded-2xl p-0 border-2 touch-manipulation"
+                  className="h-14 w-14 rounded-2xl p-0 border-2 touch-manipulation bg-background"
                   onClick={handleContact}
                 >
                   <MessageCircle className="h-6 w-6" />

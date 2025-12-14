@@ -417,7 +417,7 @@ const ParcelDetail = () => {
         )}
 
         {/* Action Buttons */}
-        <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/95 backdrop-blur-xl border-t z-50 md:relative md:bg-transparent md:border-0 md:p-0 md:backdrop-blur-none safe-area-bottom">
+        <div className="fixed bottom-0 left-0 right-0 p-4 pb-24 bg-gradient-to-t from-background via-background to-transparent md:relative md:bg-transparent md:p-0 md:pb-0 z-40 md:z-auto">
           <div className="container max-w-3xl mx-auto flex gap-3">
             {user?.id === parcel.user_id ? (
               <Button 
@@ -441,7 +441,7 @@ const ParcelDetail = () => {
                   <Button 
                     onClick={() => setReviewDialogOpen(true)} 
                     variant="outline" 
-                    className="h-14 w-14 rounded-2xl p-0 border-2 touch-manipulation"
+                    className="h-14 w-14 rounded-2xl p-0 border-2 touch-manipulation bg-background"
                   >
                     <Star className="w-5 h-5" />
                   </Button>
