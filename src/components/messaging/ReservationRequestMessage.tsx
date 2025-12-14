@@ -12,9 +12,10 @@ import type { ReservationRequest } from "@/integrations/supabase/types";
 interface ReservationRequestMessageProps {
   request: ReservationRequest;
   onUpdate?: () => void;
+  isOwn?: boolean;
 }
 
-export function ReservationRequestMessage({ request, onUpdate }: ReservationRequestMessageProps) {
+export function ReservationRequestMessage({ request, onUpdate, isOwn }: ReservationRequestMessageProps) {
   const { user } = useAuth();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
@@ -118,7 +119,10 @@ export function ReservationRequestMessage({ request, onUpdate }: ReservationRequ
 
   return (
     <div className={cn(
-      "my-3 rounded-2xl border shadow-sm overflow-hidden",
+      // alignment: right for own messages, left for others
+      isOwn ? 'ml-auto' : 'mr-auto',
+      // sizing: behave like a chat bubble with limited width
+      'my-3 w-full max-w-[86%] md:max-w-[520px] rounded-2xl border shadow-sm overflow-hidden',
       statusStyles[request.status]
     )}>
       {/* Header compact */}

@@ -376,6 +376,7 @@ const MessageThread = () => {
                     <ReservationRequestMessage
                       request={relatedRequest}
                       onUpdate={refetchRequests}
+                      isOwn={message.sender_id === user?.id}
                     />
                   </div>
                 );
