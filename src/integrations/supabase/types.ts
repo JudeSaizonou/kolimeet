@@ -12,6 +12,31 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "13.0.5"
   }
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
       bookings: {
@@ -248,6 +273,54 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      notification_preferences: {
+        Row: {
+          created_at: string | null
+          email_bookings: boolean | null
+          email_enabled: boolean | null
+          email_matches: boolean | null
+          email_messages: boolean | null
+          id: string
+          push_bookings: boolean | null
+          push_enabled: boolean | null
+          push_matches: boolean | null
+          push_messages: boolean | null
+          push_reviews: boolean | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          email_bookings?: boolean | null
+          email_enabled?: boolean | null
+          email_matches?: boolean | null
+          email_messages?: boolean | null
+          id?: string
+          push_bookings?: boolean | null
+          push_enabled?: boolean | null
+          push_matches?: boolean | null
+          push_messages?: boolean | null
+          push_reviews?: boolean | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          email_bookings?: boolean | null
+          email_enabled?: boolean | null
+          email_matches?: boolean | null
+          email_messages?: boolean | null
+          id?: string
+          push_bookings?: boolean | null
+          push_enabled?: boolean | null
+          push_matches?: boolean | null
+          push_messages?: boolean | null
+          push_reviews?: boolean | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
       notifications: {
         Row: {
@@ -579,6 +652,36 @@ export type Database = {
           user_id?: string
           verification_status?: string | null
           verified_at?: string | null
+        }
+        Relationships: []
+      }
+      push_subscriptions: {
+        Row: {
+          auth: string
+          created_at: string | null
+          endpoint: string
+          id: string
+          p256dh: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          auth: string
+          created_at?: string | null
+          endpoint: string
+          id?: string
+          p256dh: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          auth?: string
+          created_at?: string | null
+          endpoint?: string
+          id?: string
+          p256dh?: string
+          updated_at?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -1278,6 +1381,7 @@ export type Database = {
       }
     }
     Functions: {
+      accept_counter_offer: { Args: { p_request_id: string }; Returns: string }
       accept_reservation_request: {
         Args: { p_request_id: string }
         Returns: string
@@ -1324,6 +1428,10 @@ export type Database = {
           p_trip_id: string
         }
         Returns: string
+      }
+      decline_counter_offer: {
+        Args: { p_request_id: string }
+        Returns: undefined
       }
       decline_reservation_request: {
         Args: { p_request_id: string }
@@ -1567,6 +1675,9 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user"],
@@ -1581,6 +1692,10 @@ export const Constants = {
   },
 } as const
 
-// Types utilitaires pour les composants
-export type ReservationRequest = Database["public"]["Tables"]["reservation_requests"]["Row"];
-export type ReservationRequestStatus = Database["public"]["Enums"]["reservation_request_status"];
+// Helper types for common use
+export type ReservationRequest = Database["public"]["Tables"]["reservation_requests"]["Row"]
+export type Profile = Database["public"]["Tables"]["profiles"]["Row"]
+export type Trip = Database["public"]["Tables"]["trips"]["Row"]
+export type Parcel = Database["public"]["Tables"]["parcels"]["Row"]
+export type Message = Database["public"]["Tables"]["messages"]["Row"]
+export type Thread = Database["public"]["Tables"]["threads"]["Row"]

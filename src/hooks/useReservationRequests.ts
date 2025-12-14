@@ -108,7 +108,6 @@ export const useReservationRequests = (
     }
 
     try {
-      // @ts-ignore - Function exists in DB but not in types yet
       const { error } = await supabase.rpc("create_reservation_request", {
         p_thread_id: threadId,
         p_trip_id: tripId,
@@ -137,7 +136,6 @@ export const useReservationRequests = (
   // Accepter une demande
   const acceptRequest = async (requestId: string) => {
     try {
-      // @ts-ignore - Function exists in DB but not in types yet
       const { error } = await supabase.rpc("accept_reservation_request", {
         p_request_id: requestId,
       });
@@ -164,7 +162,6 @@ export const useReservationRequests = (
   // Refuser une demande
   const declineRequest = async (requestId: string) => {
     try {
-      // @ts-ignore - Function exists in DB but not in types yet
       const { error } = await supabase.rpc("decline_reservation_request", {
         p_request_id: requestId,
       });
@@ -191,7 +188,6 @@ export const useReservationRequests = (
   // Annuler une demande
   const cancelRequest = async (requestId: string) => {
     try {
-      // @ts-ignore - Function exists in DB but not in types yet
       const { error } = await supabase.rpc("cancel_reservation_request", {
         p_request_id: requestId,
       });
@@ -222,7 +218,6 @@ export const useReservationRequests = (
     justification?: string
   ) => {
     try {
-      // @ts-ignore - Function exists in DB but not in types yet
       const { error } = await supabase.rpc("create_counter_offer", {
         p_request_id: requestId,
         p_new_price: newPrice,

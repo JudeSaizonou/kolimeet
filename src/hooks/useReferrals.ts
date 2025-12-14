@@ -96,7 +96,6 @@ export function useReferrals() {
     setLoading(true);
     try {
       // Récupérer mes parrains (ceux qui m'ont parrainé)
-      // @ts-ignore - Table referrals sera créée après migration
       const { data: myReferrers } = await supabase
         .from('referrals')
         .select(`
@@ -137,7 +136,6 @@ export function useReferrals() {
       }
 
       // Récupérer mes filleuls (ceux que j'ai parrainés)
-      // @ts-ignore - Table referrals sera créée après migration
       const { data: myReferrals } = await supabase
         .from('referrals')
         .select(`
@@ -178,7 +176,6 @@ export function useReferrals() {
       }
 
       // Récupérer les demandes de parrainage en attente
-      // @ts-ignore - Table referrals sera créée après migration
       const { data: pending } = await supabase
         .from('referrals')
         .select(`
@@ -264,7 +261,6 @@ export function useReferrals() {
     if (!user) return { error: 'Non connecté' };
 
     try {
-      // @ts-ignore - Table referrals sera créée après migration
       const { error } = await supabase
         .from('referrals')
         .insert({
@@ -286,7 +282,6 @@ export function useReferrals() {
 
   const acceptReferral = async (referralId: string) => {
     try {
-      // @ts-ignore - Table referrals sera créée après migration
       const { error } = await supabase
         .from('referrals')
         .update({ status: 'accepted' })
@@ -304,7 +299,6 @@ export function useReferrals() {
 
   const declineReferral = async (referralId: string) => {
     try {
-      // @ts-ignore - Table referrals sera créée après migration
       const { error } = await supabase
         .from('referrals')
         .update({ status: 'declined' })
@@ -322,7 +316,6 @@ export function useReferrals() {
 
   const getReferrersForUser = async (userId: string): Promise<ReferrerInfo[]> => {
     try {
-      // @ts-ignore - Table referrals sera créée après migration
       const { data, error } = await supabase
         .from('referrals')
         .select(`
@@ -367,7 +360,6 @@ export function useReferrals() {
     if (!user) return false;
 
     try {
-      // @ts-ignore - Table referrals sera créée après migration
       const { data, error } = await supabase
         .from('referrals')
         .select('id')
@@ -438,7 +430,6 @@ export function useReferrals() {
       }
 
       // 2. Vérifier le nombre de filleuls existants
-      // @ts-ignore
       const { count: referralCount } = await supabase
         .from('referrals')
         .select('id', { count: 'exact', head: true })
@@ -454,7 +445,6 @@ export function useReferrals() {
       }
 
       // 3. Vérifier le délai depuis le dernier parrainage
-      // @ts-ignore
       const { data: lastReferral } = await supabase
         .from('referrals')
         .select('created_at')
@@ -483,7 +473,6 @@ export function useReferrals() {
       }
 
       // 4. Vérifier si un parrainage existe déjà entre ces deux utilisateurs
-      // @ts-ignore
       const { data: existingReferral } = await supabase
         .from('referrals')
         .select('id')
@@ -496,7 +485,6 @@ export function useReferrals() {
       }
 
       // 5. Vérifier que la cible n'a pas déjà trop de parrains
-      // @ts-ignore
       const { count: targetReferrerCount } = await supabase
         .from('referrals')
         .select('id', { count: 'exact', head: true })

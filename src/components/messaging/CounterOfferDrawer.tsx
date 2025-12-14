@@ -77,7 +77,6 @@ export function CounterOfferDrawer({
     setLoading(true);
 
     try {
-      // @ts-ignore - Function exists in DB but not in types yet
       const { error } = await supabase.rpc("create_counter_offer", {
         p_request_id: request.id,
         p_new_price: newTotalPrice,
