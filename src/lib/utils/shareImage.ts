@@ -54,6 +54,24 @@ const buildImageUrl = (payload: ShareImagePayload) => {
 export type ShareImageResult = 'shared' | 'downloaded';
 
 /**
+ * Collecte les styles calculés d'un élément et ses enfants
+ */
+const collectComputedStyles = (element: HTMLElement): Map<Element, CSSStyleDeclaration> => {
+  const stylesMap = new Map<Element, CSSStyleDeclaration>();
+  const allElements = element.querySelectorAll('*');
+  
+  // Collecter les styles de l'élément racine
+  stylesMap.set(element, window.getComputedStyle(element));
+  
+  // Collecter les styles de tous les enfants
+  allElements.forEach((el) => {
+    stylesMap.set(el, window.getComputedStyle(el));
+  });
+  
+  return stylesMap;
+};
+
+/**
  * Génère et retourne le blob de l'image sans la partager
  */
 export const getImageBlob = async (
@@ -67,6 +85,17 @@ export const getImageBlob = async (
       // Attendre un peu pour que les animations se stabilisent
       await new Promise(resolve => setTimeout(resolve, 300));
       
+      // Collecter les styles AVANT le clonage (important!)
+      const originalStyles = collectComputedStyles(payload.element);
+      const elementWidth = payload.element.offsetWidth;
+      const elementHeight = payload.element.offsetHeight;
+      
+      // Collecter les bounding rects de tous les éléments
+      const boundingRects = new Map<Element, DOMRect>();
+      payload.element.querySelectorAll('*').forEach((el) => {
+        boundingRects.set(el, el.getBoundingClientRect());
+      });
+      
       const canvas = await html2canvas(payload.element, {
         backgroundColor: '#ffffff',
         scale: 2,
@@ -76,11 +105,29 @@ export const getImageBlob = async (
         removeContainer: true,
         imageTimeout: 15000,
         onclone: (clonedDoc, clonedElement) => {
-          // Arrêter toutes les animations et stabiliser les positions dans le clone
-          const allElements = clonedDoc.querySelectorAll('*');
-          allElements.forEach((el) => {
-            const htmlEl = el as HTMLElement;
-            const computedStyle = window.getComputedStyle(el);
+          // Appliquer les styles collectés au clone
+          const clonedElements = clonedElement.querySelectorAll('*');
+          const originalElements = Array.from(payload.element!.querySelectorAll('*'));
+          
+          // Appliquer les styles à l'élément racine
+          const rootStyle = originalStyles.get(payload.element!);
+          if (rootStyle) {
+            clonedElement.style.animation = 'none';
+            clonedElement.style.transition = 'none';
+            clonedElement.style.width = `${elementWidth}px`;
+            clonedElement.style.height = `${elementHeight}px`;
+            clonedElement.style.overflow = 'hidden';
+          }
+          
+          // Appliquer les styles à chaque élément cloné
+          clonedElements.forEach((clonedEl, index) => {
+            const htmlEl = clonedEl as HTMLElement;
+            const originalEl = originalElements[index];
+            
+            if (!originalEl) return;
+            
+            const computedStyle = originalStyles.get(originalEl);
+            if (!computedStyle) return;
             
             // Arrêter animations et transitions
             htmlEl.style.animation = 'none';
@@ -88,13 +135,23 @@ export const getImageBlob = async (
             htmlEl.style.animationDelay = '0s';
             htmlEl.style.transitionDelay = '0s';
             
-            // Fixer les transforms à leur état actuel
+            // Fixer les transforms
             if (computedStyle.transform && computedStyle.transform !== 'none') {
               htmlEl.style.transform = computedStyle.transform;
             }
             
-            // S'assurer que les éléments flex gardent leur position
-            if (computedStyle.display === 'flex' || computedStyle.display === 'inline-flex') {
+            // Pour les badges et éléments inline-flex, fixer leur taille exacte
+            if (computedStyle.display === 'inline-flex' || computedStyle.display === 'flex') {
+              const rect = boundingRects.get(originalEl);
+              if (rect) {
+                htmlEl.style.width = `${rect.width}px`;
+                htmlEl.style.height = `${rect.height}px`;
+                htmlEl.style.minWidth = `${rect.width}px`;
+                htmlEl.style.minHeight = `${rect.height}px`;
+                htmlEl.style.maxWidth = `${rect.width}px`;
+                htmlEl.style.maxHeight = `${rect.height}px`;
+              }
+              
               // Convertir gap en margin pour compatibilité html2canvas
               const gap = computedStyle.gap;
               if (gap && gap !== 'normal' && gap !== '0px') {
@@ -113,19 +170,23 @@ export const getImageBlob = async (
               }
             }
             
-            // Fixer les positions absolues/relatives
+            // Fixer les positions absolues/relatives avec leurs coordonnées exactes
             if (computedStyle.position === 'absolute' || computedStyle.position === 'fixed') {
               htmlEl.style.top = computedStyle.top;
               htmlEl.style.left = computedStyle.left;
               htmlEl.style.right = computedStyle.right;
               htmlEl.style.bottom = computedStyle.bottom;
             }
+            
+            // Fixer la taille des textes
+            htmlEl.style.fontSize = computedStyle.fontSize;
+            htmlEl.style.lineHeight = computedStyle.lineHeight;
+            htmlEl.style.fontWeight = computedStyle.fontWeight;
+            
+            // Fixer padding et margin
+            htmlEl.style.padding = computedStyle.padding;
+            htmlEl.style.margin = computedStyle.margin;
           });
-          
-          // S'assurer que l'élément racine cloné a une taille fixe
-          clonedElement.style.width = `${payload.element!.offsetWidth}px`;
-          clonedElement.style.height = `${payload.element!.offsetHeight}px`;
-          clonedElement.style.overflow = 'hidden';
         },
       });
       
