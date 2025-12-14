@@ -75,14 +75,57 @@ export const getImageBlob = async (
         allowTaint: false,
         removeContainer: true,
         imageTimeout: 15000,
-        onclone: (clonedDoc) => {
-          // Arrêter toutes les animations dans le clone
+        onclone: (clonedDoc, clonedElement) => {
+          // Arrêter toutes les animations et stabiliser les positions dans le clone
           const allElements = clonedDoc.querySelectorAll('*');
           allElements.forEach((el) => {
             const htmlEl = el as HTMLElement;
+            const computedStyle = window.getComputedStyle(el);
+            
+            // Arrêter animations et transitions
             htmlEl.style.animation = 'none';
             htmlEl.style.transition = 'none';
+            htmlEl.style.animationDelay = '0s';
+            htmlEl.style.transitionDelay = '0s';
+            
+            // Fixer les transforms à leur état actuel
+            if (computedStyle.transform && computedStyle.transform !== 'none') {
+              htmlEl.style.transform = computedStyle.transform;
+            }
+            
+            // S'assurer que les éléments flex gardent leur position
+            if (computedStyle.display === 'flex' || computedStyle.display === 'inline-flex') {
+              // Convertir gap en margin pour compatibilité html2canvas
+              const gap = computedStyle.gap;
+              if (gap && gap !== 'normal' && gap !== '0px') {
+                const children = htmlEl.children;
+                for (let i = 0; i < children.length; i++) {
+                  const child = children[i] as HTMLElement;
+                  if (i > 0) {
+                    const gapValue = parseFloat(gap) || 0;
+                    if (computedStyle.flexDirection === 'column' || computedStyle.flexDirection === 'column-reverse') {
+                      child.style.marginTop = `${gapValue}px`;
+                    } else {
+                      child.style.marginLeft = `${gapValue}px`;
+                    }
+                  }
+                }
+              }
+            }
+            
+            // Fixer les positions absolues/relatives
+            if (computedStyle.position === 'absolute' || computedStyle.position === 'fixed') {
+              htmlEl.style.top = computedStyle.top;
+              htmlEl.style.left = computedStyle.left;
+              htmlEl.style.right = computedStyle.right;
+              htmlEl.style.bottom = computedStyle.bottom;
+            }
           });
+          
+          // S'assurer que l'élément racine cloné a une taille fixe
+          clonedElement.style.width = `${payload.element!.offsetWidth}px`;
+          clonedElement.style.height = `${payload.element!.offsetHeight}px`;
+          clonedElement.style.overflow = 'hidden';
         },
       });
       
