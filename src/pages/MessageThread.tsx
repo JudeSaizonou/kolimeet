@@ -271,10 +271,10 @@ const MessageThread = () => {
         </AnimatePresence>
 
         {/* Safety Warning - Collapsible sur mobile */}
-        <Alert className="mx-4 mb-3 border-yellow-500 bg-yellow-50 dark:bg-yellow-950/20 md:mx-6">
+          <Alert className="mx-4 mb-3 border-yellow-500 bg-yellow-50 dark:bg-yellow-950/20 md:mx-6">
           <AlertTriangle className="h-4 w-4 text-yellow-600 shrink-0" />
           <AlertDescription className="text-xs md:text-sm text-yellow-800 dark:text-yellow-200">
-            <strong className="font-semibold">⚠️ Sécurité :</strong>
+            <strong className="font-semibold">Sécurité :</strong>
             <span className="hidden md:inline"> Gardez toutes vos communications sur Kolimeet. Ne partagez jamais votre numéro ou email avant de rencontrer la personne.</span>
             <span className="md:hidden"> Restez sur Kolimeet, ne partagez pas vos coordonnées.</span>
           </AlertDescription>
@@ -289,12 +289,12 @@ const MessageThread = () => {
         
         {messages.length === 0 ? (
           <div className="flex items-center justify-center h-full">
-            <div className="text-center space-y-2">
+              <div className="text-center space-y-2">
               <p className="text-muted-foreground text-sm md:text-base">
                 Aucun message pour le moment
               </p>
               <p className="text-xs text-muted-foreground">
-                Envoyez votre premier message 👋
+                Envoyez votre premier message
               </p>
             </div>
           </div>

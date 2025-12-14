@@ -138,14 +138,15 @@ export function CounterOfferDrawer({
             </Label>
             <div className="flex items-center gap-2">
               <Input
-                id="new-price-per-kg"
-                type="number"
-                min={0}
-                step={0.1}
-                value={newPricePerKg}
-                onChange={(e) => setNewPricePerKg(parseFloat(e.target.value) || 0)}
-                className="text-center text-lg font-bold"
-              />
+                  id="new-price-per-kg"
+                  type="number"
+                  inputMode="decimal"
+                  min={0}
+                  step={0.1}
+                  value={newPricePerKg}
+                  onChange={(e) => setNewPricePerKg(parseFloat(e.target.value) || 0)}
+                  className="text-center text-base font-semibold py-2"
+                />
               <span className="text-sm text-muted-foreground">€/kg</span>
             </div>
           </div>
