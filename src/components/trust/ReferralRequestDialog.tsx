@@ -2,14 +2,14 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { UserPlus, Loader2, AlertCircle, Shield, Clock, Phone, CheckCircle2 } from 'lucide-react';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
+  ResponsiveModal,
+  ResponsiveModalContent,
+  ResponsiveModalDescription,
+  ResponsiveModalFooter,
+  ResponsiveModalHeader,
+  ResponsiveModalTitle,
+  ResponsiveModalTrigger,
+} from '@/components/ui/responsive-modal';
 import {
   Select,
   SelectContent,
@@ -31,11 +31,11 @@ interface ReferralRequestDialogProps {
 }
 
 const RELATIONSHIPS = [
-  { value: 'friend', label: 'Ami(e)' },
-  { value: 'family', label: 'Famille' },
-  { value: 'colleague', label: 'Collègue' },
-  { value: 'neighbor', label: 'Voisin(e)' },
-  { value: 'other', label: 'Autre' },
+  { value: 'friend', label: 'Ami(e)', emoji: '👋' },
+  { value: 'family', label: 'Famille', emoji: '👨‍👩‍👧‍👦' },
+  { value: 'colleague', label: 'Collègue', emoji: '💼' },
+  { value: 'neighbor', label: 'Voisin(e)', emoji: '🏠' },
+  { value: 'other', label: 'Autre', emoji: '🤝' },
 ];
 
 export function ReferralRequestDialog({ 
@@ -102,26 +102,26 @@ export function ReferralRequestDialog({
 
     // Autres cas (cooldown, limite, ancienneté)
     return (
-      <Dialog>
-        <DialogTrigger asChild>
+      <ResponsiveModal>
+        <ResponsiveModalTrigger asChild>
           <Button variant="outline" size="sm" className={`${className} opacity-70`}>
             <UserPlus className="h-4 w-4 mr-2" />
             Parrainer
           </Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
+        </ResponsiveModalTrigger>
+        <ResponsiveModalContent className="sm:max-w-md">
+          <ResponsiveModalHeader>
+            <ResponsiveModalTitle className="flex items-center gap-2">
               <AlertCircle className="h-5 w-5 text-amber-500" />
               Parrainage non disponible
-            </DialogTitle>
-          </DialogHeader>
-          <div className="py-4">
+            </ResponsiveModalTitle>
+          </ResponsiveModalHeader>
+          <div className="py-4 px-4 md:px-0">
             <p className="text-muted-foreground mb-4">{eligibility.reason}</p>
             
             {eligibility.details && (
-              <div className="bg-slate-50 rounded-lg p-4 space-y-2 text-sm">
-                <h4 className="font-medium text-slate-700 mb-2">Vos informations</h4>
+              <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-4 space-y-2 text-sm">
+                <h4 className="font-medium text-slate-700 dark:text-slate-300 mb-2">Vos informations</h4>
                 {eligibility.details.accountAgeDays !== undefined && (
                   <div className="flex justify-between">
                     <span className="text-slate-500">Ancienneté du compte :</span>
@@ -149,13 +149,13 @@ export function ReferralRequestDialog({
               </div>
             )}
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => {}}>
+          <ResponsiveModalFooter className="px-4 pb-4 md:px-0">
+            <Button variant="outline" className="w-full md:w-auto">
               Compris
             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </ResponsiveModalFooter>
+        </ResponsiveModalContent>
+      </ResponsiveModal>
     );
   }
 
@@ -204,7 +204,7 @@ export function ReferralRequestDialog({
 
       toast({
         title: "Demande envoyée ! 🎉",
-        description: `${targetUserName} recevra votre demande et pourra l'accepter.`,
+        description: `${targetUserName} recevra une notification et pourra l'accepter.`,
       });
       setOpen(false);
       setRelationship('');
@@ -223,40 +223,61 @@ export function ReferralRequestDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
+    <ResponsiveModal open={open} onOpenChange={setOpen}>
+      <ResponsiveModalTrigger asChild>
         <Button variant="outline" size="sm" className={className}>
           <UserPlus className="h-4 w-4 mr-2" />
           Parrainer
         </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
+      </ResponsiveModalTrigger>
+      <ResponsiveModalContent className="sm:max-w-md">
+        <ResponsiveModalHeader className="px-4 md:px-0">
+          <ResponsiveModalTitle className="flex items-center gap-2">
             <Shield className="h-5 w-5 text-primary" />
             Parrainer {targetUserName}
-          </DialogTitle>
-          <DialogDescription>
+          </ResponsiveModalTitle>
+          <ResponsiveModalDescription>
             En parrainant quelqu'un, vous certifiez le connaître personnellement 
-            et lui faites confiance. Votre parrainage augmentera son score de confiance.
-          </DialogDescription>
-        </DialogHeader>
+            et lui faites confiance.
+          </ResponsiveModalDescription>
+        </ResponsiveModalHeader>
 
-        <div className="space-y-4 py-4">
-          <div className="space-y-2">
+        <div className="space-y-4 py-4 px-4 md:px-0">
+          {/* Sélection de la relation avec boutons visuels sur mobile */}
+          <div className="space-y-3">
             <Label>Comment connaissez-vous cette personne ? *</Label>
-            <Select value={relationship} onValueChange={setRelationship}>
-              <SelectTrigger>
-                <SelectValue placeholder="Sélectionnez votre relation" />
-              </SelectTrigger>
-              <SelectContent>
-                {RELATIONSHIPS.map((r) => (
-                  <SelectItem key={r.value} value={r.value}>
-                    {r.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            
+            {/* Version mobile : boutons */}
+            <div className="grid grid-cols-2 gap-2 md:hidden">
+              {RELATIONSHIPS.map((r) => (
+                <Button
+                  key={r.value}
+                  type="button"
+                  variant={relationship === r.value ? "default" : "outline"}
+                  className="h-auto py-3 flex flex-col gap-1"
+                  onClick={() => setRelationship(r.value)}
+                >
+                  <span className="text-lg">{r.emoji}</span>
+                  <span className="text-xs">{r.label}</span>
+                </Button>
+              ))}
+            </div>
+            
+            {/* Version desktop : select */}
+            <div className="hidden md:block">
+              <Select value={relationship} onValueChange={setRelationship}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Sélectionnez votre relation" />
+                </SelectTrigger>
+                <SelectContent>
+                  {RELATIONSHIPS.map((r) => (
+                    <SelectItem key={r.value} value={r.value}>
+                      {r.emoji} {r.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           <div className="space-y-2">
@@ -266,34 +287,38 @@ export function ReferralRequestDialog({
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               rows={3}
+              className="resize-none"
             />
           </div>
 
-          <div className="bg-violet-50 p-3 rounded-lg text-sm text-violet-700">
+          <div className="bg-violet-50 dark:bg-violet-950 p-3 rounded-lg text-sm text-violet-700 dark:text-violet-300">
             <p className="font-medium mb-1">💡 Bon à savoir</p>
             <p className="text-xs mb-2">
               Le parrainage est un engagement de confiance. Ne parrainez que des 
-              personnes que vous connaissez vraiment. En cas de problème avec un 
-              filleul, votre propre score de confiance pourrait être affecté.
+              personnes que vous connaissez vraiment.
             </p>
-            <div className="text-xs space-y-1 pt-2 border-t border-violet-200">
+            <div className="text-xs space-y-1 pt-2 border-t border-violet-200 dark:border-violet-800">
               <div className="flex items-center gap-1">
-                <Clock className="h-3 w-3" />
+                <Clock className="h-3 w-3 shrink-0" />
                 <span>Délai de {REFERRAL_CONSTRAINTS.COOLDOWN_HOURS}h entre chaque parrainage</span>
               </div>
               <div className="flex items-center gap-1">
-                <UserPlus className="h-3 w-3" />
+                <UserPlus className="h-3 w-3 shrink-0" />
                 <span>Maximum {REFERRAL_CONSTRAINTS.MAX_REFERRALS_AS_REFERRER} filleuls par parrain</span>
               </div>
             </div>
           </div>
         </div>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={() => setOpen(false)}>
+        <ResponsiveModalFooter className="flex-col-reverse gap-2 px-4 pb-4 md:flex-row md:px-0 md:pb-0">
+          <Button variant="outline" onClick={() => setOpen(false)} className="w-full md:w-auto">
             Annuler
           </Button>
-          <Button onClick={handleSubmit} disabled={!relationship || loading}>
+          <Button 
+            onClick={handleSubmit} 
+            disabled={!relationship || loading}
+            className="w-full md:w-auto"
+          >
             {loading ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -303,8 +328,8 @@ export function ReferralRequestDialog({
               'Envoyer la demande'
             )}
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </ResponsiveModalFooter>
+      </ResponsiveModalContent>
+    </ResponsiveModal>
   );
 }
