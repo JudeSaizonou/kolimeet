@@ -38,7 +38,8 @@ export const useTrips = (filters: TripFilters, page: number = 1, pageSize: numbe
         .from("trips")
         .select("*, profiles!trips_user_id_fkey(full_name, avatar_url, rating_avg)", { count: "exact" })
         .eq("status", "open")
-        .gte("date_departure", today); // Exclure les dates passées
+        .gte("date_departure", today) // Exclure les dates passées
+        .gt("capacity_available_kg", 0); // Exclure les trips sans capacité disponible
 
       if (filters.fromCountry) {
         query = query.ilike("from_country", `%${filters.fromCountry}%`);

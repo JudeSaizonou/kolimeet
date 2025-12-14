@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Package, CheckCircle, XCircle, MessageSquare, Loader2, ArrowRight } from "lucide-react";
@@ -19,6 +19,8 @@ export function ReservationRequestMessage({ request, onUpdate }: ReservationRequ
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [counterOfferOpen, setCounterOfferOpen] = useState(false);
+  const [parentRequest, setParentRequest] = useState<ReservationRequest | null>(null);
+  const [loadingParent, setLoadingParent] = useState(false);
 
   const isDriver = user?.id === request.driver_id;
   const isRequester = user?.id === request.requester_id;
@@ -94,6 +96,26 @@ export function ReservationRequestMessage({ request, onUpdate }: ReservationRequ
 
   const status = statusConfig[request.status];
 
+  // Récupérer la demande parente si c'est une contre-offre
+  useEffect(() => {
+    if (isCounterOfferMessage && request.parent_request_id) {
+      setLoadingParent(true);
+      supabase
+        .from('reservation_requests')
+        .select('*')
+        .eq('id', request.parent_request_id)
+        .single()
+        .then(({ data, error }) => {
+          if (error) {
+            console.error('Erreur lors de la récupération de la demande parente:', error);
+          } else {
+            setParentRequest(data);
+          }
+        })
+        .finally(() => setLoadingParent(false));
+    }
+  }, [isCounterOfferMessage, request.parent_request_id]);
+
   return (
     <div className={cn(
       "my-3 rounded-2xl border shadow-sm overflow-hidden",
@@ -131,8 +153,21 @@ export function ReservationRequestMessage({ request, onUpdate }: ReservationRequ
             </div>
             <ArrowRight className="h-4 w-4 text-slate-300" />
             <div>
-              <p className="text-2xl font-bold text-slate-900">{request.price_offered}<span className="text-base font-medium text-slate-400 ml-0.5">€</span></p>
-              <p className="text-xs text-slate-400">{request.price_per_kg?.toFixed(2)}€/kg</p>
+              {isCounterOfferMessage && parentRequest ? (
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <p className="text-lg text-slate-500 line-through">{parentRequest.price_offered}€</p>
+                    <ArrowRight className="h-3 w-3 text-slate-400" />
+                    <p className="text-2xl font-bold text-slate-900">{request.price_offered}<span className="text-base font-medium text-slate-400 ml-0.5">€</span></p>
+                  </div>
+                  <p className="text-xs text-slate-400">{request.price_per_kg?.toFixed(2)}€/kg</p>
+                </div>
+              ) : (
+                <>
+                  <p className="text-2xl font-bold text-slate-900">{request.price_offered}<span className="text-base font-medium text-slate-400 ml-0.5">€</span></p>
+                  <p className="text-xs text-slate-400">{request.price_per_kg?.toFixed(2)}€/kg</p>
+                </>
+              )}
             </div>
           </div>
         </div>
