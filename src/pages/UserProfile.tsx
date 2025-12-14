@@ -227,7 +227,7 @@ export default function UserProfile() {
 
                 {isOwnProfile && (
                   <Button variant="outline" size="sm" asChild>
-                    <Link to="/profile">Modifier mon profil</Link>
+                    <Link to="/profil">Modifier mon profil</Link>
                   </Button>
                 )}
               </div>

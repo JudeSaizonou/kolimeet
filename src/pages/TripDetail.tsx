@@ -368,11 +368,11 @@ const TripDetail = () => {
         </div>
 
         {/* Action Buttons */}
-        <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/80 backdrop-blur-xl border-t z-40 md:relative md:bg-transparent md:border-0 md:p-0 md:backdrop-blur-none">
+        <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/95 backdrop-blur-xl border-t z-50 md:relative md:bg-transparent md:border-0 md:p-0 md:backdrop-blur-none safe-area-bottom">
           <div className="container max-w-3xl mx-auto flex gap-3">
             {user?.id === trip.user_id ? (
               <Button 
-                className="flex-1 h-14 rounded-2xl font-semibold text-base shadow-lg shadow-primary/20"
+                className="flex-1 h-14 rounded-2xl font-semibold text-base shadow-lg shadow-primary/20 touch-manipulation"
                 onClick={() => navigate(`/publier/trajet/${trip.id}`)}
               >
                 <Settings className="mr-2 h-5 w-5" />
@@ -381,7 +381,7 @@ const TripDetail = () => {
             ) : (
               <>
                 <Button 
-                  className="flex-1 h-14 rounded-2xl font-semibold text-base shadow-lg shadow-primary/20 bg-gradient-to-r from-primary to-primary/90"
+                  className="flex-1 h-14 rounded-2xl font-semibold text-base shadow-lg shadow-primary/20 bg-gradient-to-r from-primary to-primary/90 touch-manipulation"
                   onClick={() => setBookingDialogOpen(true)}
                 >
                   <Package className="mr-2 h-5 w-5" />
@@ -389,7 +389,7 @@ const TripDetail = () => {
                 </Button>
                 <Button 
                   variant="outline" 
-                  className="h-14 w-14 rounded-2xl p-0 border-2"
+                  className="h-14 w-14 rounded-2xl p-0 border-2 touch-manipulation"
                   onClick={handleContact}
                 >
                   <MessageCircle className="h-6 w-6" />

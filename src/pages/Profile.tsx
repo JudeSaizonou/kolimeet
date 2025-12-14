@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Select,
   SelectContent,
@@ -14,7 +15,7 @@ import {
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
-import { Camera, Star, LogOut, EyeOff, ChevronRight, Shield, Settings, HelpCircle, Phone, MapPin, Bell } from "lucide-react";
+import { Camera, Star, LogOut, EyeOff, ChevronRight, Shield, Settings, HelpCircle, Phone, MapPin, Bell, User, Users } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PhoneVerification } from "@/components/profile/PhoneVerification";
 import { OneSignalNotificationToggle } from "@/components/notifications/OneSignalNotificationToggle";
@@ -302,153 +303,175 @@ const Profile = () => {
           </div>
         </div>
 
-        {/* Section Parrainage */}
-        <div className="px-4 -mt-2">
-          <MyReferralsSection />
-        </div>
-
-        {/* Formulaire */}
-        <div className="mt-4 mx-4 bg-white rounded-2xl shadow-sm overflow-hidden">
-          <div className="px-4 py-3 bg-slate-50 border-b border-slate-100">
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-              Informations personnelles
-            </p>
-          </div>
-
-          {/* Nom */}
-          <div className="px-4 py-4 border-b border-slate-100">
-            <Label className="text-xs text-slate-400 font-medium">Nom complet</Label>
-            <Input
-              value={formData.full_name}
-              onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
-              placeholder="Votre nom"
-              className="border-0 p-0 h-7 text-base text-slate-900 focus-visible:ring-0 placeholder:text-slate-300"
-            />
-          </div>
-
-          {/* Pays */}
-          <div className="px-4 py-4 border-b border-slate-100">
-            <Label className="text-xs text-slate-400 font-medium">Pays</Label>
-            <Select
-              value={formData.country}
-              onValueChange={(value) => {
-                setFormData({ ...formData, country: value, city: "" });
-                setSelectedCountry(value);
-              }}
+        {/* Tabs pour Mes infos / Mon réseau */}
+        <Tabs defaultValue="infos" className="px-4 -mt-2">
+          <TabsList className="grid w-full grid-cols-2 bg-slate-100 p-1 rounded-xl h-12">
+            <TabsTrigger 
+              value="infos" 
+              className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm flex items-center gap-2 h-10"
             >
-              <SelectTrigger className="border-0 p-0 h-7 text-base text-slate-900 focus:ring-0 [&>svg]:text-slate-400">
-                <SelectValue placeholder="Choisir un pays" />
-              </SelectTrigger>
-              <SelectContent>
-                {countries.map((country) => (
-                  <SelectItem key={country} value={country}>{country}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+              <User className="h-4 w-4" />
+              Mes infos
+            </TabsTrigger>
+            <TabsTrigger 
+              value="network" 
+              className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm flex items-center gap-2 h-10"
+            >
+              <Users className="h-4 w-4" />
+              Mon réseau
+            </TabsTrigger>
+          </TabsList>
 
-          {/* Ville */}
-          <div className="px-4 py-4 border-b border-slate-100">
-            <Label className="text-xs text-slate-400 font-medium">Ville</Label>
-            {selectedCountry && citiesByCountry[selectedCountry] ? (
-              <Select
-                value={formData.city}
-                onValueChange={(value) => setFormData({ ...formData, city: value })}
-              >
-                <SelectTrigger className="border-0 p-0 h-7 text-base text-slate-900 focus:ring-0 [&>svg]:text-slate-400">
-                  <SelectValue placeholder="Choisir une ville" />
-                </SelectTrigger>
-                <SelectContent>
-                  {citiesByCountry[selectedCountry].map((city) => (
-                    <SelectItem key={city} value={city}>{city}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            ) : (
-              <Input
-                value={formData.city}
-                onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                placeholder="Votre ville"
-                disabled={!selectedCountry}
-                className="border-0 p-0 h-7 text-base text-slate-900 focus-visible:ring-0 placeholder:text-slate-300"
+          {/* Tab: Mes infos */}
+          <TabsContent value="infos" className="mt-4 space-y-4">
+            {/* Formulaire */}
+            <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+              <div className="px-4 py-3 bg-slate-50 border-b border-slate-100">
+                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                  Informations personnelles
+                </p>
+              </div>
+
+              {/* Nom */}
+              <div className="px-4 py-4 border-b border-slate-100">
+                <Label className="text-xs text-slate-400 font-medium">Nom complet</Label>
+                <Input
+                  value={formData.full_name}
+                  onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
+                  placeholder="Votre nom"
+                  className="border-0 p-0 h-7 text-base text-slate-900 focus-visible:ring-0 placeholder:text-slate-300"
+                />
+              </div>
+
+              {/* Pays */}
+              <div className="px-4 py-4 border-b border-slate-100">
+                <Label className="text-xs text-slate-400 font-medium">Pays</Label>
+                <Select
+                  value={formData.country}
+                  onValueChange={(value) => {
+                    setFormData({ ...formData, country: value, city: "" });
+                    setSelectedCountry(value);
+                  }}
+                >
+                  <SelectTrigger className="border-0 p-0 h-7 text-base text-slate-900 focus:ring-0 [&>svg]:text-slate-400">
+                    <SelectValue placeholder="Choisir un pays" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {countries.map((country) => (
+                      <SelectItem key={country} value={country}>{country}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Ville */}
+              <div className="px-4 py-4 border-b border-slate-100">
+                <Label className="text-xs text-slate-400 font-medium">Ville</Label>
+                {selectedCountry && citiesByCountry[selectedCountry] ? (
+                  <Select
+                    value={formData.city}
+                    onValueChange={(value) => setFormData({ ...formData, city: value })}
+                  >
+                    <SelectTrigger className="border-0 p-0 h-7 text-base text-slate-900 focus:ring-0 [&>svg]:text-slate-400">
+                      <SelectValue placeholder="Choisir une ville" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {citiesByCountry[selectedCountry].map((city) => (
+                        <SelectItem key={city} value={city}>{city}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <Input
+                    value={formData.city}
+                    onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                    placeholder="Votre ville"
+                    disabled={!selectedCountry}
+                    className="border-0 p-0 h-7 text-base text-slate-900 focus-visible:ring-0 placeholder:text-slate-300"
+                  />
+                )}
+              </div>
+
+              {/* Téléphone */}
+              <div className="px-4 py-4 flex items-center justify-between">
+                <div className="flex-1">
+                  <Label className="text-xs text-slate-400 font-medium">Téléphone</Label>
+                  <Input
+                    type="tel"
+                    value={formData.phone_e164}
+                    onChange={(e) => setFormData({ ...formData, phone_e164: e.target.value })}
+                    placeholder="+33 6 12 34 56 78"
+                    className="border-0 p-0 h-7 text-base text-slate-900 focus-visible:ring-0 placeholder:text-slate-300"
+                  />
+                </div>
+                {phoneVerified && (
+                  <span className="text-xs text-emerald-600 font-medium bg-emerald-50 px-2.5 py-1 rounded-full">
+                    ✓ Vérifié
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Vérification téléphone */}
+            {formData.phone_e164 && !phoneVerified && (
+              <PhoneVerification
+                phoneNumber={formData.phone_e164}
+                isVerified={phoneVerified}
+                userEmail={userEmail}
+                onVerified={() => {
+                  setPhoneVerified(true);
+                  loadProfile();
+                }}
               />
             )}
-          </div>
 
-          {/* Téléphone */}
-          <div className="px-4 py-4 flex items-center justify-between">
-            <div className="flex-1">
-              <Label className="text-xs text-slate-400 font-medium">Téléphone</Label>
-              <Input
-                type="tel"
-                value={formData.phone_e164}
-                onChange={(e) => setFormData({ ...formData, phone_e164: e.target.value })}
-                placeholder="+33 6 12 34 56 78"
-                className="border-0 p-0 h-7 text-base text-slate-900 focus-visible:ring-0 placeholder:text-slate-300"
-              />
-            </div>
-            {phoneVerified && (
-              <span className="text-xs text-emerald-600 font-medium bg-emerald-50 px-2.5 py-1 rounded-full">
-                ✓ Vérifié
-              </span>
-            )}
-          </div>
-        </div>
-
-        {/* Vérification téléphone */}
-        {formData.phone_e164 && !phoneVerified && (
-          <div className="mt-4 px-4">
-            <PhoneVerification
-              phoneNumber={formData.phone_e164}
-              isVerified={phoneVerified}
-              userEmail={userEmail}
-              onVerified={() => {
-                setPhoneVerified(true);
-                loadProfile();
-              }}
-            />
-          </div>
-        )}
-
-        {/* Préférences */}
-        <div className="mt-4 mx-4 bg-white rounded-2xl shadow-sm overflow-hidden">
-          <div className="px-4 py-3 bg-slate-50 border-b border-slate-100">
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-              Préférences
-            </p>
-          </div>
-
-          {/* Publication anonyme */}
-          <div className="px-4 py-4 border-b border-slate-100 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 bg-violet-100 rounded-xl flex items-center justify-center">
-                <EyeOff className="h-4.5 w-4.5 text-violet-600" />
+            {/* Préférences */}
+            <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+              <div className="px-4 py-3 bg-slate-50 border-b border-slate-100">
+                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                  Préférences
+                </p>
               </div>
-              <div>
-                <p className="text-sm font-medium text-slate-900">Publication anonyme</p>
-                <p className="text-xs text-slate-500">Cacher votre identité</p>
+
+              {/* Publication anonyme */}
+              <div className="px-4 py-4 border-b border-slate-100 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 bg-violet-100 rounded-xl flex items-center justify-center">
+                    <EyeOff className="h-4.5 w-4.5 text-violet-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-slate-900">Publication anonyme</p>
+                    <p className="text-xs text-slate-500">Cacher votre identité</p>
+                  </div>
+                </div>
+                <Switch
+                  checked={defaultAnonymous}
+                  onCheckedChange={setDefaultAnonymous}
+                />
               </div>
+
+              {/* Notifications intégré */}
+              <OneSignalNotificationToggle />
             </div>
-            <Switch
-              checked={defaultAnonymous}
-              onCheckedChange={setDefaultAnonymous}
-            />
-          </div>
 
-          {/* Notifications intégré */}
-          <OneSignalNotificationToggle />
-        </div>
+            {/* Bouton enregistrer */}
+            <Button
+              onClick={handleSubmit}
+              className="w-full h-12 text-base font-semibold rounded-xl shadow-md shadow-primary/20"
+              disabled={loading}
+            >
+              {loading ? "Enregistrement..." : "Enregistrer les modifications"}
+            </Button>
+          </TabsContent>
 
-        {/* Boutons d'action */}
-        <div className="mt-6 px-4 space-y-3 pb-8">
-          <Button
-            onClick={handleSubmit}
-            className="w-full h-12 text-base font-semibold rounded-xl shadow-md shadow-primary/20"
-            disabled={loading}
-          >
-            {loading ? "Enregistrement..." : "Enregistrer les modifications"}
-          </Button>
+          {/* Tab: Mon réseau */}
+          <TabsContent value="network" className="mt-4">
+            <MyReferralsSection />
+          </TabsContent>
+        </Tabs>
 
+        {/* Bouton déconnexion (toujours visible) */}
+        <div className="mt-6 px-4 pb-8">
           <Button
             variant="ghost"
             onClick={handleSignOut}
