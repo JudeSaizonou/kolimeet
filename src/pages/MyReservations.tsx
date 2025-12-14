@@ -125,7 +125,7 @@ const ReservationCard: React.FC<ReservationCardProps> = ({
               variant="ghost" 
               size="sm"
             >
-              <Link to={`/trajet/${reservation.trip_id}`}>
+              <Link to={`/trajets/${reservation.trip_id}`}>
                 Voir le trajet
               </Link>
             </Button>
