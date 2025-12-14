@@ -46,22 +46,28 @@ export default function UserProfile() {
 
       if (error) throw error;
       setProfile(data);
-      
-      // Charger les parrains de cet utilisateur
-      if (userId) {
-        const userReferrers = await getReferrersForUser(userId);
-        setReferrers(userReferrers);
-      }
     } catch (error) {
       console.error("Error loading profile:", error);
     } finally {
       setLoading(false);
+    }
+  }, [userId]);
+
+  // Charger les parrains séparément pour éviter les re-fetches
+  const loadReferrers = useCallback(async () => {
+    if (!userId) return;
+    try {
+      const userReferrers = await getReferrersForUser(userId);
+      setReferrers(userReferrers);
+    } catch (error) {
+      console.error("Error loading referrers:", error);
     }
   }, [userId, getReferrersForUser]);
 
   useEffect(() => {
     if (userId) {
       loadProfile();
+      loadReferrers();
 
       // Temps réel : écouter les changements du profil de cet utilisateur
       const channel = supabase
@@ -92,13 +98,26 @@ export default function UserProfile() {
             loadProfile();
           }
         )
+        .on(
+          'postgres_changes',
+          { 
+            event: '*', 
+            schema: 'public', 
+            table: 'referrals',
+            filter: `referred_id=eq.${userId}`
+          },
+          () => {
+            console.log('[UserProfile] 🔔 Referrals changed, reloading...');
+            loadReferrers();
+          }
+        )
         .subscribe();
 
       return () => {
         supabase.removeChannel(channel);
       };
     }
-  }, [userId, loadProfile]);
+  }, [userId, loadProfile, loadReferrers]);
 
   if (loading) {
     return (
@@ -152,8 +171,8 @@ export default function UserProfile() {
                     {profile.full_name || "Utilisateur"}
                   </h1>
                   <TrustBadge 
-                    score={profile.trust_score || 50} 
-                    referrerCount={referrers.length}
+                    trustScore={profile.trust_score || 50} 
+                    referredByCount={referrers.length}
                     isVerified={profile.is_verified}
                     size="md"
                   />

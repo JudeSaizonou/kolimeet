@@ -5,6 +5,7 @@ import { Users, UserPlus, Shield, Loader2 } from 'lucide-react';
 import { useReferrals } from '@/hooks/useReferrals';
 import { TrustBadge } from './TrustBadge';
 import { PendingReferrals } from './PendingReferrals';
+import { SentPendingReferrals } from './SentPendingReferrals';
 
 const RELATIONSHIP_LABELS: Record<string, string> = {
   friend: 'Ami(e)',
@@ -31,8 +32,11 @@ export function MyReferralsSection() {
 
   return (
     <div className="space-y-4">
-      {/* Demandes en attente */}
+      {/* Demandes reçues en attente */}
       <PendingReferrals />
+
+      {/* Demandes envoyées en attente */}
+      <SentPendingReferrals />
 
       {/* Mes parrainages */}
       <Card>

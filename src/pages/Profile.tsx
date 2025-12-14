@@ -41,6 +41,7 @@ const Profile = () => {
   const [trustScore, setTrustScore] = useState(50);
   const [referredByCount, setReferredByCount] = useState(0);
   const [isVerified, setIsVerified] = useState(false);
+  const [userEmail, setUserEmail] = useState<string>("");
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -51,6 +52,9 @@ const Profile = () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
+
+      // Stocker l'email de l'utilisateur
+      setUserEmail(user.email || "");
 
       const { data: profile } = await supabase
         .from("profiles")
@@ -397,6 +401,7 @@ const Profile = () => {
             <PhoneVerification
               phoneNumber={formData.phone_e164}
               isVerified={phoneVerified}
+              userEmail={userEmail}
               onVerified={() => {
                 setPhoneVerified(true);
                 loadProfile();

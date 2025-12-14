@@ -32,10 +32,13 @@ export const useTrips = (filters: TripFilters, page: number = 1, pageSize: numbe
   const fetchTrips = useCallback(async () => {
     setLoading(true);
     try {
+      const today = new Date().toISOString().split('T')[0]; // Format YYYY-MM-DD
+      
       let query = supabase
         .from("trips")
         .select("*, profiles!trips_user_id_fkey(full_name, avatar_url, rating_avg)", { count: "exact" })
-        .eq("status", "open");
+        .eq("status", "open")
+        .gte("date_departure", today); // Exclure les dates passées
 
       if (filters.fromCountry) {
         query = query.ilike("from_country", `%${filters.fromCountry}%`);
@@ -113,10 +116,14 @@ export const useParcels = (filters: ParcelFilters, page: number = 1, pageSize: n
   const fetchParcels = useCallback(async () => {
     setLoading(true);
     try {
+      // Date du jour pour exclure les colis avec deadline passée
+      const today = new Date().toISOString().split('T')[0];
+      
       let query = supabase
         .from("parcels")
         .select("*, profiles!parcels_user_id_fkey(full_name, avatar_url, rating_avg)", { count: "exact" })
-        .eq("status", "open");
+        .eq("status", "open")
+        .gte("deadline", today); // Exclure les colis avec deadline passée
 
       if (filters.fromCountry) {
         query = query.ilike("from_country", `%${filters.fromCountry}%`);

@@ -41,6 +41,17 @@ export interface PendingRequest {
   created_at: string;
 }
 
+// Demande de parrainage envoyée en attente
+export interface SentPendingRequest {
+  id: string;
+  referred_id: string;
+  referred_name: string;
+  referred_avatar: string | null;
+  relationship: string;
+  message?: string;
+  created_at: string;
+}
+
 // Contraintes intelligentes de parrainage (comme Gens de Confiance)
 export const REFERRAL_CONSTRAINTS = {
   // Ancienneté minimum du compte pour pouvoir parrainer (en jours)
@@ -49,8 +60,8 @@ export const REFERRAL_CONSTRAINTS = {
   MAX_REFERRALS_AS_REFERRER: 10,
   // Nombre maximum de parrains qu'un utilisateur peut avoir
   MAX_REFERRERS_PER_USER: 5,
-  // Délai minimum entre deux parrainages (en heures)
-  COOLDOWN_HOURS: 24,
+  // Délai minimum entre deux parrainages (en heures) - désactivé pour le moment
+  COOLDOWN_HOURS: 0,
 };
 
 export interface EligibilityResult {
@@ -88,15 +99,21 @@ export function useReferrals() {
   const [referrers, setReferrers] = useState<ReferrerInfo[]>([]);
   const [referrals, setReferrals] = useState<ReferredInfo[]>([]);
   const [pendingRequests, setPendingRequests] = useState<PendingRequest[]>([]);
+  const [sentPendingRequests, setSentPendingRequests] = useState<SentPendingRequest[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchReferrals = useCallback(async () => {
-    if (!user) return;
+    if (!user) {
+      console.log('[useReferrals] No user, skipping fetch');
+      setLoading(false);
+      return;
+    }
 
+    console.log('[useReferrals] Fetching referrals for user:', user.id);
     setLoading(true);
     try {
       // Récupérer mes parrains (ceux qui m'ont parrainé)
-      const { data: myReferrers } = await supabase
+      const { data: myReferrers, error: referrersError } = await supabase
         .from('referrals')
         .select(`
           id,
@@ -108,7 +125,13 @@ export function useReferrals() {
           accepted_at
         `)
         .eq('referred_id', user.id)
-        .eq('status', 'accepted') as { data: ReferralRow[] | null };
+        .eq('status', 'accepted') as { data: ReferralRow[] | null; error: any };
+
+      if (referrersError) {
+        console.error('[useReferrals] Error fetching my referrers:', referrersError);
+      } else {
+        console.log('[useReferrals] My referrers (accepted):', myReferrers?.length || 0, myReferrers);
+      }
 
       if (myReferrers && myReferrers.length > 0) {
         // Récupérer les profils des parrains
@@ -136,7 +159,7 @@ export function useReferrals() {
       }
 
       // Récupérer mes filleuls (ceux que j'ai parrainés)
-      const { data: myReferrals } = await supabase
+      const { data: myReferrals, error: referralsError } = await supabase
         .from('referrals')
         .select(`
           id,
@@ -148,7 +171,13 @@ export function useReferrals() {
           accepted_at
         `)
         .eq('referrer_id', user.id)
-        .eq('status', 'accepted') as { data: ReferralRow[] | null };
+        .eq('status', 'accepted') as { data: ReferralRow[] | null; error: any };
+
+      if (referralsError) {
+        console.error('[useReferrals] Error fetching my referrals (filleuls):', referralsError);
+      } else {
+        console.log('[useReferrals] My referrals (filleuls, accepted):', myReferrals?.length || 0, myReferrals);
+      }
 
       if (myReferrals && myReferrals.length > 0) {
         // Récupérer les profils des filleuls
@@ -176,7 +205,7 @@ export function useReferrals() {
       }
 
       // Récupérer les demandes de parrainage en attente
-      const { data: pending } = await supabase
+      const { data: pending, error: pendingError } = await supabase
         .from('referrals')
         .select(`
           id,
@@ -186,7 +215,13 @@ export function useReferrals() {
           created_at
         `)
         .eq('referred_id', user.id)
-        .eq('status', 'pending') as { data: ReferralRow[] | null };
+        .eq('status', 'pending') as { data: ReferralRow[] | null; error: any };
+
+      if (pendingError) {
+        console.error('[useReferrals] Error fetching pending requests:', pendingError);
+      } else {
+        console.log('[useReferrals] Pending requests:', pending?.length || 0, pending);
+      }
 
       if (pending && pending.length > 0) {
         // Récupérer les profils des demandeurs
@@ -213,6 +248,51 @@ export function useReferrals() {
       } else {
         setPendingRequests([]);
       }
+
+      // Récupérer les demandes de parrainage que j'ai envoyées et qui sont en attente
+      const { data: sentPending, error: sentPendingError } = await supabase
+        .from('referrals')
+        .select(`
+          id,
+          referred_id,
+          relationship,
+          message,
+          created_at
+        `)
+        .eq('referrer_id', user.id)
+        .eq('status', 'pending') as { data: ReferralRow[] | null; error: any };
+
+      if (sentPendingError) {
+        console.error('[useReferrals] Error fetching sent pending requests:', sentPendingError);
+      } else {
+        console.log('[useReferrals] Sent pending requests:', sentPending?.length || 0, sentPending);
+      }
+
+      if (sentPending && sentPending.length > 0) {
+        // Récupérer les profils des destinataires
+        const referredIds = sentPending.map((r: ReferralRow) => r.referred_id);
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('user_id, full_name, avatar_url, trust_score')
+          .in('user_id', referredIds);
+
+        const profileMap = new Map(profiles?.map(p => [p.user_id, p]) || []);
+
+        setSentPendingRequests(sentPending.map((r: ReferralRow) => {
+          const profile = profileMap.get(r.referred_id);
+          return {
+            id: r.id,
+            referred_id: r.referred_id,
+            referred_name: (profile as any)?.full_name || 'Utilisateur',
+            referred_avatar: (profile as any)?.avatar_url || null,
+            relationship: r.relationship || 'other',
+            message: r.message || undefined,
+            created_at: r.created_at,
+          };
+        }));
+      } else {
+        setSentPendingRequests([]);
+      }
     } catch (error) {
       console.error('Erreur chargement parrainages:', error);
     } finally {
@@ -225,6 +305,7 @@ export function useReferrals() {
       setReferrers([]);
       setReferrals([]);
       setPendingRequests([]);
+      setSentPendingRequests([]);
       setLoading(false);
       return;
     }
@@ -281,14 +362,20 @@ export function useReferrals() {
   };
 
   const acceptReferral = async (referralId: string) => {
+    console.log('[useReferrals] Accepting referral:', referralId);
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('referrals')
         .update({ status: 'accepted' })
-        .eq('id', referralId);
+        .eq('id', referralId)
+        .select();
 
-      if (error) throw error;
+      if (error) {
+        console.error('[useReferrals] Error accepting referral:', error);
+        throw error;
+      }
 
+      console.log('[useReferrals] Referral accepted successfully:', data);
       await fetchReferrals();
       return { success: true };
     } catch (error: any) {
@@ -314,7 +401,7 @@ export function useReferrals() {
     }
   };
 
-  const getReferrersForUser = async (userId: string): Promise<ReferrerInfo[]> => {
+  const getReferrersForUser = useCallback(async (userId: string): Promise<ReferrerInfo[]> => {
     try {
       const { data, error } = await supabase
         .from('referrals')
@@ -354,7 +441,7 @@ export function useReferrals() {
       console.error('Erreur récupération parrains:', error);
       return [];
     }
-  };
+  }, []);
 
   const checkExistingReferral = async (referredId: string): Promise<boolean> => {
     if (!user) return false;
@@ -384,13 +471,17 @@ export function useReferrals() {
    * - Pas trop de filleuls déjà
    * - Délai entre parrainages
    * - La cible n'a pas déjà trop de parrains
+   * @param targetUserId - ID de l'utilisateur cible à parrainer
+   * @param currentUserId - ID de l'utilisateur qui parraine (optionnel, utilise user du hook par défaut)
    */
-  const checkReferralEligibility = async (targetUserId: string): Promise<EligibilityResult> => {
-    if (!user) {
+  const checkReferralEligibility = async (targetUserId: string, currentUserId?: string): Promise<EligibilityResult> => {
+    const referrerId = currentUserId || user?.id;
+    
+    if (!referrerId) {
       return { canRefer: false, reason: 'Vous devez être connecté pour parrainer' };
     }
 
-    if (user.id === targetUserId) {
+    if (referrerId === targetUserId) {
       return { canRefer: false, reason: 'Vous ne pouvez pas vous parrainer vous-même' };
     }
 
@@ -399,7 +490,7 @@ export function useReferrals() {
       const { data: myProfile } = await supabase
         .from('profiles')
         .select('phone_verified, created_at')
-        .eq('user_id', user.id)
+        .eq('user_id', referrerId)
         .single();
 
       if (!myProfile) {
@@ -417,7 +508,7 @@ export function useReferrals() {
       }
 
       // Vérifier l'ancienneté du compte
-      const createdAt = new Date((myProfile as any).created_at || user.created_at);
+      const createdAt = new Date((myProfile as any).created_at);
       const now = new Date();
       const accountAgeDays = Math.floor((now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24));
       
@@ -433,7 +524,7 @@ export function useReferrals() {
       const { count: referralCount } = await supabase
         .from('referrals')
         .select('id', { count: 'exact', head: true })
-        .eq('referrer_id', user.id)
+        .eq('referrer_id', referrerId)
         .in('status', ['accepted', 'pending']);
 
       if ((referralCount || 0) >= REFERRAL_CONSTRAINTS.MAX_REFERRALS_AS_REFERRER) {
@@ -448,7 +539,7 @@ export function useReferrals() {
       const { data: lastReferral } = await supabase
         .from('referrals')
         .select('created_at')
-        .eq('referrer_id', user.id)
+        .eq('referrer_id', referrerId)
         .order('created_at', { ascending: false })
         .limit(1)
         .maybeSingle();
@@ -476,7 +567,7 @@ export function useReferrals() {
       const { data: existingReferral } = await supabase
         .from('referrals')
         .select('id')
-        .eq('referrer_id', user.id)
+        .eq('referrer_id', referrerId)
         .eq('referred_id', targetUserId)
         .maybeSingle();
 
@@ -519,6 +610,7 @@ export function useReferrals() {
     referrers,
     referrals,
     pendingRequests,
+    sentPendingRequests,
     loading,
     sendReferralRequest,
     acceptReferral,

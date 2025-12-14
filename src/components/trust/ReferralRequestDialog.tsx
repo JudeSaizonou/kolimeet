@@ -64,8 +64,10 @@ export function ReferralRequestDialog({
   }, [user, authLoading, targetUserId]);
 
   const checkEligibility = async () => {
+    if (!user?.id) return;
     setChecking(true);
-    const result = await checkReferralEligibility(targetUserId);
+    // Passer explicitement l'ID utilisateur pour éviter les problèmes de désync d'auth
+    const result = await checkReferralEligibility(targetUserId, user.id);
     setEligibility(result);
     setChecking(false);
   };
