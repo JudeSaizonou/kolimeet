@@ -43,7 +43,7 @@ export function ReferralRequestDialog({
   targetUserName,
   className 
 }: ReferralRequestDialogProps) {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { toast } = useToast();
   const { sendReferralRequest, checkReferralEligibility } = useReferrals();
   const [open, setOpen] = useState(false);
@@ -51,13 +51,17 @@ export function ReferralRequestDialog({
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [eligibility, setEligibility] = useState<EligibilityResult | null>(null);
-  const [checking, setChecking] = useState(false);
+  const [checking, setChecking] = useState(true); // Commence à true
 
   useEffect(() => {
-    if (user && targetUserId && user.id !== targetUserId) {
+    // Attendre que l'auth soit chargée et qu'on ait un user différent de la cible
+    if (!authLoading && user && targetUserId && user.id !== targetUserId) {
       checkEligibility();
+    } else if (!authLoading && (!user || user.id === targetUserId)) {
+      // Auth chargée mais pas de user ou même utilisateur
+      setChecking(false);
     }
-  }, [user, targetUserId]);
+  }, [user, authLoading, targetUserId]);
 
   const checkEligibility = async () => {
     setChecking(true);
@@ -66,15 +70,17 @@ export function ReferralRequestDialog({
     setChecking(false);
   };
 
-  if (!user || user.id === targetUserId) return null;
-
-  if (checking) {
+  // Pendant le chargement de l'auth ou de l'éligibilité
+  if (authLoading || checking) {
     return (
       <Button variant="outline" size="sm" disabled className={className}>
         <Loader2 className="h-4 w-4 animate-spin" />
       </Button>
     );
   }
+
+  // Ne rien afficher si pas connecté ou si c'est le même utilisateur
+  if (!user || user.id === targetUserId) return null;
 
   // Afficher un bouton désactivé avec info si non éligible
   if (eligibility && !eligibility.canRefer) {
