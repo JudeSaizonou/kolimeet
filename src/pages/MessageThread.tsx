@@ -325,20 +325,37 @@ const MessageThread = () => {
               };
 
               // Vérifier si le message est lié à une demande de réservation
-              // Option 1: Le message a un reservation_request_id
+              // Option 1: Le message a un reservation_request_id direct
               // Option 2: Une request a ce message_id
+              // Option 3: C'est un message de type booking_request/reservation_request (ancien système)
               let relatedRequest = null;
               
+              // Chercher par reservation_request_id sur le message
               if (message.reservation_request_id) {
                 relatedRequest = requests.find(
                   (req) => req.id === message.reservation_request_id
                 );
               }
               
+              // Chercher par message_id sur la request
               if (!relatedRequest) {
                 relatedRequest = requests.find(
                   (req) => req.message_id === message.id
                 );
+              }
+              
+              // Fallback: Si c'est un message de type réservation, chercher une request correspondante par date
+              if (!relatedRequest && (message.message_type === 'booking_request' || message.message_type === 'reservation_request')) {
+                // Trouver la request la plus proche en date du message
+                const messageTime = new Date(message.created_at).getTime();
+                const matchingRequests = requests.filter(req => {
+                  const reqTime = new Date(req.created_at).getTime();
+                  // Tolérance de 5 secondes pour associer
+                  return Math.abs(reqTime - messageTime) < 5000;
+                });
+                if (matchingRequests.length > 0) {
+                  relatedRequest = matchingRequests[0];
+                }
               }
 
               if (relatedRequest) {

@@ -72,25 +72,7 @@ export const SimpleBookingDialog: React.FC<SimpleBookingDialogProps> = ({
     setLoading(true);
 
     try {
-      // Créer la réservation dans la table bookings
-      const { data: booking, error: bookingError } = await (supabase as any)
-        .from('bookings')
-        .insert({
-          trip_id: trip.id,
-          user_id: user.id,
-          traveler_id: trip.user_id,
-          weight_kg: weightKg,
-          price_per_kg: trip.price_expect || 0,
-          total_price: weightKg * (trip.price_expect || 0),
-          status: 'pending',
-          message: message || null,
-        })
-        .select()
-        .single();
-
-      if (bookingError) throw bookingError;
-
-      // Créer ou trouver un thread de conversation
+      // Créer ou trouver un thread de conversation d'abord
       const { data: existingThread } = await supabase
         .from('threads')
         .select('id')
@@ -117,17 +99,30 @@ export const SimpleBookingDialog: React.FC<SimpleBookingDialogProps> = ({
         threadId = newThread.id;
       }
 
-      // Envoyer un message automatique dans la conversation
-      const { error: messageError } = await supabase
-        .from('messages')
-        .insert({
-          thread_id: threadId,
-          sender_id: user.id,
-          content: `📦 Demande de réservation: ${weightKg} kg\n${message ? `Message: ${message}` : ''}`,
-          message_type: 'booking_request',
-        });
+      // Calculer le prix total
+      const totalPrice = weightKg * (trip.price_expect || 0);
 
-      if (messageError) throw messageError;
+      // Utiliser la RPC create_reservation_request qui gère tout automatiquement
+      // (création de la demande + message + notifications)
+      const { error } = await supabase.rpc("create_reservation_request", {
+        p_thread_id: threadId,
+        p_trip_id: trip.id,
+        p_kilos: weightKg,
+        p_price: totalPrice,
+      });
+
+      if (error) throw error;
+
+      // Si l'utilisateur a ajouté un message personnalisé, l'envoyer aussi
+      if (message && message.trim()) {
+        await supabase
+          .from('messages')
+          .insert({
+            thread_id: threadId,
+            sender_id: user.id,
+            content: message.trim(),
+          });
+      }
 
       toast({
         title: '✅ Réservation envoyée',
