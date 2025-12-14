@@ -17,15 +17,10 @@ import {
   CheckCircle,
   XCircle,
   Clock,
-  ChevronDown,
-  ChevronUp,
   Users,
+  ArrowRight,
+  Loader2,
 } from 'lucide-react';
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible';
 
 interface Reservation {
   id: string;
@@ -59,7 +54,6 @@ export const TripReservationsList = ({ tripId, driverId }: TripReservationsListP
   const { toast } = useToast();
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isOpen, setIsOpen] = useState(true);
   const [processingId, setProcessingId] = useState<string | null>(null);
 
   const fetchReservations = useCallback(async () => {
@@ -186,152 +180,144 @@ export const TripReservationsList = ({ tripId, driverId }: TripReservationsListP
   const acceptedCount = reservations.filter((r) => r.status === 'accepted').length;
 
   return (
-    <Card className="border-slate-200 overflow-hidden">
-      <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-        <CollapsibleTrigger asChild>
-          <CardHeader className="pb-3 cursor-pointer hover:bg-slate-50 transition-colors">
-            <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <Users className="h-5 w-5 text-primary" />
-                Réservations ({reservations.length})
-              </CardTitle>
-              <div className="flex items-center gap-2">
-                {pendingCount > 0 && (
-                  <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">
-                    {pendingCount} en attente
-                  </Badge>
-                )}
-                {acceptedCount > 0 && (
-                  <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-                    {acceptedCount} acceptée{acceptedCount > 1 ? 's' : ''}
-                  </Badge>
-                )}
-                {isOpen ? (
-                  <ChevronUp className="h-5 w-5 text-slate-400" />
-                ) : (
-                  <ChevronDown className="h-5 w-5 text-slate-400" />
-                )}
-              </div>
-            </div>
-          </CardHeader>
-        </CollapsibleTrigger>
+    <Card className="border-slate-200">
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <Users className="h-5 w-5 text-primary" />
+            Réservations
+          </CardTitle>
+          <div className="flex items-center gap-2">
+            {pendingCount > 0 && (
+              <Badge className="bg-amber-100 text-amber-700 border-0">
+                {pendingCount} en attente
+              </Badge>
+            )}
+            {acceptedCount > 0 && (
+              <Badge className="bg-emerald-100 text-emerald-700 border-0">
+                {acceptedCount} acceptée{acceptedCount > 1 ? 's' : ''}
+              </Badge>
+            )}
+          </div>
+        </div>
+      </CardHeader>
 
-        <CollapsibleContent>
-          <CardContent className="pt-0">
-            {reservations.length === 0 ? (
-              <div className="text-center py-8 text-slate-500">
-                <Package className="h-12 w-12 mx-auto mb-3 text-slate-300" />
-                <p>Aucune réservation pour le moment</p>
-                <p className="text-sm text-slate-400 mt-1">
-                  Les demandes de réservation apparaîtront ici
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {reservations.map((reservation) => {
-                  const status = statusConfig[reservation.status] || statusConfig.pending;
-                  const StatusIcon = status.icon;
-                  const isPending = reservation.status === 'pending';
-                  const isProcessing = processingId === reservation.id;
+      <CardContent className="pt-0">
+        {reservations.length === 0 ? (
+          <div className="text-center py-12 text-slate-500">
+            <Package className="h-12 w-12 mx-auto mb-3 text-slate-300" />
+            <p className="font-medium">Aucune réservation</p>
+            <p className="text-sm text-slate-400 mt-1">
+              Les demandes apparaîtront ici
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {reservations.map((reservation) => {
+              const status = statusConfig[reservation.status] || statusConfig.pending;
+              const StatusIcon = status.icon;
+              const isPending = reservation.status === 'pending';
+              const isCounterOffered = reservation.status === 'counter_offered';
+              const isProcessing = processingId === reservation.id;
+              const canAct = isPending || isCounterOffered;
 
-                  return (
-                    <div
-                      key={reservation.id}
-                      className={`p-4 rounded-xl border transition-all ${
-                        isPending
-                          ? 'border-yellow-200 bg-yellow-50/50'
-                          : 'border-slate-100 bg-slate-50/50'
-                      }`}
+              return (
+                <div
+                  key={reservation.id}
+                  className={`rounded-2xl border overflow-hidden transition-all ${
+                    isPending
+                      ? 'border-amber-200 bg-white'
+                      : reservation.status === 'accepted'
+                      ? 'border-emerald-200 bg-emerald-50/50'
+                      : 'border-slate-100 bg-slate-50/50'
+                  }`}
+                >
+                  {/* Header avec avatar et statut */}
+                  <div className="px-4 py-3 flex items-center justify-between border-b border-slate-100/50">
+                    <Link 
+                      to={`/u/${reservation.requester_id}`}
+                      className="flex items-center gap-3 hover:opacity-80 transition-opacity"
                     >
-                      <div className="flex items-start justify-between gap-4">
-                        {/* Info demandeur */}
-                        <div className="flex items-center gap-3 flex-1 min-w-0">
-                          <Link to={`/u/${reservation.requester_id}`}>
-                            <Avatar className="h-10 w-10">
-                              <AvatarImage src={reservation.requester?.avatar_url} />
-                              <AvatarFallback className="bg-primary/10 text-primary">
-                                {reservation.requester?.full_name?.[0] || <User className="h-4 w-4" />}
-                              </AvatarFallback>
-                            </Avatar>
-                          </Link>
-                          <div className="flex-1 min-w-0">
-                            <Link
-                              to={`/u/${reservation.requester_id}`}
-                              className="font-medium text-slate-900 hover:text-primary truncate block"
-                            >
-                              {reservation.requester?.full_name || 'Utilisateur'}
-                            </Link>
-                            <div className="flex items-center gap-3 text-sm text-slate-500">
-                              <span className="flex items-center gap-1">
-                                <Package className="h-3.5 w-3.5" />
-                                {reservation.kilos_requested} kg
-                              </span>
-                              <span className="flex items-center gap-1">
-                                <Euro className="h-3.5 w-3.5" />
-                                {reservation.price_offered}€
-                              </span>
-                            </div>
-                          </div>
-                        </div>
+                      <Avatar className="h-9 w-9">
+                        <AvatarImage src={reservation.requester?.avatar_url} />
+                        <AvatarFallback className="bg-primary/10 text-primary text-sm">
+                          {reservation.requester?.full_name?.[0] || <User className="h-4 w-4" />}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="font-medium text-slate-900">
+                        {reservation.requester?.full_name || 'Utilisateur'}
+                      </span>
+                    </Link>
+                    <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${status.color}`}>
+                      {status.label}
+                    </span>
+                  </div>
 
-                        {/* Status */}
-                        <Badge className={`${status.color} shrink-0`}>
-                          <StatusIcon className="h-3 w-3 mr-1" />
-                          {status.label}
-                        </Badge>
+                  {/* Contenu principal */}
+                  <div className="px-4 py-3">
+                    <div className="flex items-center gap-4">
+                      <div>
+                        <p className="text-2xl font-bold text-slate-900">
+                          {reservation.kilos_requested}
+                          <span className="text-base font-medium text-slate-400 ml-0.5">kg</span>
+                        </p>
                       </div>
-
-                      {/* Actions */}
-                      <div className="mt-3 flex items-center gap-2">
-                        <Button
-                          asChild
-                          variant="outline"
-                          size="sm"
-                          className="flex-1"
-                        >
-                          <Link to={`/messages/${reservation.thread_id}`}>
-                            <MessageCircle className="h-4 w-4 mr-2" />
-                            Conversation
-                          </Link>
-                        </Button>
-
-                        {isPending && (
-                          <>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="border-red-200 text-red-600 hover:bg-red-50"
-                              onClick={() => handleDecline(reservation.id)}
-                              disabled={isProcessing}
-                            >
-                              <XCircle className="h-4 w-4 mr-1" />
-                              Refuser
-                            </Button>
-                            <Button
-                              size="sm"
-                              className="bg-green-600 hover:bg-green-700"
-                              onClick={() => handleAccept(reservation.id)}
-                              disabled={isProcessing}
-                            >
-                              <CheckCircle className="h-4 w-4 mr-1" />
-                              Accepter
-                            </Button>
-                          </>
+                      <ArrowRight className="h-4 w-4 text-slate-300" />
+                      <div>
+                        <p className="text-2xl font-bold text-slate-900">
+                          {reservation.price_offered}
+                          <span className="text-base font-medium text-slate-400 ml-0.5">€</span>
+                        </p>
+                        {reservation.price_per_kg && (
+                          <p className="text-xs text-slate-400">{reservation.price_per_kg.toFixed(2)}€/kg</p>
                         )}
                       </div>
-
-                      {/* Date */}
-                      <p className="text-xs text-slate-400 mt-2">
-                        Demandé le {format(new Date(reservation.created_at), 'PPp', { locale: fr })}
-                      </p>
                     </div>
-                  );
-                })}
-              </div>
-            )}
-          </CardContent>
-        </CollapsibleContent>
-      </Collapsible>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="px-4 pb-3 flex items-center gap-2">
+                    <Button
+                      asChild
+                      variant="outline"
+                      size="sm"
+                      className="flex-1 h-9 rounded-xl border-slate-200"
+                    >
+                      <Link to={`/messages/${reservation.thread_id}`}>
+                        <MessageCircle className="h-4 w-4 mr-1.5" />
+                        Conversation
+                      </Link>
+                    </Button>
+
+                    {canAct && (
+                      <>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-9 px-3 rounded-xl text-rose-600 hover:text-rose-700 hover:bg-rose-50"
+                          onClick={() => handleDecline(reservation.id)}
+                          disabled={isProcessing}
+                        >
+                          {isProcessing ? <Loader2 className="h-4 w-4 animate-spin" /> : <XCircle className="h-4 w-4" />}
+                        </Button>
+                        <Button
+                          size="sm"
+                          className="h-9 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700"
+                          onClick={() => handleAccept(reservation.id)}
+                          disabled={isProcessing}
+                        >
+                          {isProcessing ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle className="h-4 w-4 mr-1.5" />}
+                          Accepter
+                        </Button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </CardContent>
     </Card>
   );
 };

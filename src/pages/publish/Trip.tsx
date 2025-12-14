@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CalendarIcon, EyeOff } from "lucide-react";
+import { CalendarIcon, EyeOff, Pencil, Users } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { useParams, useNavigate } from "react-router-dom";
@@ -14,6 +14,7 @@ import { Combobox } from "@/components/ui/combobox";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { createTripSchema, CreateTripInput } from "@/lib/validations/trips";
 import { useTrips } from "@/hooks/useTrips";
 import { cn } from "@/lib/utils";
@@ -21,7 +22,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { countries, citiesByCountry } from "@/lib/data/countries";
 import { AcceptTermsCheckbox } from "@/components/AcceptTermsCheckbox";
-import { TripBookings } from "@/components/booking/TripBookings";
+import { TripReservationsList } from "@/components/reservations/TripReservationsList";
 
 const PublishTrip = () => {
   const { id } = useParams();
@@ -32,7 +33,8 @@ const PublishTrip = () => {
   const [defaultAnonymous, setDefaultAnonymous] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [termsError, setTermsError] = useState<string>();
-  const [refreshKey, setRefreshKey] = useState(0);
+  const [activeTab, setActiveTab] = useState<string>("edit");
+  const [tripUserId, setTripUserId] = useState<string | null>(null);
 
   const form = useForm<CreateTripInput>({
     resolver: zodResolver(createTripSchema),
@@ -101,6 +103,7 @@ const PublishTrip = () => {
           is_anonymous: data.is_anonymous || false,
         });
         setDate(new Date(data.date_departure));
+        setTripUserId(data.user_id);
       }
     } catch (error: any) {
       toast({
@@ -134,20 +137,99 @@ const PublishTrip = () => {
   return (
     <div className="min-h-screen bg-background py-8 px-4">
       <div className="max-w-2xl mx-auto">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-2xl">
-              {id ? "Modifier le trajet" : "Publier un trajet"}
-            </CardTitle>
-            <CardDescription>
-              {id ? "Mettez à jour votre annonce" : "Partagez votre itinéraire et transportez des colis"}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <FormField
+        {/* Mode création - pas de tabs */}
+        {!id ? (
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-2xl">Publier un trajet</CardTitle>
+              <CardDescription>
+                Partagez votre itinéraire et transportez des colis
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                  {renderFormFields()}
+                  
+                  <AcceptTermsCheckbox
+                    checked={acceptedTerms}
+                    onCheckedChange={(checked) => {
+                      setAcceptedTerms(checked);
+                      if (checked) setTermsError(undefined);
+                    }}
+                    type="trip"
+                    error={termsError}
+                  />
+
+                  <Button 
+                    type="submit" 
+                    className="w-full" 
+                    disabled={loading}
+                    onClick={(e) => {
+                      if (!acceptedTerms) {
+                        e.preventDefault();
+                        setTermsError("Vous devez accepter les conditions pour publier");
+                      }
+                    }}
+                  >
+                    {loading ? "Publication..." : "Publier le trajet"}
+                  </Button>
+                </form>
+              </Form>
+            </CardContent>
+          </Card>
+        ) : (
+          /* Mode édition - avec tabs */
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="w-full grid grid-cols-2 mb-6">
+              <TabsTrigger value="edit" className="flex items-center gap-2">
+                <Pencil className="h-4 w-4" />
+                Modifier
+              </TabsTrigger>
+              <TabsTrigger value="reservations" className="flex items-center gap-2">
+                <Users className="h-4 w-4" />
+                Réservations
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="edit">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-2xl">Modifier le trajet</CardTitle>
+                  <CardDescription>
+                    Mettez à jour votre annonce
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                      {renderFormFields()}
+
+                      <Button type="submit" className="w-full" disabled={loading}>
+                        {loading ? "Mise à jour..." : "Mettre à jour"}
+                      </Button>
+                    </form>
+                  </Form>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="reservations">
+              {tripUserId && (
+                <TripReservationsList tripId={id} driverId={tripUserId} />
+              )}
+            </TabsContent>
+          </Tabs>
+        )}
+      </div>
+    </div>
+  );
+
+  function renderFormFields() {
+    return (
+      <>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField
                     control={form.control}
                     name="from_country"
                     render={({ field }) => (
@@ -386,54 +468,9 @@ const PublishTrip = () => {
                     </FormItem>
                   )}
                 />
-
-                {/* Acceptation des CGU - uniquement pour nouvelle publication */}
-                {!id && (
-                  <AcceptTermsCheckbox
-                    checked={acceptedTerms}
-                    onCheckedChange={(checked) => {
-                      setAcceptedTerms(checked);
-                      if (checked) setTermsError(undefined);
-                    }}
-                    type="trip"
-                    error={termsError}
-                  />
-                )}
-
-                <Button 
-                  type="submit" 
-                  className="w-full" 
-                  disabled={loading}
-                  onClick={(e) => {
-                    if (!id && !acceptedTerms) {
-                      e.preventDefault();
-                      setTermsError("Vous devez accepter les conditions pour publier");
-                    }
-                  }}
-                >
-                  {loading ? (id ? "Mise à jour..." : "Publication...") : (id ? "Mettre à jour" : "Publier le trajet")}
-                </Button>
-              </form>
-            </Form>
-          </CardContent>
-        </Card>
-
-        {/* Afficher les réservations si on est en mode édition */}
-        {id && (
-          <div className="mt-6">
-            <TripBookings 
-              tripId={id} 
-              onCapacityUpdate={() => {
-                // Recharger les données du trajet pour mettre à jour la capacité
-                setRefreshKey(prev => prev + 1);
-                loadTrip(id);
-              }}
-            />
-          </div>
-        )}
-      </div>
-    </div>
-  );
+      </>
+    );
+  }
 };
 
 export default PublishTrip;
