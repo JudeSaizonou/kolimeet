@@ -9,6 +9,13 @@ BEGIN
   ) THEN
     ALTER TABLE reservation_requests DROP CONSTRAINT IF EXISTS reservation_requests_requester_id_trip_id_key;
   END IF;
+  
+  -- Supprimer aussi l'index unique partiel qui empêche les contre-offres
+  IF EXISTS (
+    SELECT 1 FROM pg_indexes WHERE tablename = 'reservation_requests' AND indexname = 'unique_active_request_per_user_trip'
+  ) THEN
+    DROP INDEX unique_active_request_per_user_trip;
+  END IF;
 END $$;
 
 -- 2. Créer le trigger qui empêche les demandes actives multiples
@@ -43,4 +50,4 @@ FOR EACH ROW
 EXECUTE FUNCTION public.prevent_multiple_active_reservations();
 
 -- Message de confirmation
-SELECT 'Migration appliquée avec succès ! Les contre-offres et contre-offres en chaîne sont maintenant possibles.' as status;
+SELECT 'Migration appliquée avec succès ! Les contraintes uniques ont été supprimées et les contre-offres en chaîne sont maintenant possibles.' as status;
