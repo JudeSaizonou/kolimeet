@@ -52,6 +52,14 @@ const ReservationCard: React.FC<ReservationCardProps> = ({
               {trip?.from_city}, {trip?.from_country} →{' '}
               {trip?.to_city}, {trip?.to_country}
             </CardTitle>
+            {/* Numéro de réservation lisible (préférer reservation_number si dispo) */}
+            <div className="text-xs text-muted-foreground font-mono">
+              N° réservation : <span className="font-semibold">
+                {reservation.reservation_number
+                  ? reservation.reservation_number
+                  : `#RZV-${reservation.id?.slice(-6)?.toUpperCase() || '------'}`}
+              </span>
+            </div>
             <CardDescription className="flex flex-wrap items-center gap-4">
               <span className="flex items-center gap-1">
                 <Calendar className="h-4 w-4" />

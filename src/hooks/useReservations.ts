@@ -4,6 +4,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 
 export interface Reservation {
+    reservation_number?: string;
   id: string;
   trip_id: string;
   requester_id: string;
