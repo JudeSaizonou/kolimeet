@@ -23,6 +23,7 @@ import { SEO } from "@/components/SEO";
 import { generateTripOGImage } from "@/lib/utils/ogImage";
 import { ReportButton } from "@/components/ReportButton";
 import { TrustBadge, ReferralRequestDialog, ReferrersList } from "@/components/trust";
+import { TripReservationsList } from "@/components/reservations/TripReservationsList";
 
 const TripDetail = () => {
   const { id } = useParams();
@@ -376,7 +377,7 @@ const TripDetail = () => {
                 onClick={() => navigate(`/publier/trajet/${trip.id}`)}
               >
                 <Settings className="mr-2 h-5 w-5" />
-                Gérer l'annonce
+                Modifier l'annonce
               </Button>
             ) : (
               <>
@@ -398,6 +399,13 @@ const TripDetail = () => {
             )}
           </div>
         </div>
+
+        {/* Réservations pour l'auteur de l'annonce */}
+        {user?.id === trip.user_id && (
+          <div className="mt-6">
+            <TripReservationsList tripId={trip.id} driverId={trip.user_id} />
+          </div>
+        )}
 
         {/* Suggestions de colis compatibles */}
         <div className="mt-8 mb-24 md:mb-8">

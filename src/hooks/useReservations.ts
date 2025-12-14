@@ -1,87 +1,174 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-
-export interface CreateReservationInput {
-  trip_id: string;
-  weight_kg: number;
-  price_per_kg: number;
-  total_amount: number;
-  message?: string;
-}
+import { useAuth } from '@/hooks/useAuth';
 
 export interface Reservation {
   id: string;
   trip_id: string;
-  user_id: string;
-  weight_kg: number;
-  price_per_kg: number;
-  total_amount: number;
-  status: 'pending' | 'confirmed' | 'paid' | 'cancelled' | 'completed';
-  payment_status: 'pending' | 'processing' | 'paid' | 'failed' | 'refunded';
-  stripe_payment_intent_id?: string;
-  message?: string;
-  notes?: string;
+  requester_id: string;
+  driver_id: string;
+  kilos_requested: number;
+  price_offered: number;
+  price_per_kg: number | null;
+  status: 'pending' | 'accepted' | 'declined' | 'cancelled' | 'counter_offered';
+  thread_id: string;
   created_at: string;
-  confirmed_at?: string;
-  paid_at?: string;
-  completed_at?: string;
-  trips?: any;
-  profiles?: any;
+  updated_at: string;
+  // Relations
+  trips?: {
+    id: string;
+    from_city: string;
+    from_country: string;
+    to_city: string;
+    to_country: string;
+    date_departure: string;
+    price_per_kg: number;
+    capacity_available_kg: number;
+    profiles?: {
+      full_name: string;
+      avatar_url: string;
+    };
+  };
+  requester?: {
+    full_name: string;
+    avatar_url: string;
+  };
+  driver?: {
+    full_name: string;
+    avatar_url: string;
+  };
 }
 
-// Hook temporaire - nécessite l'application de la migration de base de données
 export const useReservations = () => {
-  const [loading, setLoading] = useState(false);
+  const { user } = useAuth();
   const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
+  const [myRequests, setMyRequests] = useState<Reservation[]>([]); // Demandes que j'ai faites
+  const [receivedRequests, setReceivedRequests] = useState<Reservation[]>([]); // Demandes reçues sur mes trajets
 
-  const createReservation = async (data: CreateReservationInput) => {
+  const fetchReservations = useCallback(async () => {
+    if (!user) return;
+    
     setLoading(true);
     try {
-      // Pour l'instant, retourner une erreur explicative
-      toast({
-        title: 'Migration requise',
-        description: 'Veuillez d\'abord appliquer la migration de base de données pour activer les réservations',
-        variant: 'destructive',
-      });
-      throw new Error('Migration de base de données requise');
+      // Récupérer les demandes que j'ai faites (je suis requester)
+      const { data: myData, error: myError } = await supabase
+        .from('reservation_requests')
+        .select('*, trips(*)')
+        .eq('requester_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (myError) {
+        console.error('Error fetching my requests:', myError);
+        throw myError;
+      }
+
+      // Enrichir avec les profils des conducteurs
+      const enrichedMyData = await Promise.all(
+        (myData || []).map(async (req: any) => {
+          if (req.trips?.user_id) {
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('full_name, avatar_url')
+              .eq('user_id', req.trips.user_id)
+              .single();
+            return {
+              ...req,
+              trips: {
+                ...req.trips,
+                profiles: profile
+              }
+            };
+          }
+          return req;
+        })
+      );
+
+      // Récupérer les demandes reçues sur mes trajets (je suis driver)
+      const { data: receivedData, error: receivedError } = await supabase
+        .from('reservation_requests')
+        .select('*, trips(*)')
+        .eq('driver_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (receivedError) {
+        console.error('Error fetching received requests:', receivedError);
+        throw receivedError;
+      }
+
+      // Enrichir avec les profils des demandeurs
+      const enrichedReceivedData = await Promise.all(
+        (receivedData || []).map(async (req: any) => {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('full_name, avatar_url')
+            .eq('user_id', req.requester_id)
+            .single();
+          return {
+            ...req,
+            requester: profile
+          };
+        })
+      );
+
+      setMyRequests(enrichedMyData);
+      setReceivedRequests(enrichedReceivedData);
     } catch (error: any) {
-      throw error;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const updateReservationStatus = async (
-    reservationId: string,
-    status: Reservation['status'],
-    notes?: string
-  ) => {
-    setLoading(true);
-    try {
+      console.error('Error fetching reservations:', error);
       toast({
-        title: 'Migration requise',
-        description: 'Veuillez d\'abord appliquer la migration de base de données',
+        title: 'Erreur',
+        description: 'Impossible de charger les réservations',
         variant: 'destructive',
       });
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, toast]);
 
-  const getUserReservations = async () => {
-    return [];
-  };
+  useEffect(() => {
+    fetchReservations();
+  }, [fetchReservations]);
 
-  const getTripReservations = async (tripId: string) => {
-    return [];
-  };
+  // Écouter les changements en temps réel
+  useEffect(() => {
+    if (!user) return;
+
+    const channel = supabase
+      .channel('my-reservations')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'reservation_requests',
+        },
+        (payload) => {
+          const record = payload.new as any;
+          const oldRecord = payload.old as any;
+          
+          // Vérifier si ça nous concerne
+          if (
+            record?.requester_id === user.id ||
+            record?.driver_id === user.id ||
+            oldRecord?.requester_id === user.id ||
+            oldRecord?.driver_id === user.id
+          ) {
+            fetchReservations();
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user, fetchReservations]);
 
   return {
     loading,
-    createReservation,
-    updateReservationStatus,
-    getUserReservations,
-    getTripReservations,
+    myRequests,        // Mes demandes envoyées
+    receivedRequests,  // Demandes reçues sur mes trajets
+    refetch: fetchReservations,
   };
 };
