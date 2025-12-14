@@ -86,38 +86,16 @@ export function ReservationRequestDrawer({
     setLoading(true);
 
     try {
-      // Récupérer l'utilisateur actuel
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Non authentifié");
+      // Utiliser la RPC create_reservation_request qui gère tout automatiquement
+      // (création de la demande + message + notifications)
+      const { error } = await supabase.rpc("create_reservation_request", {
+        p_thread_id: threadId,
+        p_trip_id: trip.id,
+        p_kilos: kilos,
+        p_price: totalPrice,
+      });
 
-      // Créer la réservation dans la table bookings
-      const { data: booking, error: bookingError } = await (supabase as any)
-        .from('bookings')
-        .insert({
-          trip_id: trip.id,
-          user_id: user.id,
-          traveler_id: trip.user_id,
-          weight_kg: kilos,
-          price_per_kg: pricePerKg,
-          total_price: totalPrice,
-          status: 'pending',
-        })
-        .select()
-        .single();
-
-      if (bookingError) throw bookingError;
-
-      // Envoyer un message automatique dans la conversation
-      const { error: messageError } = await supabase
-        .from('messages')
-        .insert({
-          thread_id: threadId,
-          sender_id: user.id,
-          content: `📦 Demande de réservation: ${kilos} kg pour ${totalPrice.toFixed(2)}€`,
-          message_type: 'booking_request',
-        });
-
-      if (messageError) throw messageError;
+      if (error) throw error;
 
       toast({
         title: "Demande envoyée",

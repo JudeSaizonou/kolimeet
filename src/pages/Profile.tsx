@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,7 +16,7 @@ import {
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
-import { Camera, Star, LogOut, EyeOff, ChevronRight, Shield, Settings, HelpCircle, Phone, MapPin, Bell, User, Users } from "lucide-react";
+import { Camera, Star, LogOut, EyeOff, ChevronRight, Shield, Settings, HelpCircle, Phone, MapPin, Bell, User, Users, Package, Plane, ClipboardList } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PhoneVerification } from "@/components/profile/PhoneVerification";
 import { OneSignalNotificationToggle } from "@/components/notifications/OneSignalNotificationToggle";
@@ -300,6 +301,36 @@ const Profile = () => {
                 size="sm"
               />
             </div>
+          </div>
+        </div>
+
+        {/* Raccourcis rapides */}
+        <div className="px-4 -mt-4 mb-4">
+          <div className="grid grid-cols-2 gap-3">
+            <Link 
+              to="/mes-annonces"
+              className="flex items-center gap-3 p-4 bg-white rounded-xl shadow-sm border border-slate-100 hover:border-primary/30 hover:shadow-md transition-all"
+            >
+              <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+                <Plane className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <p className="font-medium text-sm text-slate-900">Mes annonces</p>
+                <p className="text-xs text-slate-500">Gérer</p>
+              </div>
+            </Link>
+            <Link 
+              to="/mes-reservations"
+              className="flex items-center gap-3 p-4 bg-white rounded-xl shadow-sm border border-slate-100 hover:border-primary/30 hover:shadow-md transition-all"
+            >
+              <div className="w-10 h-10 bg-violet-100 rounded-xl flex items-center justify-center">
+                <ClipboardList className="h-5 w-5 text-violet-600" />
+              </div>
+              <div>
+                <p className="font-medium text-sm text-slate-900">Réservations</p>
+                <p className="text-xs text-slate-500">Suivre</p>
+              </div>
+            </Link>
           </div>
         </div>
 
