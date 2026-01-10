@@ -19,9 +19,19 @@ import {
 const HomePage = () => {
   return (
     <>
-      {/* Hero Section - Full viewport on large screens */}
-      <section className="min-h-[60vh] lg:min-h-[80vh] flex items-center pt-20 md:pt-28 pb-16 md:pb-24 lg:pb-32 px-4 bg-secondary/30">
-        <div className="container mx-auto max-w-7xl">
+      {/* Hero Section - Full viewport with background image */}
+      <section className="relative min-h-[70vh] lg:min-h-[85vh] flex items-center pt-20 md:pt-28 pb-16 md:pb-24 lg:pb-32 px-4 overflow-hidden">
+        {/* Background Image with Overlay */}
+        <div className="absolute inset-0 z-0">
+          <img 
+            src="/images/hero-bg.jpg" 
+            alt="" 
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/80 to-background/60" />
+        </div>
+        
+        <div className="container mx-auto max-w-7xl relative z-10">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             {/* Left: Text Content */}
             <div className="text-center lg:text-left">
@@ -45,7 +55,7 @@ const HomePage = () => {
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Link>
                 </Button>
-                <Button size="lg" variant="outline" asChild className="text-base lg:text-lg lg:px-8 lg:py-6">
+                <Button size="lg" variant="outline" asChild className="text-base lg:text-lg lg:px-8 lg:py-6 bg-background/80 backdrop-blur-sm">
                   <Link to="/auth/register">
                     Créer un compte gratuit
                   </Link>
@@ -53,31 +63,15 @@ const HomePage = () => {
               </div>
             </div>
             
-            {/* Right: Visual illustration (large screens only) */}
+            {/* Right: Hero Image (large screens only) */}
             <div className="hidden lg:flex justify-center items-center">
               <div className="relative">
-                {/* Main visual */}
-                <div className="w-96 h-96 rounded-full bg-primary/10 flex items-center justify-center">
-                  <div className="w-72 h-72 rounded-full bg-primary/15 flex items-center justify-center">
-                    <div className="grid grid-cols-2 gap-6">
-                      <div className="bg-background rounded-2xl p-6 shadow-lg">
-                        <Package className="h-12 w-12 text-primary mb-2" />
-                        <p className="text-sm font-medium">Colis</p>
-                      </div>
-                      <div className="bg-background rounded-2xl p-6 shadow-lg">
-                        <Plane className="h-12 w-12 text-success mb-2" />
-                        <p className="text-sm font-medium">Trajets</p>
-                      </div>
-                      <div className="bg-background rounded-2xl p-6 shadow-lg">
-                        <MessageSquare className="h-12 w-12 text-blue-500 mb-2" />
-                        <p className="text-sm font-medium">Messages</p>
-                      </div>
-                      <div className="bg-background rounded-2xl p-6 shadow-lg">
-                        <Shield className="h-12 w-12 text-amber-500 mb-2" />
-                        <p className="text-sm font-medium">Sécurité</p>
-                      </div>
-                    </div>
-                  </div>
+                <div className="w-[420px] h-[420px] rounded-3xl overflow-hidden shadow-2xl">
+                  <img 
+                    src="/images/traveler.jpg" 
+                    alt="Voyageur avec valise" 
+                    className="w-full h-full object-cover"
+                  />
                 </div>
                 {/* Floating elements */}
                 <div className="absolute -top-4 -right-4 bg-success text-white rounded-full px-4 py-2 text-sm font-medium shadow-lg">
@@ -104,14 +98,16 @@ const HomePage = () => {
           </p>
           
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
-            <Card className="border-2 border-primary/20 hover:shadow-lg transition-shadow">
+            <Card className="border-2 border-primary/20 hover:shadow-lg transition-shadow overflow-hidden">
+              <div className="h-48 overflow-hidden">
+                <img 
+                  src="/images/airport-luggage.jpg" 
+                  alt="Bagages à l'aéroport" 
+                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                />
+              </div>
               <CardContent className="p-8 lg:p-10">
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
-                    <Package className="h-8 w-8 text-primary" />
-                  </div>
-                  <h3 className="text-2xl font-semibold">Pour les expéditeurs</h3>
-                </div>
+                <h3 className="text-2xl font-semibold mb-6">Pour les expéditeurs</h3>
                 <p className="text-muted-foreground text-lg leading-relaxed">
                   Vous avez un colis à envoyer ? Publiez votre annonce avec les détails 
                   (poids, dimensions, destination) et trouvez un voyageur de confiance 
@@ -134,14 +130,16 @@ const HomePage = () => {
               </CardContent>
             </Card>
             
-            <Card className="border-2 border-success/20 hover:shadow-lg transition-shadow">
+            <Card className="border-2 border-success/20 hover:shadow-lg transition-shadow overflow-hidden">
+              <div className="h-48 overflow-hidden">
+                <img 
+                  src="/images/savings.jpg" 
+                  alt="Économies" 
+                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                />
+              </div>
               <CardContent className="p-8 lg:p-10">
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="h-16 w-16 rounded-full bg-success/10 flex items-center justify-center">
-                    <Plane className="h-8 w-8 text-success" />
-                  </div>
-                  <h3 className="text-2xl font-semibold">Pour les voyageurs</h3>
-                </div>
+                <h3 className="text-2xl font-semibold mb-6">Pour les voyageurs</h3>
                 <p className="text-muted-foreground text-lg leading-relaxed">
                   Vous voyagez et avez de l'espace disponible ? Publiez votre trajet et 
                   rentabilisez votre voyage en transportant des colis pour d'autres utilisateurs.
@@ -167,15 +165,25 @@ const HomePage = () => {
       </section>
 
       {/* How it works */}
-      <section className="py-20 lg:py-32 px-4 bg-secondary/30">
-        <div className="container mx-auto max-w-7xl">
+      <section className="relative py-20 lg:py-32 px-4 overflow-hidden">
+        {/* Background Image */}
+        <div className="absolute inset-0 z-0">
+          <img 
+            src="/images/package-handover.jpg" 
+            alt="" 
+            className="w-full h-full object-cover opacity-10"
+          />
+          <div className="absolute inset-0 bg-secondary/80" />
+        </div>
+        
+        <div className="container mx-auto max-w-7xl relative z-10">
           <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-16 tracking-tight">
             Comment ça marche ?
           </h2>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
             <div className="text-center group">
-              <div className="h-20 w-20 lg:h-24 lg:w-24 rounded-full bg-primary text-white flex items-center justify-center mx-auto mb-6 text-3xl lg:text-4xl font-bold group-hover:scale-110 transition-transform">
+              <div className="h-20 w-20 lg:h-24 lg:w-24 rounded-full bg-primary text-white flex items-center justify-center mx-auto mb-6 text-3xl lg:text-4xl font-bold group-hover:scale-110 transition-transform shadow-lg">
                 1
               </div>
               <h3 className="font-semibold text-lg mb-3">Créez votre compte</h3>
@@ -185,7 +193,7 @@ const HomePage = () => {
             </div>
             
             <div className="text-center group">
-              <div className="h-20 w-20 lg:h-24 lg:w-24 rounded-full bg-primary text-white flex items-center justify-center mx-auto mb-6 text-3xl lg:text-4xl font-bold group-hover:scale-110 transition-transform">
+              <div className="h-20 w-20 lg:h-24 lg:w-24 rounded-full bg-primary text-white flex items-center justify-center mx-auto mb-6 text-3xl lg:text-4xl font-bold group-hover:scale-110 transition-transform shadow-lg">
                 2
               </div>
               <h3 className="font-semibold text-lg mb-3">Publiez ou explorez</h3>
@@ -195,7 +203,7 @@ const HomePage = () => {
             </div>
             
             <div className="text-center group">
-              <div className="h-20 w-20 lg:h-24 lg:w-24 rounded-full bg-primary text-white flex items-center justify-center mx-auto mb-6 text-3xl lg:text-4xl font-bold group-hover:scale-110 transition-transform">
+              <div className="h-20 w-20 lg:h-24 lg:w-24 rounded-full bg-primary text-white flex items-center justify-center mx-auto mb-6 text-3xl lg:text-4xl font-bold group-hover:scale-110 transition-transform shadow-lg">
                 3
               </div>
               <h3 className="font-semibold text-lg mb-3">Échangez</h3>
@@ -205,7 +213,7 @@ const HomePage = () => {
             </div>
             
             <div className="text-center group">
-              <div className="h-20 w-20 lg:h-24 lg:w-24 rounded-full bg-primary text-white flex items-center justify-center mx-auto mb-6 text-3xl lg:text-4xl font-bold group-hover:scale-110 transition-transform">
+              <div className="h-20 w-20 lg:h-24 lg:w-24 rounded-full bg-primary text-white flex items-center justify-center mx-auto mb-6 text-3xl lg:text-4xl font-bold group-hover:scale-110 transition-transform shadow-lg">
                 4
               </div>
               <h3 className="font-semibold text-lg mb-3">Finalisez</h3>
@@ -303,8 +311,73 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Data Privacy Section - Required by Google */}
+      {/* Why Trust Us - New section with images */}
       <section className="py-20 lg:py-32 px-4 bg-secondary/30">
+        <div className="container mx-auto max-w-7xl">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-6 tracking-tight">
+            Pourquoi nous faire confiance ?
+          </h2>
+          <p className="text-center text-muted-foreground mb-16 max-w-2xl mx-auto text-base sm:text-lg md:text-xl">
+            Une communauté basée sur la confiance et la transparence
+          </p>
+          
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="group">
+              <div className="relative h-64 rounded-2xl overflow-hidden mb-6">
+                <img 
+                  src="/images/trust-handshake.jpg" 
+                  alt="Confiance" 
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                <div className="absolute bottom-4 left-4 right-4">
+                  <h3 className="text-white text-xl font-semibold">Confiance mutuelle</h3>
+                </div>
+              </div>
+              <p className="text-muted-foreground">
+                Système d'avis et de notation pour garantir des échanges en toute sérénité entre utilisateurs vérifiés.
+              </p>
+            </div>
+            
+            <div className="group">
+              <div className="relative h-64 rounded-2xl overflow-hidden mb-6">
+                <img 
+                  src="/images/community.jpg" 
+                  alt="Communauté" 
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                <div className="absolute bottom-4 left-4 right-4">
+                  <h3 className="text-white text-xl font-semibold">Communauté solidaire</h3>
+                </div>
+              </div>
+              <p className="text-muted-foreground">
+                Rejoignez une communauté de voyageurs et expéditeurs qui s'entraident au quotidien.
+              </p>
+            </div>
+            
+            <div className="group">
+              <div className="relative h-64 rounded-2xl overflow-hidden mb-6">
+                <img 
+                  src="/images/package-handover.jpg" 
+                  alt="Remise de colis" 
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                <div className="absolute bottom-4 left-4 right-4">
+                  <h3 className="text-white text-xl font-semibold">Remise sécurisée</h3>
+                </div>
+              </div>
+              <p className="text-muted-foreground">
+                Organisez facilement la remise en main propre de vos colis via notre messagerie intégrée.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Data Privacy Section - Required by Google */}
+      <section className="py-20 lg:py-32 px-4 bg-background">
         <div className="container mx-auto max-w-5xl">
           <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-6 tracking-tight">
             Vos données, notre priorité
@@ -313,7 +386,7 @@ const HomePage = () => {
             Nous prenons la protection de vos données très au sérieux
           </p>
           
-          <div className="bg-background rounded-2xl p-8 lg:p-12 shadow-sm">
+          <div className="bg-secondary/30 rounded-2xl p-8 lg:p-12 shadow-sm">
             <div className="grid lg:grid-cols-3 gap-8 lg:gap-12">
               <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
                 <div className="h-14 w-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
@@ -361,9 +434,12 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 lg:py-32 px-4 bg-primary text-primary-foreground">
-        <div className="container mx-auto max-w-4xl text-center">
+      {/* CTA Section with background */}
+      <section className="relative py-20 lg:py-32 px-4 overflow-hidden">
+        {/* Background */}
+        <div className="absolute inset-0 bg-primary" />
+        
+        <div className="container mx-auto max-w-4xl text-center relative z-10 text-primary-foreground">
           <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-6 tracking-tight">
             Prêt à rejoindre Kolimeet ?
           </h2>
