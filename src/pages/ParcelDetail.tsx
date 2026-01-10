@@ -209,7 +209,7 @@ const ParcelDetail = () => {
         url={shareUrl}
         type="article"
       />
-      <div className="min-h-screen bg-gradient-to-b from-slate-50 via-background to-background pb-24 pt-20 md:pt-24">
+      <div className="min-h-screen bg-slate-50 pb-24 pt-20 md:pt-24">
         <div className="container mx-auto px-4 max-w-3xl">
         
         {/* Hero Card - Design épuré sur fond blanc */}
@@ -260,7 +260,7 @@ const ParcelDetail = () => {
           {/* Zone de capture pour le partage */}
           <div ref={shareContentRef} className="bg-white">
             {/* Header coloré subtil */}
-            <div className="bg-gradient-to-r from-violet-500/10 via-violet-500/5 to-transparent p-6 pb-4 pt-16">
+            <div className="bg-violet-50 p-6 pb-4 pt-16">
               {/* Badge colis */}
               <div className="flex items-center gap-2 mb-4">
                 <Badge className="bg-violet-500/10 text-violet-600 border-0">
@@ -454,7 +454,7 @@ const ParcelDetail = () => {
             {user?.id === parcel.user_id ? (
               <Button 
                 onClick={() => navigate(`/publier/colis/${parcel.id}`)}
-                className="flex-1 h-14 rounded-2xl font-semibold text-base shadow-lg shadow-violet-500/20 bg-gradient-to-r from-violet-500 to-indigo-500 hover:from-violet-600 hover:to-indigo-600 touch-manipulation"
+                className="flex-1 h-14 rounded-2xl font-semibold text-base shadow-lg shadow-violet-500/20 bg-violet-500 hover:bg-violet-600 touch-manipulation"
               >
                 <Settings className="w-5 h-5 mr-2" />
                 Gérer l'annonce
@@ -463,7 +463,7 @@ const ParcelDetail = () => {
               <>
                 <Button 
                   onClick={handleContact} 
-                  className="flex-1 h-14 rounded-2xl font-semibold text-base shadow-lg shadow-violet-500/20 bg-gradient-to-r from-violet-500 to-indigo-500 hover:from-violet-600 hover:to-indigo-600 touch-manipulation"
+                  className="flex-1 h-14 rounded-2xl font-semibold text-base shadow-lg shadow-violet-500/20 bg-violet-500 hover:bg-violet-600 touch-manipulation"
                 >
                   <MessageCircle className="w-5 h-5 mr-2" />
                   Contacter l'expéditeur

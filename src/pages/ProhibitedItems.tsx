@@ -13,7 +13,7 @@ const ProhibitedItems = () => {
         <meta name="description" content="Liste des articles qu'il est strictement interdit de transporter via Kolimeet." />
       </Helmet>
 
-      <div className="min-h-screen bg-secondary">
+      <div className="min-h-screen bg-secondary pt-20 md:pt-28">
         <div className="container mx-auto px-4 py-8 max-w-4xl">
           <Button variant="ghost" asChild className="mb-4">
             <Link to="/cgu" className="flex items-center gap-2">

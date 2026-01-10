@@ -41,20 +41,21 @@ const Explorer = () => {
   };
 
   return (
-    <section className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-2">
-          <div className="p-2 bg-primary rounded-lg">
-            <Search className="h-6 w-6 text-white" />
+    <section className="min-h-screen bg-background pt-20 md:pt-28">
+      <div className="container mx-auto px-4 py-8">
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2 bg-primary rounded-lg">
+              <Search className="h-6 w-6 text-white" />
+            </div>
+            <h1 className="text-2xl md:text-4xl font-extrabold text-foreground tracking-tight">
+              Explorer les annonces
+            </h1>
           </div>
-          <h1 className="text-2xl md:text-4xl font-extrabold text-foreground tracking-tight">
-            Explorer les annonces
-          </h1>
+          <p className="text-slate-600 text-base md:text-lg font-medium">
+            Trouvez le voyageur ou l'expéditeur qui correspond à vos besoins.
+          </p>
         </div>
-        <p className="text-slate-600 text-base md:text-lg font-medium">
-          Trouvez le voyageur ou l'expéditeur qui correspond à vos besoins.
-        </p>
-      </div>
 
       <Tabs defaultValue="trips" className="w-full">
         <TabsList className="mb-6 bg-white/80 backdrop-blur-md border border-border/50 p-1 h-auto">
@@ -220,6 +221,7 @@ const Explorer = () => {
           )}
         </TabsContent>
       </Tabs>
+      </div>
     </section>
   );
 };

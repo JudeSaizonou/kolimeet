@@ -46,7 +46,7 @@ const Notifications = () => {
         <meta name="description" content="Gérez vos notifications sur Kolimeet" />
       </Helmet>
 
-      <div className="min-h-screen bg-secondary">
+      <div className="min-h-screen bg-secondary pt-20 md:pt-28">
         <div className="container mx-auto px-4 py-8 max-w-2xl">
           {/* Header */}
           <div className="flex items-center justify-between mb-6">

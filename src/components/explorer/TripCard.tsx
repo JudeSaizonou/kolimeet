@@ -23,7 +23,7 @@ export const TripCard = ({ trip }: TripCardProps) => {
       onClick={() => navigate(`/trajets/${trip.id}`)}
     >
       {/* Header Image / Map Placeholder */}
-      <div className="h-24 md:h-32 bg-gradient-to-br from-primary/5 to-primary/10 relative">
+      <div className="h-24 md:h-32 bg-primary/5 relative">
         <div className="absolute top-2 right-2 z-10">
           <Button
             variant="secondary"

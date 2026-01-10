@@ -30,7 +30,7 @@ export const ParcelCard = ({ parcel }: ParcelCardProps) => {
       onClick={() => navigate(`/colis/${parcel.id}`)}
     >
       {/* Header Image / Map Placeholder */}
-      <div className="h-24 md:h-32 bg-gradient-to-br from-violet-500/5 to-violet-500/10 relative">
+      <div className="h-24 md:h-32 bg-violet-500/5 relative">
         <div className="absolute top-2 right-2 z-10">
           <Button
             variant="secondary"

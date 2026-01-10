@@ -171,7 +171,7 @@ const FavoriteCard = ({ favorite, onView, onRemove }: FavoriteCardProps) => {
 
   return (
     <Card className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer" onClick={onView}>
-      <div className="bg-gradient-to-r from-primary/5 to-background p-3 md:p-4 border-b">
+      <div className="bg-primary/5 p-3 md:p-4 border-b">
         <div className="flex items-start justify-between gap-2">
           <div className="space-y-1 flex-1 min-w-0">
             <div className="flex items-center gap-2 text-sm md:text-base font-semibold">

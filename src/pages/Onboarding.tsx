@@ -163,7 +163,7 @@ const Onboarding = () => {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-secondary py-12 px-4">
+      <div className="min-h-screen bg-secondary pt-20 md:pt-28 py-12 px-4">
         <div className="max-w-2xl mx-auto">
           <Card className="p-8 border-2">
             <div className="text-center mb-8">

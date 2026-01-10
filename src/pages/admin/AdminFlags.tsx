@@ -66,7 +66,7 @@ export function AdminFlags() {
 
       toast({
         title: "Signalement mis à jour",
-        description: status === "resolved" ? "Marqué comme traité ✅" : "Marqué comme rejeté",
+        description: status === "resolved" ? "Marqué comme traité" : "Marqué comme rejeté",
       });
 
       fetchFlags();
@@ -105,7 +105,7 @@ export function AdminFlags() {
 
       toast({
         title: "Contenu supprimé",
-        description: "Le contenu signalé a été supprimé 🗑️",
+        description: "Le contenu signalé a été supprimé",
       });
     } catch (error: any) {
       toast({

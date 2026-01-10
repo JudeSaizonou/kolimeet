@@ -66,7 +66,7 @@ const FAQ = () => {
         <meta name="description" content="Retrouvez les réponses aux questions fréquentes sur l'utilisation de Kolimeet, la plateforme de mise en relation pour l'envoi de colis." />
       </Helmet>
 
-      <div className="min-h-screen bg-secondary">
+      <div className="min-h-screen bg-secondary pt-20 md:pt-28">
         <div className="container mx-auto px-4 py-8 max-w-4xl">
           <div className="bg-background rounded-lg shadow-sm p-6 md:p-8">
             <div className="flex items-center gap-3 mb-6">

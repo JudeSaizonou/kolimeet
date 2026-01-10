@@ -64,7 +64,7 @@ export function AdminReviews() {
 
       toast({
         title: "Avis supprimé",
-        description: "L'avis a été supprimé 🗑️",
+        description: "L'avis a été supprimé",
       });
 
       fetchReviews();

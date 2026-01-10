@@ -109,7 +109,7 @@ export function AdminListings() {
 
       toast({
         title: "Trajet supprimé",
-        description: "Le trajet a été supprimé 🗑️",
+        description: "Le trajet a été supprimé",
       });
 
       fetchListings();
@@ -154,7 +154,7 @@ export function AdminListings() {
 
       toast({
         title: "Colis supprimé",
-        description: "Le colis a été supprimé 🗑️",
+        description: "Le colis a été supprimé",
       });
 
       fetchListings();

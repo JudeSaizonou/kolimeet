@@ -27,13 +27,15 @@ export function SuspensionBanner() {
   if (!isSuspended) return null;
 
   return (
-    <Alert variant="destructive" className="mb-4">
-      <AlertCircle className="h-4 w-4" />
-      <AlertTitle>Compte suspendu</AlertTitle>
-      <AlertDescription>
-        Votre compte est actuellement suspendu. Vous ne pouvez pas publier de contenu ni envoyer de messages. 
-        Pour plus d'informations, veuillez contacter le support.
-      </AlertDescription>
-    </Alert>
+    <div className="container mx-auto px-4 pt-4">
+      <Alert variant="destructive" className="mb-4">
+        <AlertCircle className="h-4 w-4" />
+        <AlertTitle>Compte suspendu</AlertTitle>
+        <AlertDescription>
+          Votre compte est actuellement suspendu. Vous ne pouvez pas publier de contenu ni envoyer de messages. 
+          Pour plus d'informations, veuillez contacter le support.
+        </AlertDescription>
+      </Alert>
+    </div>
   );
 }

@@ -106,8 +106,8 @@ export function AdminUsers() {
       toast({
         title: currentStatus ? "Utilisateur réactivé" : "Utilisateur suspendu",
         description: currentStatus
-          ? "Le compte a été réactivé ✅"
-          : "Le compte a été suspendu 🚫",
+          ? "Le compte a été réactivé"
+          : "Le compte a été suspendu",
       });
 
       // Refresh data to ensure consistency
@@ -175,7 +175,7 @@ export function AdminUsers() {
 
       toast({
         title: "Utilisateur supprimé",
-        description: "Le profil utilisateur a été supprimé avec succès ✅",
+        description: "Le profil utilisateur a été supprimé avec succès",
       });
 
       // Refresh data to ensure consistency

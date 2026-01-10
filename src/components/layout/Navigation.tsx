@@ -73,52 +73,26 @@ const Navigation = () => {
             </span>
           </Link>
         ) : (
-          <a 
-            href="https://kolimeet.framer.ai/"
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link 
+            to="/"
             className="flex items-center gap-2 flex-shrink-0"
           >
             <Package className="h-6 w-6 text-primary" />
             <span className="text-xl font-bold text-foreground whitespace-nowrap">
               Kolimeet
             </span>
-          </a>
+          </Link>
         )}
         
         {/* Desktop Navigation Links */}
         <div className="hidden md:flex items-center gap-[30px] flex-1 justify-center" style={{ fontFamily: 'Figtree' }}>
           {!user && (
-            <a 
-              href="https://kolimeet.framer.ai/"
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link 
+              to="/"
               className="text-muted-foreground hover:text-primary transition-all duration-200 text-base font-medium whitespace-nowrap"
             >
               Accueil
-            </a>
-          )}
-          
-          {!user && (
-            <>
-              <a 
-                href="https://kolimeet.framer.ai/services"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-primary transition-all duration-200 text-base font-medium whitespace-nowrap"
-              >
-                Nos services
-              </a>
-              
-              <a 
-                href="https://kolimeet.framer.ai/about-us"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-primary transition-all duration-200 text-base font-medium whitespace-nowrap"
-              >
-                À propos de nous
-              </a>
-            </>
+            </Link>
           )}
           
           <Link 
@@ -142,14 +116,23 @@ const Navigation = () => {
             </Link>
           )}
           
-          <a 
-            href="https://kolimeet.framer.ai/blog"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-muted-foreground hover:text-primary transition-all duration-200 text-base font-medium whitespace-nowrap"
-          >
-            Blog
-          </a>
+          {!user && (
+            <Link 
+              to="/faq"
+              className="text-muted-foreground hover:text-primary transition-all duration-200 text-base font-medium whitespace-nowrap"
+            >
+              FAQ
+            </Link>
+          )}
+          
+          {!user && (
+            <Link 
+              to="/contact"
+              className="text-muted-foreground hover:text-primary transition-all duration-200 text-base font-medium whitespace-nowrap"
+            >
+              Contact
+            </Link>
+          )}
         </div>
 
         {/* Desktop Actions */}

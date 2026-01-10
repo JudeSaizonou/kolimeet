@@ -169,7 +169,7 @@ const MyListings = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background py-4 md:py-8 px-3 md:px-4">
+    <div className="min-h-screen bg-background pt-20 md:pt-28 py-4 md:py-8 px-3 md:px-4">
       <div className="max-w-6xl mx-auto">
         <div className="mb-6 md:mb-8">
           <h1 className="text-2xl md:text-3xl font-bold mb-1 md:mb-2">Mes annonces</h1>
@@ -199,7 +199,7 @@ const MyListings = () => {
             ) : (
               trips.map((trip) => (
                 <Card key={trip.id} className="overflow-hidden hover:shadow-md transition-shadow">
-                  <div className="bg-gradient-to-r from-primary/5 to-background p-3 md:p-4 border-b">
+                  <div className="bg-primary/5 p-3 md:p-4 border-b">
                     <div className="flex items-start justify-between gap-2">
                       <div className="space-y-1 flex-1 min-w-0">
                         <div className="flex items-center gap-2 text-sm md:text-base font-semibold">
@@ -326,7 +326,7 @@ const MyListings = () => {
             ) : (
               parcels.map((parcel) => (
                 <Card key={parcel.id} className="overflow-hidden hover:shadow-md transition-shadow">
-                  <div className="bg-gradient-to-r from-primary/5 to-background p-3 md:p-4 border-b">
+                  <div className="bg-primary/5 p-3 md:p-4 border-b">
                     <div className="flex items-start justify-between gap-2">
                       <div className="space-y-1 flex-1 min-w-0">
                         <div className="flex items-center gap-2 text-sm md:text-base font-semibold">

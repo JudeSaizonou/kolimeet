@@ -192,7 +192,7 @@ const TripDetail = () => {
         url={shareUrl}
         type="article"
       />
-      <div className="min-h-screen bg-gradient-to-b from-slate-50 via-background to-background pb-24 pt-20 md:pt-24">
+      <div className="min-h-screen bg-slate-50 pb-24 pt-20 md:pt-24">
         <div className="container mx-auto px-4 max-w-3xl">
         
         {/* Hero Card - Design épuré sur fond blanc */}
@@ -245,7 +245,7 @@ const TripDetail = () => {
           {/* Zone de capture pour le partage */}
           <div ref={shareContentRef} className="bg-white">
             {/* Header coloré subtil */}
-            <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-6 pb-4 pt-16">
+            <div className="bg-primary/5 p-6 pb-4 pt-16">
               {/* Badge trajet */}
               <div className="flex items-center gap-2 mb-4">
                 <Badge className="bg-primary/10 text-primary border-0">
@@ -407,7 +407,7 @@ const TripDetail = () => {
             ) : (
               <>
                 <Button 
-                  className="flex-1 h-14 rounded-2xl font-semibold text-base shadow-lg shadow-primary/20 bg-gradient-to-r from-primary to-primary/90 touch-manipulation"
+                  className="flex-1 h-14 rounded-2xl font-semibold text-base shadow-lg shadow-primary/20 touch-manipulation"
                   onClick={() => setBookingDialogOpen(true)}
                 >
                   <Package className="mr-2 h-5 w-5" />

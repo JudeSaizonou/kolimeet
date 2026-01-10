@@ -38,7 +38,7 @@ export default function Feedback() {
 
       if (error) throw error;
 
-      toast.success("Merci pour votre retour ! 💚");
+      toast.success("Merci pour votre retour !");
       navigate(-1);
     } catch (error) {
       console.error("Error submitting feedback:", error);
@@ -49,7 +49,7 @@ export default function Feedback() {
   };
 
   return (
-    <div className="min-h-screen bg-secondary">
+    <div className="min-h-screen bg-secondary pt-20 md:pt-28">
       <header className="bg-background border-b sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4 flex items-center gap-4">
           <Button
@@ -78,19 +78,19 @@ export default function Feedback() {
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="bug" id="bug" />
                   <Label htmlFor="bug" className="font-normal cursor-pointer">
-                    🐛 Signaler un bug
+                    Signaler un bug
                   </Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="suggestion" id="suggestion" />
-                  <Label htmlFor="suggestion" className="font-normal cursor-pointer">
-                    💡 Suggérer une amélioration
+                  <Label htmlFor="suggestion" className="cursor-pointer">
+                    Suggérer une amélioration
                   </Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="autre" id="autre" />
-                  <Label htmlFor="autre" className="font-normal cursor-pointer">
-                    💬 Autre
+                  <Label htmlFor="autre" className="cursor-pointer">
+                    Autre
                   </Label>
                 </div>
               </RadioGroup>
@@ -120,7 +120,7 @@ export default function Feedback() {
         </Card>
 
         <p className="text-sm text-muted-foreground text-center mt-6">
-          Merci de contribuer à l'amélioration de Kolimeet ! ✈️📦
+          Merci de contribuer à l'amélioration de Kolimeet !
         </p>
       </main>
     </div>

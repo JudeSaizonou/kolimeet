@@ -172,14 +172,14 @@ const PublishParcel = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center pt-20 md:pt-28">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background py-8 px-4">
+    <div className="min-h-screen bg-background pt-20 md:pt-28 py-8 px-4">
       <div className="max-w-2xl mx-auto">
         <Card>
           <CardHeader>

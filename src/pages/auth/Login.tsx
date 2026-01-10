@@ -247,7 +247,7 @@ const Login = () => {
       {/* Effet de vague */}
       <MouseWaveEffect />
       
-      <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden -mt-16 pt-16">
+      <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden pt-20 md:pt-28">
       {/* Image de fond qui remonte pour couvrir la navigation */}
       <div 
         className="absolute w-full h-full"
@@ -373,7 +373,7 @@ const Login = () => {
 
           {!isFormValid && (
             <p className="text-xs text-center text-muted-foreground italic">
-              👆 Remplissez les champs pour attraper le bouton !
+              Remplissez les champs pour continuer
             </p>
           )}
         </form>

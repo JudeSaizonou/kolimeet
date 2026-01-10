@@ -257,7 +257,7 @@ const Register = () => {
   return (
     <>
       <MouseWaveEffect />
-      <div className="min-h-screen flex items-center justify-center px-4 py-8 relative overflow-hidden -mt-16 pt-16">
+      <div className="min-h-screen flex items-center justify-center px-4 py-8 relative overflow-hidden pt-20 md:pt-28">
       {/* Image de fond qui remonte pour couvrir la navigation */}
       <div 
         className="absolute w-full h-full"
@@ -407,9 +407,9 @@ const Register = () => {
 
           {!isFormValid && (
             <p className="text-xs text-center text-muted-foreground italic">
-              👆 {password !== confirmPassword && password && confirmPassword 
-                ? "Les mots de passe ne correspondent pas !" 
-                : "Remplissez tous les champs pour attraper le bouton !"}
+              {password !== confirmPassword && password && confirmPassword 
+                ? "Les mots de passe ne correspondent pas" 
+                : "Remplissez tous les champs pour continuer"}
             </p>
           )}
         </form>

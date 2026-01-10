@@ -11,7 +11,7 @@ const CGU = () => {
         <meta name="description" content="Conditions générales d'utilisation de Kolimeet, plateforme de mise en relation pour l'envoi de colis entre la France et le Bénin." />
       </Helmet>
 
-      <div className="min-h-screen bg-secondary">
+      <div className="min-h-screen bg-secondary pt-20 md:pt-28">
         <div className="container mx-auto px-4 py-8 max-w-4xl">
           <div className="bg-background rounded-lg shadow-sm p-6 md:p-8">
             <div className="flex items-center gap-3 mb-6">
@@ -193,19 +193,19 @@ const CGU = () => {
                   to="/articles-interdits" 
                   className="text-primary hover:underline text-sm font-medium"
                 >
-                  📋 Liste des articles interdits
+                  Liste des articles interdits
                 </Link>
                 <Link 
                   to="/faq" 
                   className="text-primary hover:underline text-sm font-medium"
                 >
-                  ❓ FAQ
+                  FAQ
                 </Link>
                 <Link 
                   to="/contact" 
                   className="text-primary hover:underline text-sm font-medium"
                 >
-                  ✉️ Nous contacter
+                  Nous contacter
                 </Link>
               </div>
 

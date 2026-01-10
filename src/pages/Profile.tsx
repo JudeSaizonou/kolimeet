@@ -13,10 +13,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
-import { Camera, Star, LogOut, EyeOff, ChevronRight, Shield, Settings, HelpCircle, Phone, MapPin, Bell, User, Users, Package, Plane, ClipboardList } from "lucide-react";
+import { Camera, Star, LogOut, EyeOff, ChevronRight, Shield, Settings, HelpCircle, Phone, MapPin, Bell, User, Users, Package, Plane, ClipboardList, Download, Trash2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PhoneVerification } from "@/components/profile/PhoneVerification";
 import { OneSignalNotificationToggle } from "@/components/notifications/OneSignalNotificationToggle";
@@ -28,6 +39,8 @@ const Profile = () => {
   const [initialLoading, setInitialLoading] = useState(true);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [exportingData, setExportingData] = useState(false);
+  const [deletingAccount, setDeletingAccount] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState("");
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -229,11 +242,101 @@ const Profile = () => {
     }
   };
 
+  // Export des données personnelles (RGPD - Droit d'accès)
+  const handleExportData = async () => {
+    setExportingData(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Non authentifié");
+
+      // Récupérer toutes les données de l'utilisateur
+      const [profileRes, tripsRes, parcelsRes, reviewsRes, messagesRes, threadsRes] = await Promise.all([
+        supabase.from("profiles").select("*").eq("user_id", user.id).single(),
+        supabase.from("trips").select("*").eq("user_id", user.id),
+        supabase.from("parcels").select("*").eq("user_id", user.id),
+        supabase.from("reviews").select("*").or(`reviewer_id.eq.${user.id},reviewed_user_id.eq.${user.id}`),
+        supabase.from("messages").select("*").eq("sender_id", user.id),
+        supabase.from("threads").select("*").or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`),
+      ]);
+
+      const exportData = {
+        exportDate: new Date().toISOString(),
+        user: {
+          id: user.id,
+          email: user.email,
+          createdAt: user.created_at,
+        },
+        profile: profileRes.data,
+        trips: tripsRes.data || [],
+        parcels: parcelsRes.data || [],
+        reviews: reviewsRes.data || [],
+        messages: messagesRes.data || [],
+        conversations: threadsRes.data || [],
+      };
+
+      // Télécharger en JSON
+      const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `kolimeet-mes-donnees-${new Date().toISOString().split("T")[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      toast({
+        title: "Export réussi",
+        description: "Vos données ont été téléchargées",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Erreur",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setExportingData(false);
+    }
+  };
+
+  // Suppression du compte (RGPD - Droit à l'effacement)
+  const handleDeleteAccount = async () => {
+    setDeletingAccount(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Non authentifié");
+
+      // Appeler la fonction RPC pour supprimer le compte
+      const { error } = await supabase.rpc("delete_user_account", { p_target_user_id: user.id });
+
+      if (error) throw error;
+
+      // Déconnexion
+      await supabase.auth.signOut();
+
+      toast({
+        title: "Compte supprimé",
+        description: "Votre compte et toutes vos données ont été supprimés",
+      });
+
+      navigate("/");
+    } catch (error: any) {
+      toast({
+        title: "Erreur",
+        description: error.message || "Impossible de supprimer le compte. Contactez le support.",
+        variant: "destructive",
+      });
+    } finally {
+      setDeletingAccount(false);
+    }
+  };
+
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-slate-50/50">
+      <div className="min-h-screen bg-slate-50/50 pt-20 md:pt-28">
         {/* Header profil avec fond dégradé */}
-        <div className="bg-gradient-to-b from-primary/5 to-white px-4 pt-6 pb-8">
+        <div className="bg-primary/5 px-4 pt-6 pb-8">
           {/* Avatar centré */}
           <div className="flex flex-col items-center">
             <div className="relative mb-4">
@@ -483,6 +586,85 @@ const Profile = () => {
 
               {/* Notifications intégré */}
               <OneSignalNotificationToggle />
+            </div>
+
+            {/* Confidentialité et données (RGPD) */}
+            <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+              <div className="px-4 py-3 bg-slate-50 border-b border-slate-100">
+                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                  Confidentialité et données
+                </p>
+              </div>
+
+              {/* Télécharger mes données */}
+              <div className="px-4 py-4 border-b border-slate-100 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 bg-blue-100 rounded-xl flex items-center justify-center">
+                    <Download className="h-4.5 w-4.5 text-blue-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-slate-900">Télécharger mes données</p>
+                    <p className="text-xs text-slate-500">Export JSON complet</p>
+                  </div>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleExportData}
+                  disabled={exportingData}
+                  className="h-8 text-xs"
+                >
+                  {exportingData ? "Export..." : "Exporter"}
+                </Button>
+              </div>
+
+              {/* Supprimer mon compte */}
+              <div className="px-4 py-4 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 bg-red-100 rounded-xl flex items-center justify-center">
+                    <Trash2 className="h-4.5 w-4.5 text-red-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-slate-900">Supprimer mon compte</p>
+                    <p className="text-xs text-slate-500">Action irréversible</p>
+                  </div>
+                </div>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-8 text-xs text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
+                    >
+                      Supprimer
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Supprimer votre compte ?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Cette action est irréversible. Toutes vos données seront définitivement supprimées :
+                        <ul className="list-disc list-inside mt-2 space-y-1">
+                          <li>Votre profil et photo</li>
+                          <li>Vos trajets et colis publiés</li>
+                          <li>Vos messages et conversations</li>
+                          <li>Vos avis donnés et reçus</li>
+                        </ul>
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Annuler</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={handleDeleteAccount}
+                        disabled={deletingAccount}
+                        className="bg-red-600 hover:bg-red-700"
+                      >
+                        {deletingAccount ? "Suppression..." : "Supprimer définitivement"}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
             </div>
 
             {/* Bouton enregistrer */}

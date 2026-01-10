@@ -15,6 +15,7 @@ import { OfflineBanner } from "@/components/OfflineBanner";
 import { MessageNotificationListener } from "@/components/notifications/MessageNotificationListener";
 import { useAuth } from "@/hooks/useAuth";
 import Home from "./pages/Home";
+import HomePage from "./pages/HomePage";
 import Explorer from "./pages/Explorer";
 import TripDetail from "./pages/TripDetail";
 import ParcelDetail from "./pages/ParcelDetail";
@@ -37,6 +38,7 @@ import Feedback from "./pages/Feedback";
 import NotFound from "./pages/NotFound";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import CGU from "./pages/CGU";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 import FAQ from "./pages/FAQ";
 import Contact from "./pages/Contact";
 import ProhibitedItems from "./pages/ProhibitedItems";
@@ -80,17 +82,18 @@ const MainWrapper = ({ children }: { children: React.ReactNode }) => {
   const hiddenBottomNavPaths = ['/publier/', '/auth/', '/onboarding'];
   const shouldHideBottomNav = hiddenBottomNavPaths.some(path => location.pathname.startsWith(path));
   
-  // Sur mobile quand connecté avec MobileHeader : pt-16 pour laisser place au header
-  // Sur mobile quand connecté sans MobileHeader : pt-4
-  // Sur mobile quand non connecté : navbar top visible, donc pt-24
-  // Sur desktop : toujours pt-28 pour la navbar top
+  // Padding minimal - les pages gèrent leur propre espacement interne
+  // Sur mobile connecté avec MobileHeader : pt-16
+  // Sur mobile connecté sans MobileHeader : pt-0 (pages gèrent elles-mêmes)
+  // Sur mobile non connecté : pt-0 (navbar flottante, pages gèrent le spacing)
+  // Sur desktop : pt-0 (navbar flottante, pages gèrent leur padding-top)
   const topPadding = isInConversation 
-    ? "pt-0 md:pt-28" 
+    ? "pt-0" 
     : user 
       ? shouldShowMobileHeader
-        ? "pt-16 md:pt-28"
-        : "pt-4 md:pt-28" 
-      : "pt-24 md:pt-28";
+        ? "pt-16 md:pt-0"
+        : "pt-0" 
+      : "pt-0";
   
   // Bottom padding pour la bottom navbar (uniquement sur mobile et si connecté)
   const bottomPadding = !shouldHideBottomNav && user ? "pb-24 md:pb-0" : "";
@@ -115,12 +118,10 @@ const App = () => (
           <OfflineBanner />
           <PWAInstallBanner />
           <MainWrapper>
-            <div className="container mx-auto px-4 py-4">
-              <SuspensionBanner />
-            </div>
+            <SuspensionBanner />
             <Routes>
-        <Route path="/" element={<Explorer />} />
-        <Route path="/home" element={<Home />} />
+        <Route path="/" element={<HomePage />} />
+        <Route path="/home" element={<HomePage />} />
         <Route path="/explorer" element={<Explorer />} />
         <Route path="/trajets/:id" element={<TripDetail />} />
         <Route path="/colis/:id" element={<ParcelDetail />} />
@@ -229,6 +230,7 @@ const App = () => (
                 }
               />
               <Route path="/cgu" element={<CGU />} />
+              <Route path="/confidentialite" element={<PrivacyPolicy />} />
               <Route path="/articles-interdits" element={<ProhibitedItems />} />
               <Route path="/faq" element={<FAQ />} />
               <Route path="/contact" element={<Contact />} />

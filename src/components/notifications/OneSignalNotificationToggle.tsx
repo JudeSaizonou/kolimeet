@@ -104,7 +104,7 @@ export function OneSignalNotificationToggle() {
         
         if (granted) {
           toast({
-            title: 'Notifications activées ! 🔔',
+            title: 'Notifications activées',
             description: 'Vous recevrez des notifications même quand l\'app est fermée.',
           });
         } else {
