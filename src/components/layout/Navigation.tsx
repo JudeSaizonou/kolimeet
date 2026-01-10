@@ -67,11 +67,11 @@ const Navigation = () => {
         {/* Logo */}
         {user ? (
           <Link to="/explorer" className="flex-shrink-0">
-            <img src="/Kolimeetlogo.png" alt="KoliMeet" className="h-10 w-auto" />
+            <img src="/Kolimeetlogo.png" alt="Kolimeet" className="h-10 w-auto" />
           </Link>
         ) : (
           <Link to="/" className="flex-shrink-0">
-            <img src="/Kolimeetlogo.png" alt="KoliMeet" className="h-10 w-auto" />
+            <img src="/Kolimeetlogo.png" alt="Kolimeet" className="h-10 w-auto" />
           </Link>
         )}
         

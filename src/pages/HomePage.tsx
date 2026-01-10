@@ -25,16 +25,15 @@ const HomePage = () => {
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             {/* Left: Text Content */}
             <div className="text-center lg:text-left">
-              {/* Brand Identity */}
-              <div className="flex items-center justify-center lg:justify-start mb-8">
-                <img src="/Kolimeetlogo.png" alt="KoliMeet" className="h-20 lg:h-24 w-auto" />
-              </div>
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
+                Envoyez vos colis <span className="text-primary">partout dans le monde</span>
+              </h1>
               
-              <p className="text-xl md:text-2xl lg:text-3xl text-muted-foreground mb-6">
+              <p className="text-lg sm:text-xl md:text-2xl lg:text-2xl text-muted-foreground mb-6 leading-relaxed">
                 La plateforme de mise en relation pour le transport de colis entre particuliers
               </p>
               
-              <p className="text-lg lg:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto lg:mx-0">
+              <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
                 Envoyez vos colis avec des voyageurs de confiance ou rentabilisez vos trajets 
                 en transportant des colis pour d'autres. Simple, économique et sécurisé.
               </p>
@@ -85,7 +84,7 @@ const HomePage = () => {
                   100% Gratuit
                 </div>
                 <div className="absolute -bottom-4 -left-4 bg-primary text-white rounded-full px-4 py-2 text-sm font-medium shadow-lg">
-                  France ↔ Bénin
+                  Monde entier
                 </div>
               </div>
             </div>
@@ -93,14 +92,14 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* What is KoliMeet */}
+      {/* What is Kolimeet */}
       <section className="py-20 lg:py-32 px-4 bg-background">
         <div className="container mx-auto max-w-7xl">
-          <h2 className="text-3xl lg:text-4xl font-bold text-center mb-6">
-            Qu'est-ce que KoliMeet ?
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-6 tracking-tight">
+            Qu'est-ce que Kolimeet ?
           </h2>
-          <p className="text-center text-muted-foreground mb-16 max-w-3xl mx-auto text-lg">
-            KoliMeet est une plateforme collaborative qui connecte les personnes souhaitant 
+          <p className="text-center text-muted-foreground mb-16 max-w-3xl mx-auto text-base sm:text-lg md:text-xl">
+            Kolimeet est une plateforme collaborative qui connecte les personnes souhaitant 
             envoyer des colis avec des voyageurs ayant de l'espace disponible dans leurs bagages.
           </p>
           
@@ -170,7 +169,7 @@ const HomePage = () => {
       {/* How it works */}
       <section className="py-20 lg:py-32 px-4 bg-secondary/30">
         <div className="container mx-auto max-w-7xl">
-          <h2 className="text-3xl lg:text-4xl font-bold text-center mb-16">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-16 tracking-tight">
             Comment ça marche ?
           </h2>
           
@@ -221,10 +220,10 @@ const HomePage = () => {
       {/* Features */}
       <section className="py-20 lg:py-32 px-4 bg-background">
         <div className="container mx-auto max-w-7xl">
-          <h2 className="text-3xl lg:text-4xl font-bold text-center mb-6">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-6 tracking-tight">
             Fonctionnalités de l'application
           </h2>
-          <p className="text-center text-muted-foreground mb-16 max-w-2xl mx-auto text-lg">
+          <p className="text-center text-muted-foreground mb-16 max-w-2xl mx-auto text-base sm:text-lg md:text-xl">
             Tout ce dont vous avez besoin pour envoyer ou transporter des colis en toute sérénité
           </p>
           
@@ -307,10 +306,10 @@ const HomePage = () => {
       {/* Data Privacy Section - Required by Google */}
       <section className="py-20 lg:py-32 px-4 bg-secondary/30">
         <div className="container mx-auto max-w-5xl">
-          <h2 className="text-3xl lg:text-4xl font-bold text-center mb-6">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-6 tracking-tight">
             Vos données, notre priorité
           </h2>
-          <p className="text-center text-muted-foreground mb-12 max-w-2xl mx-auto text-lg">
+          <p className="text-center text-muted-foreground mb-12 max-w-2xl mx-auto text-base sm:text-lg md:text-xl">
             Nous prenons la protection de vos données très au sérieux
           </p>
           
@@ -365,10 +364,10 @@ const HomePage = () => {
       {/* CTA Section */}
       <section className="py-20 lg:py-32 px-4 bg-primary text-primary-foreground">
         <div className="container mx-auto max-w-4xl text-center">
-          <h2 className="text-3xl lg:text-5xl font-bold mb-6">
-            Prêt à rejoindre KoliMeet ?
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-6 tracking-tight">
+            Prêt à rejoindre Kolimeet ?
           </h2>
-          <p className="text-xl lg:text-2xl opacity-90 mb-10 max-w-2xl mx-auto">
+          <p className="text-lg sm:text-xl md:text-2xl opacity-90 mb-10 max-w-2xl mx-auto">
             Créez votre compte gratuitement et commencez à envoyer ou transporter des colis dès aujourd'hui.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

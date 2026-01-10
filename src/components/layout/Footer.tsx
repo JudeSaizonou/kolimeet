@@ -7,7 +7,7 @@ const Footer = () => {
         <div className="grid gap-8 md:grid-cols-4">
           <div className="md:col-span-2">
             <Link to="/" className="inline-block mb-4">
-              <img src="/Kolimeetlogo.png" alt="KoliMeet" className="h-10 w-auto" />
+              <img src="/Kolimeetlogo.png" alt="Kolimeet" className="h-10 w-auto" />
             </Link>
             <p className="text-sm text-muted-foreground max-w-md">
               Plateforme de mise en relation entre voyageurs et expéditeurs pour l'envoi de colis à l'international.
