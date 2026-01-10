@@ -263,7 +263,7 @@ export function GlassButton({
 
   const variantStyles: Record<typeof buttonVariant, CSSProperties> = {
     primary: {
-      backgroundColor: `rgba(31, 111, 235, 0.95)`,
+      backgroundColor: `rgba(138, 56, 245, 0.95)`,
     },
     secondary: {
       backgroundColor: `rgba(255, 255, 255, 0.98)`,

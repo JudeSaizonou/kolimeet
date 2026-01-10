@@ -8,7 +8,7 @@ const CGU = () => {
     <>
       <Helmet>
         <title>Conditions Générales d'Utilisation - Kolimeet</title>
-        <meta name="description" content="Conditions générales d'utilisation de Kolimeet, plateforme de mise en relation pour l'envoi de colis entre la France et le Bénin." />
+        <meta name="description" content="Conditions générales d'utilisation de Kolimeet, plateforme de mise en relation pour l'envoi de colis à l'international." />
       </Helmet>
 
       <div className="min-h-screen bg-secondary pt-20 md:pt-28">
@@ -33,7 +33,7 @@ const CGU = () => {
               <section className="mb-8">
                 <h2 className="text-xl font-semibold text-foreground mb-3">Préambule</h2>
                 <p className="text-muted-foreground leading-relaxed">
-                  Kolimeet est une plateforme de mise en relation entre voyageurs et expéditeurs souhaitant acheminer des colis entre la France et le Bénin. La plateforme ne transporte pas elle-même de colis et n'est en aucun cas responsable des échanges entre utilisateurs.
+                  Kolimeet est une plateforme de mise en relation entre voyageurs et expéditeurs souhaitant acheminer des colis à l'international. La plateforme ne transporte pas elle-même de colis et n'est en aucun cas responsable des échanges entre utilisateurs.
                 </p>
               </section>
 

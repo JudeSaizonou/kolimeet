@@ -1,25 +1,25 @@
 {
-  "name": "Kolimeet - Envoi de colis France-Bénin",
+  "name": "Kolimeet - Envoi de colis international",
   "short_name": "Kolimeet",
-  "description": "Plateforme de mise en relation entre voyageurs et expéditeurs pour l'envoi de colis entre la France et le Bénin",
+  "description": "Plateforme de mise en relation entre voyageurs et expéditeurs pour l'envoi de colis à l'international",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "background_color": "#F3F4F6",
-  "theme_color": "#1F6FEB",
+  "theme_color": "#8A38F5",
   "orientation": "portrait-primary",
   "categories": ["travel", "business", "logistics"],
   "lang": "fr",
   "dir": "ltr",
   "icons": [
     {
-      "src": "/icon-192.png",
+      "src": "/Kolimeetlogo-only.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/icon-512.png",
+      "src": "/Kolimeetlogo-only.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"

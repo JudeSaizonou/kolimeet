@@ -2,7 +2,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Package } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useState, useEffect, useRef } from "react";
 import { Separator } from "@/components/ui/separator";
@@ -291,9 +290,8 @@ const Register = () => {
         rounded="xl"
         className="w-full max-w-md relative backdrop-blur-xl bg-white/10 border border-white/20 shadow-2xl z-10"
       >
-        <Link to="/" className="flex items-center justify-center gap-2 mb-8">
-          <Package className="h-8 w-8 text-primary" />
-          <span className="text-2xl font-bold text-foreground">Kolimeet</span>
+        <Link to="/" className="flex justify-center mb-8">
+          <img src="/Kolimeetlogo.png" alt="KoliMeet" className="h-12 w-auto" />
         </Link>
 
         <h1 className="text-2xl font-bold text-center text-foreground mb-2">

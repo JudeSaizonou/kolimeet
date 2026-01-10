@@ -26,11 +26,8 @@ const HomePage = () => {
             {/* Left: Text Content */}
             <div className="text-center lg:text-left">
               {/* Brand Identity */}
-              <div className="flex items-center justify-center lg:justify-start gap-3 mb-8">
-                <Package className="h-12 w-12 lg:h-16 lg:w-16 text-primary" />
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground">
-                  KoliMeet
-                </h1>
+              <div className="flex items-center justify-center lg:justify-start mb-8">
+                <img src="/Kolimeetlogo.png" alt="KoliMeet" className="h-20 lg:h-24 w-auto" />
               </div>
               
               <p className="text-xl md:text-2xl lg:text-3xl text-muted-foreground mb-6">
@@ -287,7 +284,7 @@ const HomePage = () => {
                 </div>
                 <h3 className="font-semibold text-lg mb-3">International</h3>
                 <p className="text-muted-foreground">
-                  Envoyez vos colis vers n'importe quelle destination, principalement France ↔ Bénin
+                  Envoyez vos colis vers n'importe quelle destination internationale
                 </p>
               </CardContent>
             </Card>

@@ -29,7 +29,7 @@ function AnimatedParticles() {
     <Points ref={particlesRef} positions={particlesPosition} stride={3}>
       <PointMaterial
         transparent
-        color="#1F6FEB"
+        color="#8A38F5"
         size={0.05}
         sizeAttenuation={true}
         depthWrite={false}

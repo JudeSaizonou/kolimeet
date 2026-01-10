@@ -25,7 +25,7 @@ function InteractiveSphere({ mousePosition }: { mousePosition: { x: number; y: n
   return (
     <Sphere ref={meshRef} args={[1.5, 64, 64]} position={[0, 0, 0]}>
       <MeshDistortMaterial
-        color="#1F6FEB"
+        color="#8A38F5"
         attach="material"
         distort={0.4}
         speed={3}

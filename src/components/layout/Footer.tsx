@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import { Package } from "lucide-react";
 
 const Footer = () => {
   return (
@@ -7,12 +6,11 @@ const Footer = () => {
       <div className="container mx-auto px-4 py-12">
         <div className="grid gap-8 md:grid-cols-4">
           <div className="md:col-span-2">
-            <Link to="/" className="flex items-center gap-2 mb-4">
-              <Package className="h-6 w-6 text-primary" />
-              <span className="text-xl font-bold text-foreground">Kolimeet</span>
+            <Link to="/" className="inline-block mb-4">
+              <img src="/Kolimeetlogo.png" alt="KoliMeet" className="h-10 w-auto" />
             </Link>
             <p className="text-sm text-muted-foreground max-w-md">
-              Plateforme de mise en relation entre voyageurs et expéditeurs pour l'envoi de colis entre la France et le Bénin.
+              Plateforme de mise en relation entre voyageurs et expéditeurs pour l'envoi de colis à l'international.
             </p>
           </div>
           

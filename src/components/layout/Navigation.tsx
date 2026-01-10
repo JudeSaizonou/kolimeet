@@ -66,21 +66,12 @@ const Navigation = () => {
       )}>
         {/* Logo */}
         {user ? (
-          <Link to="/explorer" className="flex items-center gap-2 flex-shrink-0">
-            <Package className="h-6 w-6 text-primary" />
-            <span className="text-xl font-bold text-foreground whitespace-nowrap">
-              Kolimeet
-            </span>
+          <Link to="/explorer" className="flex-shrink-0">
+            <img src="/Kolimeetlogo.png" alt="KoliMeet" className="h-10 w-auto" />
           </Link>
         ) : (
-          <Link 
-            to="/"
-            className="flex items-center gap-2 flex-shrink-0"
-          >
-            <Package className="h-6 w-6 text-primary" />
-            <span className="text-xl font-bold text-foreground whitespace-nowrap">
-              Kolimeet
-            </span>
+          <Link to="/" className="flex-shrink-0">
+            <img src="/Kolimeetlogo.png" alt="KoliMeet" className="h-10 w-auto" />
           </Link>
         )}
         

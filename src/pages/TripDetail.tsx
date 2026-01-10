@@ -302,34 +302,15 @@ const TripDetail = () => {
                 </div>
               </div>
 
-              {/* Profil du voyageur - Version simplifiée pour le partage */}
-              <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100">
-                <div className="flex items-center gap-3">
-                  <Avatar className="h-10 w-10 ring-2 ring-primary/20">
-                    <AvatarImage src={trip.profiles?.avatar_url} />
-                    <AvatarFallback className="text-sm bg-primary/10 text-primary">
-                      {trip.profiles?.full_name?.[0]}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-sm text-slate-900 truncate">{trip.profiles?.full_name}</h3>
-                    <div className="flex items-center gap-1 text-xs text-slate-500">
-                      <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-                      <span>{trip.profiles?.rating_avg?.toFixed(1) || "Nouveau"}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
               {/* Logo Kolimeet pour le partage */}
-              <div className="mt-4 text-center">
-                <span className="text-xs text-slate-400">kolimeet.com</span>
+              <div className="mt-4 flex justify-center">
+                <img src="/Kolimeetlogo-only.png" alt="KoliMeet" className="h-6 w-auto" />
               </div>
             </div>
           </div>
         </div>
 
-        {/* Section profil complète - Hors de la card principale */}
+        {/* Section profil complète */}
         <div className="bg-white rounded-2xl border border-slate-200/60 p-4 mb-6 shadow-sm">
           <Link 
             to={`/u/${trip.user_id}`}

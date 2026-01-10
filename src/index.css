@@ -22,8 +22,8 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
 
-    /* Primary: Electric Indigo (#4F46E5) - Vibrant & Trustworthy */
-    --primary: 243 75% 59%;
+    /* Primary: Purple (#8A38F5) - Vibrant & Modern */
+    --primary: 266 90% 59%;
     --primary-foreground: 210 40% 98%;
 
     /* Secondary: Subtle Gray (#F3F4F6) */
@@ -48,7 +48,7 @@ All colors MUST be HSL.
     /* Border: Ultra subtle (opacity handled in components or here) */
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 243 75% 59%;
+    --ring: 266 90% 59%;
 
     --radius: 1rem; /* 16px for that modern rounded feel */
   }
@@ -63,7 +63,7 @@ All colors MUST be HSL.
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
  
-    --primary: 217.2 91.2% 59.8%;
+    --primary: 266 90% 59%;
     --primary-foreground: 222.2 47.4% 11.2%;
  
     --secondary: 217.2 32.6% 17.5%;

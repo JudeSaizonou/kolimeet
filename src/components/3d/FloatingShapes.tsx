@@ -5,7 +5,7 @@ import * as THREE from 'three';
 
 // Couleurs du thème en format hex
 const COLORS = {
-  primary: '#1F6FEB',    // Bleu
+  primary: '#8A38F5',    // Violet
   accent: '#F59E0B',     // Jaune
   success: '#10B981',    // Vert
 };

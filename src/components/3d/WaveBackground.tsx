@@ -51,7 +51,7 @@ export default function WaveBackground() {
         <pointLight position={[-5, 5, 5]} intensity={0.5} color="#F59E0B" />
         
         {/* Vagues multiples avec différentes couleurs et vitesses */}
-        <AnimatedWave color="#1F6FEB" speed={0.5} offset={0} />
+        <AnimatedWave color="#8A38F5" speed={0.5} offset={0} />
         <AnimatedWave color="#10B981" speed={0.3} offset={Math.PI / 3} />
         <AnimatedWave color="#F59E0B" speed={0.4} offset={Math.PI / 2} />
       </Canvas>

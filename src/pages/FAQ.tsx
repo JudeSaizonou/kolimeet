@@ -11,7 +11,7 @@ const FAQ = () => {
   const faqs = [
     {
       question: "Comment fonctionne Kolimeet ?",
-      answer: "Kolimeet met en relation des voyageurs ayant de la place dans leurs bagages et des personnes souhaitant envoyer un colis entre la France et le Bénin. Vous pouvez publier ou consulter une annonce en quelques clics, puis contacter directement l'autre partie via notre messagerie intégrée."
+      answer: "Kolimeet met en relation des voyageurs ayant de la place dans leurs bagages et des personnes souhaitant envoyer un colis vers n'importe quelle destination internationale. Vous pouvez publier ou consulter une annonce en quelques clics, puis contacter directement l'autre partie via notre messagerie intégrée."
     },
     {
       question: "Kolimeet transporte-t-il les colis ?",
