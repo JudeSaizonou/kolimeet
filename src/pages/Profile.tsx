@@ -29,7 +29,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { Camera, Star, LogOut, EyeOff, ChevronRight, Shield, Settings, HelpCircle, Phone, MapPin, Bell, User, Users, Package, Plane, ClipboardList, Download, Trash2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { PhoneVerification } from "@/components/profile/PhoneVerification";
 import { OneSignalNotificationToggle } from "@/components/notifications/OneSignalNotificationToggle";
 import { useNavigate } from "react-router-dom";
 import { countries, citiesByCountry } from "@/lib/data/countries";
@@ -335,8 +334,9 @@ const Profile = () => {
   return (
     <ProtectedRoute>
       <div className="min-h-screen bg-slate-50/50 pt-20 md:pt-28">
-        {/* Header profil avec fond dégradé */}
+        {/* Header profil avec fond dégradé - largeur max */}
         <div className="bg-primary/5 px-4 pt-6 pb-8">
+          <div className="max-w-4xl mx-auto">
           {/* Avatar centré */}
           <div className="flex flex-col items-center">
             <div className="relative mb-4">
@@ -406,10 +406,12 @@ const Profile = () => {
             </div>
           </div>
         </div>
+        </div>
 
         {/* Raccourcis rapides */}
-        <div className="px-4 -mt-4 mb-4">
-          <div className="grid grid-cols-2 gap-3">
+        <div className="px-4 -mt-4 mb-6">
+          <div className="max-w-4xl mx-auto">
+            <div className="grid grid-cols-2 gap-3">
             <Link 
               to="/mes-annonces"
               className="flex items-center gap-3 p-4 bg-white rounded-xl shadow-sm border border-slate-100 hover:border-primary/30 hover:shadow-md transition-all"
@@ -435,12 +437,15 @@ const Profile = () => {
               </div>
             </Link>
           </div>
+          </div>
         </div>
 
-        {/* Tabs pour Mes infos / Mon réseau */}
-        <Tabs defaultValue="infos" className="px-4 -mt-2">
-          <TabsList className="grid w-full grid-cols-2 bg-slate-100 p-1 rounded-xl h-12">
-            <TabsTrigger 
+        {/* Conteneur principal avec largeur max */}
+        <div className="max-w-4xl mx-auto px-4 pb-8">
+          {/* Tabs pour Mes infos / Mon réseau */}
+          <Tabs defaultValue="infos" className="-mt-2">
+            <TabsList className="grid w-full grid-cols-2 bg-slate-100 p-1 rounded-xl h-12 max-w-md mx-auto">
+              <TabsTrigger 
               value="infos" 
               className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm flex items-center gap-2 h-10"
             >
@@ -457,7 +462,7 @@ const Profile = () => {
           </TabsList>
 
           {/* Tab: Mes infos */}
-          <TabsContent value="infos" className="mt-4 space-y-4">
+          <TabsContent value="infos" className="mt-6 space-y-5">
             {/* Formulaire */}
             <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
               <div className="px-4 py-3 bg-slate-50 border-b border-slate-100">
@@ -545,19 +550,6 @@ const Profile = () => {
                 )}
               </div>
             </div>
-
-            {/* Vérification téléphone */}
-            {formData.phone_e164 && !phoneVerified && (
-              <PhoneVerification
-                phoneNumber={formData.phone_e164}
-                isVerified={phoneVerified}
-                userEmail={userEmail}
-                onVerified={() => {
-                  setPhoneVerified(true);
-                  loadProfile();
-                }}
-              />
-            )}
 
             {/* Préférences */}
             <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
@@ -670,7 +662,7 @@ const Profile = () => {
             {/* Bouton enregistrer */}
             <Button
               onClick={handleSubmit}
-              className="w-full h-12 text-base font-semibold rounded-xl shadow-md shadow-primary/20"
+              className="w-full max-w-sm mx-auto block h-12 text-base font-semibold rounded-xl shadow-md shadow-primary/20"
               disabled={loading}
             >
               {loading ? "Enregistrement..." : "Enregistrer les modifications"}
@@ -678,21 +670,24 @@ const Profile = () => {
           </TabsContent>
 
           {/* Tab: Mon réseau */}
-          <TabsContent value="network" className="mt-4">
+          <TabsContent value="network" className="mt-6">
             <MyReferralsSection />
           </TabsContent>
         </Tabs>
+        </div>
 
-        {/* Bouton déconnexion (toujours visible) */}
+        {/* Bouton déconnexion (toujours visible) - largeur max */}
         <div className="mt-6 px-4 pb-8">
-          <Button
-            variant="ghost"
-            onClick={handleSignOut}
-            className="w-full h-11 text-sm font-medium text-slate-500 hover:text-red-500 hover:bg-red-50/50 rounded-xl"
-          >
-            <LogOut className="h-4 w-4 mr-2" />
-            Se déconnecter
-          </Button>
+          <div className="max-w-4xl mx-auto">
+            <Button
+              variant="ghost"
+              onClick={handleSignOut}
+              className="w-full max-w-sm mx-auto block h-11 text-sm font-medium text-slate-500 hover:text-red-500 hover:bg-red-50/50 rounded-xl"
+            >
+              <LogOut className="h-4 w-4 mr-2" />
+              Se déconnecter
+            </Button>
+          </div>
         </div>
       </div>
     </ProtectedRoute>

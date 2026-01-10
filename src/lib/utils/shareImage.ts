@@ -54,24 +54,6 @@ const buildImageUrl = (payload: ShareImagePayload) => {
 export type ShareImageResult = 'shared' | 'downloaded';
 
 /**
- * Collecte les styles calculés d'un élément et ses enfants
- */
-const collectComputedStyles = (element: HTMLElement): Map<Element, CSSStyleDeclaration> => {
-  const stylesMap = new Map<Element, CSSStyleDeclaration>();
-  const allElements = element.querySelectorAll('*');
-  
-  // Collecter les styles de l'élément racine
-  stylesMap.set(element, window.getComputedStyle(element));
-  
-  // Collecter les styles de tous les enfants
-  allElements.forEach((el) => {
-    stylesMap.set(el, window.getComputedStyle(el));
-  });
-  
-  return stylesMap;
-};
-
-/**
  * Génère et retourne le blob de l'image sans la partager
  */
 export const getImageBlob = async (
@@ -85,107 +67,80 @@ export const getImageBlob = async (
       // Attendre un peu pour que les animations se stabilisent
       await new Promise(resolve => setTimeout(resolve, 300));
       
-      // Collecter les styles AVANT le clonage (important!)
-      const originalStyles = collectComputedStyles(payload.element);
-      const elementWidth = payload.element.offsetWidth;
-      const elementHeight = payload.element.offsetHeight;
-      
-      // Collecter les bounding rects de tous les éléments
-      const boundingRects = new Map<Element, DOMRect>();
-      payload.element.querySelectorAll('*').forEach((el) => {
-        boundingRects.set(el, el.getBoundingClientRect());
-      });
+      // Déterminer le scale optimal basé sur le devicePixelRatio
+      const dpr = window.devicePixelRatio || 1;
+      const optimalScale = Math.max(3, dpr * 2); // Minimum 3x pour haute qualité
       
       const canvas = await html2canvas(payload.element, {
         backgroundColor: '#ffffff',
-        scale: 2,
+        scale: optimalScale, // Scale dynamique pour haute fidélité
         useCORS: true,
         logging: false,
-        allowTaint: false,
+        allowTaint: true, // Permettre les images cross-origin
         removeContainer: true,
         imageTimeout: 15000,
+        // Options de qualité supérieure
+        windowWidth: payload.element.scrollWidth,
+        windowHeight: payload.element.scrollHeight,
+        x: 0,
+        y: 0,
+        scrollX: 0,
+        scrollY: 0,
         onclone: (clonedDoc, clonedElement) => {
-          // Appliquer les styles collectés au clone
-          const clonedElements = clonedElement.querySelectorAll('*');
-          const originalElements = Array.from(payload.element!.querySelectorAll('*'));
-          
-          // Appliquer les styles à l'élément racine
-          const rootStyle = originalStyles.get(payload.element!);
-          if (rootStyle) {
-            clonedElement.style.animation = 'none';
-            clonedElement.style.transition = 'none';
-            clonedElement.style.width = `${elementWidth}px`;
-            clonedElement.style.height = `${elementHeight}px`;
-            clonedElement.style.overflow = 'hidden';
+          // Forcer le fond blanc sur l'élément principal
+          if (clonedElement instanceof HTMLElement) {
+            clonedElement.style.backgroundColor = '#ffffff';
+            clonedElement.style.transform = 'none';
+            clonedElement.style.width = `${payload.element!.offsetWidth}px`;
+            clonedElement.style.height = `${payload.element!.offsetHeight}px`;
           }
           
-          // Appliquer les styles à chaque élément cloné
-          clonedElements.forEach((clonedEl, index) => {
-            const htmlEl = clonedEl as HTMLElement;
-            const originalEl = originalElements[index];
-            
-            if (!originalEl) return;
-            
-            const computedStyle = originalStyles.get(originalEl);
-            if (!computedStyle) return;
-            
-            // Arrêter animations et transitions
+          // Arrêter toutes les animations et améliorer le rendu
+          const allElements = clonedDoc.querySelectorAll('*');
+          allElements.forEach((el) => {
+            const htmlEl = el as HTMLElement;
             htmlEl.style.animation = 'none';
             htmlEl.style.transition = 'none';
-            htmlEl.style.animationDelay = '0s';
-            htmlEl.style.transitionDelay = '0s';
+            // Forcer l'antialiasing du texte
+            htmlEl.style.webkitFontSmoothing = 'antialiased';
+            (htmlEl.style as any).textRendering = 'optimizeLegibility';
             
-            // Fixer les transforms
-            if (computedStyle.transform && computedStyle.transform !== 'none') {
-              htmlEl.style.transform = computedStyle.transform;
-            }
-            
-            // Pour les badges et éléments inline-flex, fixer leur taille exacte
-            if (computedStyle.display === 'inline-flex' || computedStyle.display === 'flex') {
-              const rect = boundingRects.get(originalEl);
-              if (rect) {
-                htmlEl.style.width = `${rect.width}px`;
-                htmlEl.style.height = `${rect.height}px`;
-                htmlEl.style.minWidth = `${rect.width}px`;
-                htmlEl.style.minHeight = `${rect.height}px`;
-                htmlEl.style.maxWidth = `${rect.width}px`;
-                htmlEl.style.maxHeight = `${rect.height}px`;
-              }
-              
-              // Convertir gap en margin pour compatibilité html2canvas
-              const gap = computedStyle.gap;
-              if (gap && gap !== 'normal' && gap !== '0px') {
-                const children = htmlEl.children;
-                for (let i = 0; i < children.length; i++) {
-                  const child = children[i] as HTMLElement;
-                  if (i > 0) {
-                    const gapValue = parseFloat(gap) || 0;
-                    if (computedStyle.flexDirection === 'column' || computedStyle.flexDirection === 'column-reverse') {
-                      child.style.marginTop = `${gapValue}px`;
-                    } else {
-                      child.style.marginLeft = `${gapValue}px`;
-                    }
-                  }
+            // Remplacer les fonds pastel par du blanc pour un rendu plus propre
+            const bgColor = window.getComputedStyle(htmlEl).backgroundColor;
+            if (bgColor && bgColor !== 'rgba(0, 0, 0, 0)' && bgColor !== 'transparent') {
+              // Garder les fonds colorés foncés (badges, boutons) mais blanchir les fonds pastel
+              const match = bgColor.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+              if (match) {
+                const [, r, g, b] = match.map(Number);
+                // Si c'est un fond très clair (pastel), le remplacer par blanc
+                if (r > 240 && g > 240 && b > 250) {
+                  htmlEl.style.backgroundColor = '#ffffff';
+                }
+                // Si c'est un fond violet/lavande clair
+                if (r > 230 && g > 220 && b > 240) {
+                  htmlEl.style.backgroundColor = '#ffffff';
                 }
               }
             }
-            
-            // Fixer les positions absolues/relatives avec leurs coordonnées exactes
-            if (computedStyle.position === 'absolute' || computedStyle.position === 'fixed') {
-              htmlEl.style.top = computedStyle.top;
-              htmlEl.style.left = computedStyle.left;
-              htmlEl.style.right = computedStyle.right;
-              htmlEl.style.bottom = computedStyle.bottom;
+          });
+          
+          // Convertir les SVG en inline pour meilleur rendu
+          const svgs = clonedDoc.querySelectorAll('svg');
+          svgs.forEach((svg) => {
+            // S'assurer que les SVG ont des dimensions explicites
+            const rect = svg.getBoundingClientRect();
+            if (rect.width > 0 && rect.height > 0) {
+              svg.setAttribute('width', String(rect.width));
+              svg.setAttribute('height', String(rect.height));
             }
-            
-            // Fixer la taille des textes
-            htmlEl.style.fontSize = computedStyle.fontSize;
-            htmlEl.style.lineHeight = computedStyle.lineHeight;
-            htmlEl.style.fontWeight = computedStyle.fontWeight;
-            
-            // Fixer padding et margin
-            htmlEl.style.padding = computedStyle.padding;
-            htmlEl.style.margin = computedStyle.margin;
+            // Forcer le fill des paths si pas défini
+            svg.querySelectorAll('path, circle, rect, line, polyline, polygon').forEach((path) => {
+              const currentFill = path.getAttribute('fill');
+              const currentStroke = path.getAttribute('stroke');
+              if (!currentFill && !currentStroke) {
+                path.setAttribute('fill', 'currentColor');
+              }
+            });
           });
         },
       });
@@ -201,7 +156,7 @@ export const getImageBlob = async (
           } else {
             reject(new Error('Failed to convert canvas to blob'));
           }
-        }, 'image/png', 1.0);
+        }, 'image/png', 1.0); // PNG qualité maximale
       });
     } catch (error) {
       console.warn('[shareStoryImage] DOM capture failed, using API fallback:', error);

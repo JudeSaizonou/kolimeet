@@ -280,10 +280,6 @@ const Login = () => {
         rounded="xl"
         className="w-full max-w-md relative backdrop-blur-xl bg-white/10 border border-white/20 shadow-2xl z-10"
       >
-        <Link to="/" className="flex justify-center mb-8">
-          <img src="/Kolimeetlogo.png" alt="KoliMeet" className="h-12 w-auto" />
-        </Link>
-
         <h1 className="text-2xl font-bold text-center text-foreground mb-2">
           Bon retour !
         </h1>

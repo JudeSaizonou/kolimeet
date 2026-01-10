@@ -118,7 +118,7 @@ const MessageThread = () => {
   }
 
   return (
-    <div className="md:relative md:flex md:flex-col md:h-auto fixed inset-0 top-0 flex flex-col bg-background md:bg-transparent md:top-auto">
+    <div className="md:relative md:flex md:flex-col md:h-auto md:pt-20 fixed inset-0 top-0 flex flex-col bg-background md:bg-transparent md:top-auto">
       {/* Header fixe - Mobile-first, normal sur desktop */}
       <header className="sticky top-0 z-50 bg-background border-b md:relative md:z-auto">
         <div className="flex items-center gap-3 px-4 py-3 md:px-6 md:py-4">

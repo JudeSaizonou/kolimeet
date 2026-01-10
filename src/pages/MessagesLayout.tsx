@@ -12,9 +12,10 @@ const MessagesLayout = () => {
   const { id } = useParams();
 
   return (
-    <div className="h-[calc(100vh-7rem)] md:h-[calc(100vh-8rem)]">
-      {/* Mobile: full page, Desktop: split view */}
-      <div className="h-full flex md:border md:border-border md:rounded-lg md:overflow-hidden md:shadow-sm">
+    <div className="pt-20 md:pt-28 h-screen">
+      <div className="h-[calc(100vh-5rem)] md:h-[calc(100vh-7rem)]">
+        {/* Mobile: full page, Desktop: split view */}
+        <div className="h-full flex md:border md:border-border md:rounded-lg md:overflow-hidden md:shadow-sm md:mx-4 lg:mx-8">
         {/* Sidebar - Liste des conversations */}
         <aside
           className={`
@@ -84,6 +85,7 @@ const MessagesLayout = () => {
             </div>
           )}
         </main>
+        </div>
       </div>
     </div>
   );

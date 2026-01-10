@@ -10,9 +10,10 @@ const Messages = () => {
   const { threads, loading } = useThreads();
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6">Messagerie</h1>
+    <section className="min-h-screen bg-background pt-20 md:pt-28">
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-3xl font-bold mb-6">Messagerie</h1>
 
         {loading ? (
           <div className="space-y-4">
@@ -41,8 +42,9 @@ const Messages = () => {
             ))}
           </div>
         )}
+        </div>
       </div>
-    </div>
+    </section>
   );
 };
 

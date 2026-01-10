@@ -96,18 +96,6 @@ export function ReferralRequestDialog({
       );
     }
 
-    // Si téléphone non vérifié
-    if (eligibility.details?.isPhoneVerified === false) {
-      return (
-        <Button variant="outline" size="sm" asChild className={className}>
-          <Link to="/profile">
-            <Phone className="h-4 w-4 mr-2 text-amber-500" />
-            Vérifier téléphone
-          </Link>
-        </Button>
-      );
-    }
-
     // Autres cas (cooldown, limite, ancienneté)
     return (
       <ResponsiveModal>

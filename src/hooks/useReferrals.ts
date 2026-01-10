@@ -71,6 +71,7 @@ export interface EligibilityResult {
     accountAgeDays?: number;
     referralCount?: number;
     isPhoneVerified?: boolean;
+    targetMissingPhone?: boolean;
     lastReferralDate?: string;
     targetReferrerCount?: number;
   };
@@ -486,41 +487,9 @@ export function useReferrals() {
     }
 
     try {
-      // 1. Vérifier le profil du parrain (téléphone vérifié + ancienneté)
-      const { data: myProfile } = await supabase
-        .from('profiles')
-        .select('phone_verified, created_at')
-        .eq('user_id', referrerId)
-        .single();
-
-      if (!myProfile) {
-        return { canRefer: false, reason: 'Profil introuvable' };
-      }
-
-      // Vérifier si le téléphone est vérifié
-      const isPhoneVerified = (myProfile as any).phone_verified === true;
-      if (!isPhoneVerified) {
-        return { 
-          canRefer: false, 
-          reason: 'Vous devez vérifier votre numéro de téléphone pour pouvoir parrainer',
-          details: { isPhoneVerified: false }
-        };
-      }
-
-      // Vérifier l'ancienneté du compte
-      const createdAt = new Date((myProfile as any).created_at);
       const now = new Date();
-      const accountAgeDays = Math.floor((now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24));
-      
-      if (accountAgeDays < REFERRAL_CONSTRAINTS.MIN_ACCOUNT_AGE_DAYS) {
-        return { 
-          canRefer: false, 
-          reason: `Votre compte doit avoir au moins ${REFERRAL_CONSTRAINTS.MIN_ACCOUNT_AGE_DAYS} jours pour parrainer (${accountAgeDays} jours actuellement)`,
-          details: { accountAgeDays, isPhoneVerified: true }
-        };
-      }
 
-      // 2. Vérifier le nombre de filleuls existants
+      // 1. Vérifier le nombre de filleuls existants
       const { count: referralCount } = await supabase
         .from('referrals')
         .select('id', { count: 'exact', head: true })
@@ -531,11 +500,11 @@ export function useReferrals() {
         return { 
           canRefer: false, 
           reason: `Vous avez atteint la limite de ${REFERRAL_CONSTRAINTS.MAX_REFERRALS_AS_REFERRER} parrainages`,
-          details: { referralCount: referralCount || 0, accountAgeDays, isPhoneVerified: true }
+          details: { referralCount: referralCount || 0 }
         };
       }
 
-      // 3. Vérifier le délai depuis le dernier parrainage
+      // 2. Vérifier le délai depuis le dernier parrainage
       const { data: lastReferral } = await supabase
         .from('referrals')
         .select('created_at')
@@ -555,15 +524,13 @@ export function useReferrals() {
             reason: `Veuillez attendre encore ${hoursRemaining}h avant de parrainer à nouveau`,
             details: { 
               lastReferralDate: (lastReferral as any).created_at, 
-              referralCount: referralCount || 0, 
-              accountAgeDays, 
-              isPhoneVerified: true 
+              referralCount: referralCount || 0
             }
           };
         }
       }
 
-      // 4. Vérifier si un parrainage existe déjà entre ces deux utilisateurs
+      // 3. Vérifier si un parrainage existe déjà entre ces deux utilisateurs
       const { data: existingReferral } = await supabase
         .from('referrals')
         .select('id')
@@ -575,7 +542,7 @@ export function useReferrals() {
         return { canRefer: false, reason: 'Vous avez déjà parrainé ou envoyé une demande à cette personne' };
       }
 
-      // 5. Vérifier que la cible n'a pas déjà trop de parrains
+      // 4. Vérifier que la cible n'a pas déjà trop de parrains
       const { count: targetReferrerCount } = await supabase
         .from('referrals')
         .select('id', { count: 'exact', head: true })
@@ -586,7 +553,7 @@ export function useReferrals() {
         return { 
           canRefer: false, 
           reason: `Cette personne a déjà ${REFERRAL_CONSTRAINTS.MAX_REFERRERS_PER_USER} parrains, c'est le maximum`,
-          details: { targetReferrerCount: targetReferrerCount || 0, referralCount: referralCount || 0, accountAgeDays, isPhoneVerified: true }
+          details: { targetReferrerCount: targetReferrerCount || 0, referralCount: referralCount || 0 }
         };
       }
 
@@ -594,9 +561,7 @@ export function useReferrals() {
       return { 
         canRefer: true,
         details: {
-          accountAgeDays,
           referralCount: referralCount || 0,
-          isPhoneVerified: true,
           targetReferrerCount: targetReferrerCount || 0,
         }
       };

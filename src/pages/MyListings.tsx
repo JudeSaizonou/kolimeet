@@ -28,6 +28,8 @@ interface Trip {
   price_expect?: number;
   notes?: string;
   status: string;
+  requires_referrals?: number;
+  verified_referrals_count?: number;
 }
 
 interface Parcel {
@@ -43,6 +45,8 @@ interface Parcel {
   description?: string;
   photos?: string[];
   status: string;
+  requires_referrals?: number;
+  verified_referrals_count?: number;
 }
 
 const MyListings = () => {
@@ -211,9 +215,22 @@ const MyListings = () => {
                           <span>{format(new Date(trip.date_departure), "d MMM yyyy", { locale: fr })}</span>
                         </div>
                       </div>
-                      <Badge variant={trip.status === "open" ? "default" : "secondary"} className="text-xs shrink-0">
-                        {trip.status === "open" ? "Ouvert" : "Fermé"}
-                      </Badge>
+                      <div className="flex flex-col gap-1.5 items-end shrink-0">
+                        <Badge variant={trip.status === "open" ? "default" : "secondary"} className="text-xs">
+                          {trip.status === "open" ? "Ouvert" : "Fermé"}
+                        </Badge>
+                        {trip.requires_referrals && trip.requires_referrals > 0 && (
+                          <Badge 
+                            variant={(trip.verified_referrals_count || 0) >= trip.requires_referrals ? "outline" : "destructive"} 
+                            className="text-xs"
+                          >
+                            {(trip.verified_referrals_count || 0) >= trip.requires_referrals 
+                              ? "✅ Visible" 
+                              : `🔒 ${trip.requires_referrals - (trip.verified_referrals_count || 0)} parrainage(s)`
+                            }
+                          </Badge>
+                        )}
+                      </div>
                     </div>
                   </div>
                   <CardContent className="p-3 md:p-4">
@@ -338,9 +355,22 @@ const MyListings = () => {
                           <span>Avant le {format(new Date(parcel.deadline), "d MMM yyyy", { locale: fr })}</span>
                         </div>
                       </div>
-                      <Badge variant={parcel.status === "open" ? "default" : "secondary"} className="text-xs shrink-0">
-                        {parcel.status === "open" ? "Ouvert" : "Fermé"}
-                      </Badge>
+                      <div className="flex flex-col gap-1.5 items-end shrink-0">
+                        <Badge variant={parcel.status === "open" ? "default" : "secondary"} className="text-xs">
+                          {parcel.status === "open" ? "Ouvert" : "Fermé"}
+                        </Badge>
+                        {parcel.requires_referrals && parcel.requires_referrals > 0 && (
+                          <Badge 
+                            variant={(parcel.verified_referrals_count || 0) >= parcel.requires_referrals ? "outline" : "destructive"} 
+                            className="text-xs"
+                          >
+                            {(parcel.verified_referrals_count || 0) >= parcel.requires_referrals 
+                              ? "✅ Visible" 
+                              : `🔒 ${parcel.requires_referrals - (parcel.verified_referrals_count || 0)} parrainage(s)`
+                            }
+                          </Badge>
+                        )}
+                      </div>
                     </div>
                   </div>
                   <CardContent className="p-3 md:p-4">
