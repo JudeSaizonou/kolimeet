@@ -40,7 +40,7 @@ serve(async (req) => {
     console.log("Message:", message);
 
     // Construire l'URL complète
-    const baseUrl = "https://kolimeet.vercel.app";
+    const baseUrl = "https://kolimeet.com";
     const fullUrl = url ? `${baseUrl}${url}` : undefined;
 
     // Envoyer la notification via l'API OneSignal

@@ -2,7 +2,7 @@
 
 ## Project info
 
-**URL Production**: https://kolimeet.vercel.app
+**URL Production**: https://kolimeet.com
 **Backend**: Supabase (odzxqpaovgxcwqilildp)
 
 ## How can I edit this code?

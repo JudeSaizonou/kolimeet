@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Package, CheckCircle, XCircle, MessageSquare, Loader2, ArrowRight } from "lucide-react";
@@ -118,15 +119,22 @@ export function ReservationRequestMessage({ request, onUpdate, isOwn }: Reservat
   }, [isCounterOfferMessage, request.parent_request_id]);
 
   return (
-    <div className={cn(
-      // alignment: right for own messages, left for others
-      isOwn ? 'ml-auto' : 'mr-auto',
-      // sizing: behave like a chat bubble with limited width
-      'my-3 w-full max-w-[86%] md:max-w-[520px] rounded-2xl border shadow-sm overflow-hidden',
-      statusStyles[request.status]
-    )}>
+    <motion.div
+      initial={{ opacity: 0, y: 8, scale: 0.98 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ type: "spring", stiffness: 400, damping: 30 }}
+      className={cn(
+        "flex w-full mb-3",
+        isOwn ? "justify-end" : "justify-start"
+      )}
+    >
+      <div className={cn(
+        "max-w-[86%] md:max-w-[520px] rounded-2xl border shadow-sm overflow-hidden",
+        // use message-like background for own vs others, keep status backgrounds for states
+        isOwn ? "bg-primary text-primary-foreground" : statusStyles[request.status]
+      )}>
       {/* Header compact */}
-      <div className="px-4 py-3 flex items-center justify-between border-b border-slate-100">
+        <div className="px-4 py-3 flex items-center justify-between border-b border-slate-100">
         <div className="flex items-center gap-2">
           <div className={cn(
             "w-8 h-8 rounded-full flex items-center justify-center",
@@ -145,7 +153,7 @@ export function ReservationRequestMessage({ request, onUpdate, isOwn }: Reservat
         <span className={cn("text-xs font-medium px-2.5 py-1 rounded-full", status.bg, status.text)}>
           {status.label}
         </span>
-      </div>
+        </div>
 
       {/* Contenu principal - Design compact */}
       <div className="px-4 py-3">
@@ -301,18 +309,19 @@ export function ReservationRequestMessage({ request, onUpdate, isOwn }: Reservat
         </div>
       )}
 
-      {/* Drawer */}
-      {isDriver && (
-        <CounterOfferDrawer
-          open={counterOfferOpen}
-          onOpenChange={setCounterOfferOpen}
-          request={request}
-          onSuccess={() => {
-            setCounterOfferOpen(false);
-            onUpdate?.();
-          }}
-        />
-      )}
-    </div>
+        {/* Drawer */}
+        {isDriver && (
+          <CounterOfferDrawer
+            open={counterOfferOpen}
+            onOpenChange={setCounterOfferOpen}
+            request={request}
+            onSuccess={() => {
+              setCounterOfferOpen(false);
+              onUpdate?.();
+            }}
+          />
+        )}
+      </div>
+    </motion.div>
   );
 }

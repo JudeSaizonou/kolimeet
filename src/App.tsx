@@ -41,7 +41,6 @@ import FAQ from "./pages/FAQ";
 import Contact from "./pages/Contact";
 import ProhibitedItems from "./pages/ProhibitedItems";
 import PaymentTest from "./pages/PaymentTest";
-import AwwwardsLanding from "./pages/AwwwardsLanding";
 import Notifications from "./pages/Notifications";
 
 // Import admin utilities for console access (development only)
