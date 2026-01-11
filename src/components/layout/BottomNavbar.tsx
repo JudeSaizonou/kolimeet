@@ -91,7 +91,7 @@ export function BottomNavbar() {
 
   return (
     <>
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 pb-safe">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 pb-safe" aria-label="Navigation principale">
         {/* Fond avec effet de flou et bordure subtile */}
         <div className="absolute inset-0 bg-white/95 backdrop-blur-xl border-t border-slate-100 shadow-[0_-4px_20px_rgba(0,0,0,0.08)]" />
         
@@ -106,6 +106,7 @@ export function BottomNavbar() {
               <button
                 onClick={item.action}
                 className="relative -mt-8 flex flex-col items-center"
+                aria-label="Publier une annonce"
               >
                 <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-violet-600 shadow-xl shadow-primary/40 flex items-center justify-center text-white transform hover:scale-105 active:scale-95 transition-all duration-200">
                   {item.icon}
@@ -118,11 +119,13 @@ export function BottomNavbar() {
               <Link
                 to={item.href || "/"}
                 className="flex flex-col items-center justify-center gap-1 min-w-0 px-4 py-1"
+                aria-label={item.label}
+                aria-current={active ? "page" : undefined}
               >
                 <div className="relative h-6 w-6 flex items-center justify-center">
                   <span className={cn(
                     "transition-all duration-200",
-                    active ? "text-primary scale-110" : "text-slate-400"
+                    active ? "text-primary scale-110" : "text-slate-600"
                   )}>
                     {active && item.activeIcon ? item.activeIcon : item.icon}
                   </span>
@@ -140,7 +143,7 @@ export function BottomNavbar() {
                 </div>
                 <span className={cn(
                   "text-[11px] font-medium transition-colors duration-200",
-                  active ? "text-primary font-semibold" : "text-slate-400"
+                  active ? "text-primary font-semibold" : "text-slate-600"
                 )}>
                   {item.label}
                 </span>

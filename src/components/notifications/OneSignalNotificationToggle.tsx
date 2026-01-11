@@ -179,7 +179,7 @@ export function OneSignalNotificationToggle() {
         </div>
       </div>
       {loading ? (
-        <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
+        <Loader2 className="h-4 w-4 animate-spin text-slate-600" />
       ) : (
         <Switch
           checked={isEnabled}

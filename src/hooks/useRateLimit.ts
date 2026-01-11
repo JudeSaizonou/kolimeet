@@ -27,7 +27,7 @@ export const checkRateLimit = async (
     // The actual rate limiting should be done server-side
     const ip = ipAddress || '0.0.0.0';
     
-    const { data, error } = await supabase.rpc('check_rate_limit', {
+    const { data, error } = await supabase.rpc('check_rate_limit' as any, {
       p_ip_address: ip,
       p_endpoint: endpoint,
       p_max_requests: config.maxRequests,
@@ -64,7 +64,7 @@ export const logApiRequest = async (
     const { data: { user } } = await supabase.auth.getUser();
     const ip = ipAddress || '0.0.0.0';
     
-    await supabase.rpc('log_api_request', {
+    await supabase.rpc('log_api_request' as any, {
       p_ip_address: ip,
       p_endpoint: endpoint,
       p_user_id: user?.id || null,

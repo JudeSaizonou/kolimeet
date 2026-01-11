@@ -170,7 +170,19 @@ const FavoriteCard = ({ favorite, onView, onRemove }: FavoriteCardProps) => {
   if (!item) return null;
 
   return (
-    <Card className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer" onClick={onView}>
+    <Card 
+      className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer" 
+      onClick={onView}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onView();
+        }
+      }}
+      tabIndex={0}
+      role="button"
+      aria-label={`Voir ${isTrip ? 'le trajet' : 'le colis'} ${isTrip ? (item as any).from_city : (item as any).to_city}`}
+    >
       <div className="bg-primary/5 p-3 md:p-4 border-b">
         <div className="flex items-start justify-between gap-2">
           <div className="space-y-1 flex-1 min-w-0">

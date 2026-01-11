@@ -1,10 +1,16 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, CheckCircle2, Star } from "lucide-react";
+import { SEOHead } from "@/components/SEOHead";
 
 const Home = () => {
   return (
     <div className="overflow-hidden">
+      <SEOHead
+        title="Kolimeet - Transport collaboratif de colis entre villes"
+        description="Envoyez ou transportez des colis entre villes en toute sécurité. Kolimeet connecte voyageurs et expéditeurs pour un transport collaboratif économique et écologique."
+        keywords="transport colis, covoiturage colis, envoi colis, livraison collaborative, transport entre villes, économie collaborative"
+      />
       {/* Hero Section - Split layout avec image */}
       <section className="relative min-h-[90vh] flex items-center">
         <div className="container mx-auto px-4 py-12">

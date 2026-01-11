@@ -1,4 +1,4 @@
-import { zonedTimeToUtc, utcToZonedTime, format as tzFormat } from 'date-fns-tz';
+import { toZonedTime, fromZonedTime, format as tzFormat } from 'date-fns-tz';
 import { format as dateFnsFormat, parseISO, isValid } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
@@ -23,7 +23,7 @@ export const toUTC = (date: string | Date, timezone: string = DEFAULT_TIMEZONE):
       console.error('Invalid date:', date);
       return new Date().toISOString();
     }
-    return zonedTimeToUtc(dateObj, timezone).toISOString();
+    return fromZonedTime(dateObj, timezone).toISOString();
   } catch (error) {
     console.error('Error converting to UTC:', error);
     return new Date().toISOString();
@@ -45,7 +45,7 @@ export const fromUTC = (utcDate: string, timezone: string = DEFAULT_TIMEZONE): D
       console.error('Invalid UTC date:', utcDate);
       return new Date();
     }
-    return utcToZonedTime(dateObj, timezone);
+    return toZonedTime(dateObj, timezone);
   } catch (error) {
     console.error('Error converting from UTC:', error);
     return new Date();

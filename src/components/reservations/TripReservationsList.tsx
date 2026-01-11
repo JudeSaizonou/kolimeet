@@ -205,9 +205,9 @@ export const TripReservationsList = ({ tripId, driverId }: TripReservationsListP
       <CardContent className="pt-0">
         {reservations.length === 0 ? (
           <div className="text-center py-12 text-slate-500">
-            <Package className="h-12 w-12 mx-auto mb-3 text-slate-300" />
+            <Package className="h-12 w-12 mx-auto mb-3 text-slate-500" />
             <p className="font-medium">Aucune réservation</p>
-            <p className="text-sm text-slate-400 mt-1">
+            <p className="text-sm text-slate-600 mt-1">
               Les demandes apparaîtront ici
             </p>
           </div>
@@ -259,17 +259,17 @@ export const TripReservationsList = ({ tripId, driverId }: TripReservationsListP
                       <div>
                         <p className="text-2xl font-bold text-slate-900">
                           {reservation.kilos_requested}
-                          <span className="text-base font-medium text-slate-400 ml-0.5">kg</span>
+                          <span className="text-base font-medium text-slate-600 ml-0.5">kg</span>
                         </p>
                       </div>
-                      <ArrowRight className="h-4 w-4 text-slate-300" />
+                      <ArrowRight className="h-4 w-4 text-slate-500" />
                       <div>
                         <p className="text-2xl font-bold text-slate-900">
                           {reservation.price_offered}
-                          <span className="text-base font-medium text-slate-400 ml-0.5">€</span>
+                          <span className="text-base font-medium text-slate-600 ml-0.5">€</span>
                         </p>
                         {reservation.price_per_kg && (
-                          <p className="text-xs text-slate-400">{reservation.price_per_kg.toFixed(2)}€/kg</p>
+                          <p className="text-xs text-slate-600">{reservation.price_per_kg.toFixed(2)}€/kg</p>
                         )}
                       </div>
                     </div>

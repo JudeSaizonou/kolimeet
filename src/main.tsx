@@ -2,6 +2,10 @@ import { createRoot } from "react-dom/client";
 import { HelmetProvider } from "react-helmet-async";
 import App from "./App.tsx";
 import "./index.css";
+import { initSentry } from "./lib/sentry";
+
+// Initialize Sentry before rendering
+initSentry();
 
 // Register service worker for PWA
 if ('serviceWorker' in navigator) {

@@ -399,7 +399,7 @@ const ParcelDetail = () => {
                 )}
               </div>
             </div>
-            <ChevronRight className="h-4 w-4 text-slate-400" />
+            <ChevronRight className="h-4 w-4 text-slate-600" />
           </Link>
           
           {/* Parrains et bouton de parrainage */}
@@ -413,7 +413,7 @@ const ParcelDetail = () => {
                   </span>
                 </>
               ) : (
-                <span className="text-xs text-slate-400">Pas encore parrainé</span>
+                <span className="text-xs text-slate-600">Pas encore parrainé</span>
               )}
             </div>
             {user && user.id !== parcel.user_id && (

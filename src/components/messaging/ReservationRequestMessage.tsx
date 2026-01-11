@@ -161,23 +161,23 @@ export function ReservationRequestMessage({ request, onUpdate, isOwn }: Reservat
           {/* Kilos + Prix */}
           <div className="flex items-center gap-4">
             <div>
-              <p className="text-2xl font-bold text-slate-900">{request.kilos_requested}<span className="text-base font-medium text-slate-400 ml-0.5">kg</span></p>
+              <p className="text-2xl font-bold text-slate-900">{request.kilos_requested}<span className="text-base font-medium text-slate-600 ml-0.5">kg</span></p>
             </div>
-            <ArrowRight className="h-4 w-4 text-slate-300" />
+            <ArrowRight className="h-4 w-4 text-slate-500" />
             <div>
               {isCounterOfferMessage && parentRequest ? (
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <p className="text-lg text-slate-500 line-through">{parentRequest.price_offered}€</p>
-                    <ArrowRight className="h-3 w-3 text-slate-400" />
-                    <p className="text-2xl font-bold text-slate-900">{request.price_offered}<span className="text-base font-medium text-slate-400 ml-0.5">€</span></p>
+                    <ArrowRight className="h-3 w-3 text-slate-600" />
+                    <p className="text-2xl font-bold text-slate-900">{request.price_offered}<span className="text-base font-medium text-slate-600 ml-0.5">€</span></p>
                   </div>
-                  <p className="text-xs text-slate-400">{request.price_per_kg?.toFixed(2)}€/kg</p>
+                  <p className="text-xs text-slate-600">{request.price_per_kg?.toFixed(2)}€/kg</p>
                 </div>
               ) : (
                 <>
-                  <p className="text-2xl font-bold text-slate-900">{request.price_offered}<span className="text-base font-medium text-slate-400 ml-0.5">€</span></p>
-                  <p className="text-xs text-slate-400">{request.price_per_kg?.toFixed(2)}€/kg</p>
+                  <p className="text-2xl font-bold text-slate-900">{request.price_offered}<span className="text-base font-medium text-slate-600 ml-0.5">€</span></p>
+                  <p className="text-xs text-slate-600">{request.price_per_kg?.toFixed(2)}€/kg</p>
                 </>
               )}
             </div>

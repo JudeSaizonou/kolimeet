@@ -307,7 +307,7 @@ const Profile = () => {
       if (!user) throw new Error("Non authentifié");
 
       // Appeler la fonction RPC pour supprimer le compte
-      const { data, error } = await supabase.rpc("delete_user_account", { 
+      const { data, error } = await supabase.rpc("delete_user_account" as any, { 
         p_target_user_id: user.id 
       });
 
@@ -317,9 +317,9 @@ const Profile = () => {
       }
 
       // Vérifier que la suppression a réussi
-      if (!data || data.success !== true) {
+      if (!data || (data as any).success !== true) {
         console.error("Delete account failed:", data);
-        throw new Error(data?.error || "La suppression du compte a échoué");
+        throw new Error((data as any)?.error || "La suppression du compte a échoué");
       }
 
       console.log("Account deleted successfully:", data);
@@ -487,18 +487,18 @@ const Profile = () => {
 
               {/* Nom */}
               <div className="px-4 py-4 border-b border-slate-100">
-                <Label className="text-xs text-slate-400 font-medium">Nom complet</Label>
+                <Label className="text-xs text-slate-600 font-medium">Nom complet</Label>
                 <Input
                   value={formData.full_name}
                   onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
                   placeholder="Votre nom"
-                  className="border-0 p-0 h-7 text-base text-slate-900 focus-visible:ring-0 placeholder:text-slate-300"
+                  className="border-0 p-0 h-7 text-base text-slate-900 focus-visible:ring-0 placeholder:text-slate-500"
                 />
               </div>
 
               {/* Pays */}
               <div className="px-4 py-4 border-b border-slate-100">
-                <Label className="text-xs text-slate-400 font-medium">Pays</Label>
+                <Label className="text-xs text-slate-600 font-medium">Pays</Label>
                 <Select
                   value={formData.country}
                   onValueChange={(value) => {
@@ -506,7 +506,7 @@ const Profile = () => {
                     setSelectedCountry(value);
                   }}
                 >
-                  <SelectTrigger className="border-0 p-0 h-7 text-base text-slate-900 focus:ring-0 [&>svg]:text-slate-400">
+                  <SelectTrigger className="border-0 p-0 h-7 text-base text-slate-900 focus:ring-0 [&>svg]:text-slate-600">
                     <SelectValue placeholder="Choisir un pays" />
                   </SelectTrigger>
                   <SelectContent>
@@ -519,13 +519,13 @@ const Profile = () => {
 
               {/* Ville */}
               <div className="px-4 py-4 border-b border-slate-100">
-                <Label className="text-xs text-slate-400 font-medium">Ville</Label>
+                <Label className="text-xs text-slate-600 font-medium">Ville</Label>
                 {selectedCountry && citiesByCountry[selectedCountry] ? (
                   <Select
                     value={formData.city}
                     onValueChange={(value) => setFormData({ ...formData, city: value })}
                   >
-                    <SelectTrigger className="border-0 p-0 h-7 text-base text-slate-900 focus:ring-0 [&>svg]:text-slate-400">
+                    <SelectTrigger className="border-0 p-0 h-7 text-base text-slate-900 focus:ring-0 [&>svg]:text-slate-600">
                       <SelectValue placeholder="Choisir une ville" />
                     </SelectTrigger>
                     <SelectContent>
@@ -540,7 +540,7 @@ const Profile = () => {
                     onChange={(e) => setFormData({ ...formData, city: e.target.value })}
                     placeholder="Votre ville"
                     disabled={!selectedCountry}
-                    className="border-0 p-0 h-7 text-base text-slate-900 focus-visible:ring-0 placeholder:text-slate-300"
+                    className="border-0 p-0 h-7 text-base text-slate-900 focus-visible:ring-0 placeholder:text-slate-500"
                   />
                 )}
               </div>
@@ -548,13 +548,13 @@ const Profile = () => {
               {/* Téléphone */}
               <div className="px-4 py-4 flex items-center justify-between">
                 <div className="flex-1">
-                  <Label className="text-xs text-slate-400 font-medium">Téléphone</Label>
+                  <Label className="text-xs text-slate-600 font-medium">Téléphone</Label>
                   <Input
                     type="tel"
                     value={formData.phone_e164}
                     onChange={(e) => setFormData({ ...formData, phone_e164: e.target.value })}
                     placeholder="+33 6 12 34 56 78"
-                    className="border-0 p-0 h-7 text-base text-slate-900 focus-visible:ring-0 placeholder:text-slate-300"
+                    className="border-0 p-0 h-7 text-base text-slate-900 focus-visible:ring-0 placeholder:text-slate-500"
                   />
                 </div>
                 {phoneVerified && (
