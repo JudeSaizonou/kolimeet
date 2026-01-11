@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { CreateParcelInput, UpdateParcelInput } from "@/lib/validations/parcels";
 import { useNavigate } from "react-router-dom";
+import { toUTC } from "@/lib/utils/dates";
 
 export const useParcels = () => {
   const [loading, setLoading] = useState(false);
@@ -55,7 +56,7 @@ export const useParcels = () => {
         from_city: data.from_city,
         to_country: data.to_country,
         to_city: data.to_city,
-        deadline: data.deadline,
+        deadline: data.deadline ? toUTC(data.deadline) : null,
         description: data.description,
         photos: photoUrls.length > 0 ? photoUrls : null,
       }]);

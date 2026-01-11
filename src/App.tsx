@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -13,37 +14,42 @@ import { SuspensionBanner } from "@/components/SuspensionBanner";
 import { PWAInstallBanner } from "@/components/PWAInstallBanner";
 import { OfflineBanner } from "@/components/OfflineBanner";
 import { MessageNotificationListener } from "@/components/notifications/MessageNotificationListener";
+import { PageLoader } from "@/components/PageLoader";
 import { useAuth } from "@/hooks/useAuth";
+
+// Eager load critical pages
 import Home from "./pages/Home";
 import HomePage from "./pages/HomePage";
 import Explorer from "./pages/Explorer";
-import TripDetail from "./pages/TripDetail";
-import ParcelDetail from "./pages/ParcelDetail";
-import Messages from "./pages/Messages";
-import MessagesLayout from "./pages/MessagesLayout";
-import MessageThread from "./pages/MessageThread";
-import NewMessageThread from "./pages/NewMessageThread";
-import UserProfile from "./pages/UserProfile";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
-import Callback from "./pages/auth/Callback";
-import Onboarding from "./pages/Onboarding";
-import Profile from "./pages/Profile";
-import PublishTrip from "./pages/publish/Trip";
-import PublishParcel from "./pages/publish/Parcel";
-import MyListings from "./pages/MyListings";
-import MyReservations from "./pages/MyReservations";
-import Favorites from "./pages/Favorites";
-import Feedback from "./pages/Feedback";
-import NotFound from "./pages/NotFound";
-import AdminDashboard from "./pages/admin/AdminDashboard";
-import CGU from "./pages/CGU";
-import PrivacyPolicy from "./pages/PrivacyPolicy";
-import FAQ from "./pages/FAQ";
-import Contact from "./pages/Contact";
-import ProhibitedItems from "./pages/ProhibitedItems";
-import PaymentTest from "./pages/PaymentTest";
-import Notifications from "./pages/Notifications";
+
+// Lazy load non-critical pages
+const TripDetail = lazy(() => import("./pages/TripDetail"));
+const ParcelDetail = lazy(() => import("./pages/ParcelDetail"));
+const Messages = lazy(() => import("./pages/Messages"));
+const MessagesLayout = lazy(() => import("./pages/MessagesLayout"));
+const MessageThread = lazy(() => import("./pages/MessageThread"));
+const NewMessageThread = lazy(() => import("./pages/NewMessageThread"));
+const UserProfile = lazy(() => import("./pages/UserProfile"));
+const Callback = lazy(() => import("./pages/auth/Callback"));
+const Onboarding = lazy(() => import("./pages/Onboarding"));
+const Profile = lazy(() => import("./pages/Profile"));
+const PublishTrip = lazy(() => import("./pages/publish/Trip"));
+const PublishParcel = lazy(() => import("./pages/publish/Parcel"));
+const MyListings = lazy(() => import("./pages/MyListings"));
+const MyReservations = lazy(() => import("./pages/MyReservations"));
+const Favorites = lazy(() => import("./pages/Favorites"));
+const Feedback = lazy(() => import("./pages/Feedback"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
+const CGU = lazy(() => import("./pages/CGU"));
+const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
+const FAQ = lazy(() => import("./pages/FAQ"));
+const Contact = lazy(() => import("./pages/Contact"));
+const ProhibitedItems = lazy(() => import("./pages/ProhibitedItems"));
+const PaymentTest = lazy(() => import("./pages/PaymentTest"));
+const Notifications = lazy(() => import("./pages/Notifications"));
 
 // Import admin utilities for console access (development only)
 if (import.meta.env.DEV) {
@@ -119,13 +125,14 @@ const App = () => (
           <PWAInstallBanner />
           <MainWrapper>
             <SuspensionBanner />
-            <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/home" element={<HomePage />} />
-        <Route path="/explorer" element={<Explorer />} />
-        <Route path="/trajets/:id" element={<TripDetail />} />
-        <Route path="/colis/:id" element={<ParcelDetail />} />
-        <Route path="/u/:userId" element={<UserProfile />} />
+            <Suspense fallback={<PageLoader />}>
+              <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/home" element={<HomePage />} />
+                <Route path="/explorer" element={<Explorer />} />
+                <Route path="/trajets/:id" element={<TripDetail />} />
+                <Route path="/colis/:id" element={<ParcelDetail />} />
+                <Route path="/u/:userId" element={<UserProfile />} />
               <Route
                 path="/messages"
                 element={
@@ -252,6 +259,7 @@ const App = () => (
               />
               <Route path="*" element={<NotFound />} />
             </Routes>
+            </Suspense>
           </MainWrapper>
           <FooterWrapper />
           <BottomNavbar />

@@ -20,6 +20,7 @@ import { SEO } from "@/components/SEO";
 import { generateParcelOGImage } from "@/lib/utils/ogImage";
 import { ReportButton } from "@/components/ReportButton";
 import { TrustBadge, ReferralRequestDialog, ReferrersList } from "@/components/trust";
+import { sanitizeHTML, sanitizeText } from "@/lib/utils/sanitize";
 
 const ParcelDetail = () => {
   const { id } = useParams();
@@ -428,7 +429,10 @@ const ParcelDetail = () => {
         {/* Description */}
         {parcel.description && (
           <div className="bg-white rounded-2xl border border-slate-200/60 p-4 mb-6 shadow-sm">
-            <p className="text-sm text-slate-600 leading-relaxed">{parcel.description}</p>
+            <p 
+              className="text-sm text-slate-600 leading-relaxed"
+              dangerouslySetInnerHTML={{ __html: sanitizeHTML(parcel.description) }}
+            />
           </div>
         )}
 

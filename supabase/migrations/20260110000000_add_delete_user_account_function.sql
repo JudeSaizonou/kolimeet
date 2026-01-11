@@ -5,13 +5,14 @@
 DROP FUNCTION IF EXISTS public.delete_user_account(UUID);
 
 CREATE OR REPLACE FUNCTION public.delete_user_account(p_target_user_id UUID)
-RETURNS void
+RETURNS jsonb
 LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = public
 AS $$
 DECLARE
   calling_user_id UUID;
+  deleted_count INTEGER := 0;
 BEGIN
   -- Get the calling user's ID
   calling_user_id := auth.uid();
@@ -20,6 +21,9 @@ BEGIN
   IF calling_user_id IS NULL OR calling_user_id != p_target_user_id THEN
     RAISE EXCEPTION 'You can only delete your own account';
   END IF;
+  
+  -- Log the deletion attempt
+  RAISE NOTICE 'Starting account deletion for user: %', p_target_user_id;
 
   -- Delete messages sent by user
   DELETE FROM public.messages WHERE sender_id = p_target_user_id;
@@ -65,7 +69,31 @@ BEGIN
   
   -- Finally, delete the auth user
   DELETE FROM auth.users WHERE id = p_target_user_id;
+  GET DIAGNOSTICS deleted_count = ROW_COUNT;
   
+  -- Verify deletion was successful
+  IF deleted_count = 0 THEN
+    RAISE EXCEPTION 'Failed to delete user from auth.users';
+  END IF;
+  
+  RAISE NOTICE 'Account deletion completed successfully for user: %', p_target_user_id;
+  
+  -- Return success indicator
+  RETURN jsonb_build_object(
+    'success', true,
+    'message', 'Account deleted successfully',
+    'user_id', p_target_user_id,
+    'deleted_at', NOW()
+  );
+  
+EXCEPTION
+  WHEN OTHERS THEN
+    RAISE WARNING 'Account deletion failed: %', SQLERRM;
+    RETURN jsonb_build_object(
+      'success', false,
+      'error', SQLERRM,
+      'user_id', p_target_user_id
+    );
 END;
 $$;
 

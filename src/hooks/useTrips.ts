@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { CreateTripInput, UpdateTripInput } from "@/lib/validations/trips";
 import { useNavigate } from "react-router-dom";
+import { toUTC } from "@/lib/utils/dates";
 
 export const useTrips = () => {
   const [loading, setLoading] = useState(false);
@@ -20,7 +21,7 @@ export const useTrips = () => {
         from_city: data.from_city,
         to_country: data.to_country,
         to_city: data.to_city,
-        date_departure: data.date_departure,
+        date_departure: data.date_departure ? toUTC(data.date_departure) : null,
         capacity_kg: data.capacity_kg,
         capacity_available_kg: data.capacity_available_kg,
         price_expect: data.price_expect,

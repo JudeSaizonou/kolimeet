@@ -24,6 +24,7 @@ import { generateTripOGImage } from "@/lib/utils/ogImage";
 import { ReportButton } from "@/components/ReportButton";
 import { TrustBadge, ReferralRequestDialog, ReferrersList } from "@/components/trust";
 import { TripReservationsList } from "@/components/reservations/TripReservationsList";
+import { sanitizeHTML, sanitizeText } from "@/lib/utils/sanitize";
 
 const TripDetail = () => {
   const { id } = useParams();
@@ -402,7 +403,10 @@ const TripDetail = () => {
         {/* Description */}
         {trip.notes && (
           <div className="bg-white rounded-2xl border border-slate-200/60 p-4 mb-6 shadow-sm">
-            <p className="text-sm text-slate-600 leading-relaxed">{trip.notes}</p>
+            <p 
+              className="text-sm text-slate-600 leading-relaxed"
+              dangerouslySetInnerHTML={{ __html: sanitizeHTML(trip.notes) }}
+            />
           </div>
         )}
 

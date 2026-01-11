@@ -307,9 +307,22 @@ const Profile = () => {
       if (!user) throw new Error("Non authentifié");
 
       // Appeler la fonction RPC pour supprimer le compte
-      const { error } = await supabase.rpc("delete_user_account", { p_target_user_id: user.id });
+      const { data, error } = await supabase.rpc("delete_user_account", { 
+        p_target_user_id: user.id 
+      });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Delete account RPC error:", error);
+        throw error;
+      }
+
+      // Vérifier que la suppression a réussi
+      if (!data || data.success !== true) {
+        console.error("Delete account failed:", data);
+        throw new Error(data?.error || "La suppression du compte a échoué");
+      }
+
+      console.log("Account deleted successfully:", data);
 
       // Déconnexion
       await supabase.auth.signOut();
@@ -321,6 +334,7 @@ const Profile = () => {
 
       navigate("/");
     } catch (error: any) {
+      console.error("Delete account error:", error);
       toast({
         title: "Erreur",
         description: error.message || "Impossible de supprimer le compte. Contactez le support.",
@@ -677,14 +691,14 @@ const Profile = () => {
         </div>
 
         {/* Bouton déconnexion (toujours visible) - largeur max */}
-        <div className="mt-6 px-4 pb-8">
+        <div className="mt-8 px-4 pb-10">
           <div className="max-w-4xl mx-auto">
             <Button
-              variant="ghost"
+              variant="outline"
               onClick={handleSignOut}
-              className="w-full max-w-sm mx-auto block h-11 text-sm font-medium text-slate-500 hover:text-red-500 hover:bg-red-50/50 rounded-xl"
+              className="w-full max-w-sm mx-auto flex items-center justify-center h-12 text-base font-medium text-red-600 hover:text-white hover:bg-red-600 border-red-200 hover:border-red-600 rounded-xl transition-all"
             >
-              <LogOut className="h-4 w-4 mr-2" />
+              <LogOut className="h-4 w-4 mr-2.5" />
               Se déconnecter
             </Button>
           </div>

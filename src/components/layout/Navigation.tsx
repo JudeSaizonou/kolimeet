@@ -56,31 +56,31 @@ const Navigation = () => {
     )}>
       <nav className={cn(
         "flex items-center justify-between",
-        "px-6 py-3 gap-4",
-        "bg-white/80 backdrop-blur-md",
+        "px-6 py-3.5 gap-4",
+        "bg-white/90 backdrop-blur-lg",
         "rounded-full",
-        "border border-white/20",
-        "shadow-glass",
+        "border border-slate-200/60",
+        "shadow-lg shadow-slate-900/5",
         // Responsive padding
         "md:px-8 md:py-4"
       )}>
         {/* Logo */}
         {user ? (
           <Link to="/explorer" className="flex-shrink-0">
-            <img src="/Kolimeetlogo.png" alt="Kolimeet" className="h-10 w-auto" />
+            <img src="/Kolimeetlogo.png" alt="Kolimeet" className="h-9 w-auto md:h-10" />
           </Link>
         ) : (
           <Link to="/" className="flex-shrink-0">
-            <img src="/Kolimeetlogo.png" alt="Kolimeet" className="h-10 w-auto" />
+            <img src="/Kolimeetlogo.png" alt="Kolimeet" className="h-9 w-auto md:h-10" />
           </Link>
         )}
         
         {/* Desktop Navigation Links */}
-        <div className="hidden md:flex items-center gap-[30px] flex-1 justify-center" style={{ fontFamily: 'Figtree' }}>
+        <div className="hidden md:flex items-center gap-8 flex-1 justify-center">
           {!user && (
             <Link 
               to="/"
-              className="text-muted-foreground hover:text-primary transition-all duration-200 text-base font-medium whitespace-nowrap"
+              className="text-slate-700 hover:text-primary transition-colors duration-200 text-[15px] font-medium whitespace-nowrap"
             >
               Accueil
             </Link>
@@ -88,7 +88,7 @@ const Navigation = () => {
           
           <Link 
             to="/explorer"
-            className="text-muted-foreground hover:text-primary transition-all duration-200 text-base font-medium whitespace-nowrap"
+            className="text-slate-700 hover:text-primary transition-colors duration-200 text-[15px] font-medium whitespace-nowrap"
           >
             Explorer
           </Link>
@@ -96,7 +96,7 @@ const Navigation = () => {
           {user && (
             <Link 
               to="/messages"
-              className="text-muted-foreground hover:text-primary transition-all duration-200 text-base font-medium whitespace-nowrap relative"
+              className="text-slate-700 hover:text-primary transition-colors duration-200 text-[15px] font-medium whitespace-nowrap relative"
             >
               Messagerie
               {unreadCount > 0 && (
@@ -110,7 +110,7 @@ const Navigation = () => {
           {!user && (
             <Link 
               to="/faq"
-              className="text-muted-foreground hover:text-primary transition-all duration-200 text-base font-medium whitespace-nowrap"
+              className="text-slate-700 hover:text-primary transition-colors duration-200 text-[15px] font-medium whitespace-nowrap"
             >
               FAQ
             </Link>
@@ -119,7 +119,7 @@ const Navigation = () => {
           {!user && (
             <Link 
               to="/contact"
-              className="text-muted-foreground hover:text-primary transition-all duration-200 text-base font-medium whitespace-nowrap"
+              className="text-slate-700 hover:text-primary transition-colors duration-200 text-[15px] font-medium whitespace-nowrap"
             >
               Contact
             </Link>
@@ -127,13 +127,13 @@ const Navigation = () => {
         </div>
 
         {/* Desktop Actions */}
-        <div className="hidden md:flex items-center gap-4">
+        <div className="hidden md:flex items-center gap-3">
           {user && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button 
                   variant="ghost"
-                  className="text-muted-foreground hover:text-primary hover:bg-white/10 transition-all duration-200"
+                  className="text-slate-700 hover:text-primary hover:bg-primary/5 transition-colors duration-200 h-10 px-4 text-[15px] font-medium"
                 >
                   Publier
                 </Button>
@@ -161,7 +161,7 @@ const Navigation = () => {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button className="flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-transparent rounded-full">
-                  <Avatar className="h-9 w-9 border-2 border-primary/30">
+                  <Avatar className="h-10 w-10 border-2 border-primary/20 hover:border-primary/40 transition-colors">
                     <AvatarImage src={profile?.avatar_url} alt="Avatar" />
                     <AvatarFallback className="bg-primary/10">
                       <User className="h-5 w-5 text-primary" />
@@ -259,13 +259,13 @@ const Navigation = () => {
               <Button 
                 variant="ghost"
                 asChild
-                className="text-foreground hover:text-primary hover:bg-primary/5 transition-all duration-200"
+                className="text-slate-700 hover:text-primary hover:bg-primary/5 transition-colors duration-200 h-10 px-5 text-[15px] font-medium"
               >
                 <Link to="/auth/login">Connexion</Link>
               </Button>
               <Button 
                 asChild
-                className="bg-primary hover:bg-primary/90 text-white rounded-full px-6"
+                className="bg-primary hover:bg-primary/90 text-white rounded-full h-10 px-6 text-[15px] font-semibold shadow-md shadow-primary/25 hover:shadow-lg hover:shadow-primary/30 transition-all duration-200"
               >
                 <Link to="/auth/register">Inscription</Link>
               </Button>
