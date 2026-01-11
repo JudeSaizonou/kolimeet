@@ -10,7 +10,10 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "optimize-images": "node scripts/optimize-images.js",
-    "generate-sitemap": "tsx scripts/generate-sitemap.ts"
+    "generate-sitemap": "tsx scripts/generate-sitemap.ts",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
@@ -88,6 +91,9 @@
     "@eslint/js": "^9.32.0",
     "@fontsource/inter": "^5.2.8",
     "@tailwindcss/typography": "^0.5.16",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.1",
+    "@testing-library/user-event": "^14.6.1",
     "@types/express": "^5.0.5",
     "@types/node": "^22.16.5",
     "@types/react": "^18.3.23",
@@ -99,6 +105,7 @@
     "eslint-plugin-react-refresh": "^0.4.20",
     "express": "^5.1.0",
     "globals": "^15.15.0",
+    "jsdom": "^27.4.0",
     "lovable-tagger": "^1.1.11",
     "opentype": "^0.1.2",
     "postcss": "^8.5.6",
@@ -108,6 +115,7 @@
     "tsx": "^4.21.0",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.38.0",
-    "vite": "^5.4.19"
+    "vite": "^5.4.19",
+    "vitest": "^4.0.16"
   }
 }
