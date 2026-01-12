@@ -99,6 +99,38 @@ export const formatDateTime = (
 };
 
 /**
+ * Format time only (HH:mm)
+ * @param date - Date string or Date object
+ * @param timezone - User's timezone
+ * @returns Time string like "14:30"
+ */
+export const formatTime = (
+  date: string | Date,
+  timezone: string = DEFAULT_TIMEZONE
+): string => {
+  return formatDate(date, 'HH:mm', timezone);
+};
+
+/**
+ * Check if a date is in the past
+ * @param date - Date string or Date object
+ * @returns true if date is before now
+ */
+export const isDateInPast = (date: string | Date): boolean => {
+  if (!date) return false;
+  
+  try {
+    const dateObj = typeof date === 'string' ? parseISO(date) : date;
+    if (!isValid(dateObj)) return false;
+    
+    return dateObj < new Date();
+  } catch (error) {
+    console.error('Error checking if date in past:', error);
+    return false;
+  }
+};
+
+/**
  * Format a date as relative time (e.g., "il y a 2 heures")
  * @param date - Date string or Date object
  * @returns Relative time string

@@ -12,8 +12,17 @@ const Home = () => {
         keywords="transport colis, covoiturage colis, envoi colis, livraison collaborative, transport entre villes, économie collaborative"
       />
       {/* Hero Section - Split layout avec image */}
-      <section className="relative min-h-[90vh] flex items-center">
-        <div className="container mx-auto px-4 py-12">
+      <section className="relative min-h-[90vh] flex items-center overflow-hidden">
+        {/* Background image subtil */}
+        <div className="absolute inset-0 opacity-5 dark:opacity-10">
+          <img 
+            src="/images/hero-bg.webp"
+            alt=""
+            className="w-full h-full object-cover"
+            loading="eager"
+          />
+        </div>
+        <div className="container mx-auto px-4 py-12 relative z-10">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Texte */}
             <div className="order-2 lg:order-1">
@@ -62,17 +71,23 @@ const Home = () => {
                 {/* Image principale */}
                 <div className="absolute top-0 right-0 w-[75%] h-[70%] rounded-3xl overflow-hidden shadow-2xl">
                   <img 
-                    src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800&q=80" 
-                    alt="Avion en vol"
+                    srcSet="/images/airport-luggage-320w.webp 320w, /images/airport-luggage-640w.webp 640w, /images/airport-luggage-1024w.webp 1024w, /images/airport-luggage-1920w.webp 1920w"
+                    sizes="(max-width: 640px) 75vw, (max-width: 1024px) 50vw, 40vw"
+                    src="/images/airport-luggage.webp" 
+                    alt="Bagage à l'aéroport"
                     className="w-full h-full object-cover"
+                    loading="eager"
                   />
                 </div>
                 {/* Image secondaire */}
                 <div className="absolute bottom-0 left-0 w-[60%] h-[50%] rounded-3xl overflow-hidden shadow-2xl border-4 border-background">
                   <img 
-                    src="https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?w=600&q=80" 
-                    alt="Colis et emballages"
+                    srcSet="/images/package-handover-320w.webp 320w, /images/package-handover-640w.webp 640w, /images/package-handover-1024w.webp 1024w"
+                    sizes="(max-width: 640px) 60vw, 30vw"
+                    src="/images/package-handover.webp" 
+                    alt="Remise de colis en main propre"
                     className="w-full h-full object-cover"
+                    loading="eager"
                   />
                 </div>
                 {/* Badge flottant */}
@@ -114,9 +129,12 @@ const Home = () => {
           <div className="grid lg:grid-cols-2 gap-12 items-center mb-20">
             <div className="rounded-3xl overflow-hidden shadow-xl">
               <img 
-                src="https://images.unsplash.com/photo-1512436991641-6745cdb1723f?w=800&q=80" 
-                alt="Personne préparant un colis"
+                srcSet="/images/savings-320w.webp 320w, /images/savings-640w.webp 640w, /images/savings-1024w.webp 1024w"
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                src="/images/savings.webp" 
+                alt="Économies sur l'envoi de colis"
                 className="w-full h-[350px] object-cover"
+                loading="lazy"
               />
             </div>
             <div>
@@ -161,9 +179,12 @@ const Home = () => {
             </div>
             <div className="order-1 lg:order-2 rounded-3xl overflow-hidden shadow-xl">
               <img 
-                src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80" 
-                alt="Personnes qui communiquent"
+                srcSet="/images/community-320w.webp 320w, /images/community-640w.webp 640w, /images/community-1024w.webp 1024w"
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                src="/images/community.webp" 
+                alt="Communauté Kolimeet"
                 className="w-full h-[350px] object-cover"
+                loading="lazy"
               />
             </div>
           </div>
@@ -172,9 +193,12 @@ const Home = () => {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="rounded-3xl overflow-hidden shadow-xl">
               <img 
-                src="https://images.unsplash.com/photo-1521791136064-7986c2920216?w=800&q=80" 
-                alt="Remise de colis en main propre"
+                srcSet="/images/trust-handshake-320w.webp 320w, /images/trust-handshake-640w.webp 640w, /images/trust-handshake-1024w.webp 1024w"
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                src="/images/trust-handshake.webp" 
+                alt="Confiance et poignée de main"
                 className="w-full h-[350px] object-cover"
+                loading="lazy"
               />
             </div>
             <div>
@@ -194,6 +218,58 @@ const Home = () => {
                   <span>Support client disponible</span>
                 </li>
               </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Section Pourquoi Kolimeet avec image traveler */}
+      <section className="py-20 bg-primary/5">
+        <div className="container mx-auto px-4">
+          <div className="grid lg:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
+            <div className="rounded-3xl overflow-hidden shadow-xl">
+              <img 
+                srcSet="/images/traveler-320w.webp 320w, /images/traveler-640w.webp 640w, /images/traveler-1024w.webp 1024w, /images/traveler-1920w.webp 1920w"
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                src="/images/traveler.webp" 
+                alt="Voyageur avec valise"
+                className="w-full h-[400px] object-cover"
+                loading="lazy"
+              />
+            </div>
+            <div>
+              <h2 className="text-3xl md:text-4xl font-bold mb-6">
+                Pourquoi choisir Kolimeet ?
+              </h2>
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-xl font-semibold mb-2 flex items-center gap-2">
+                    <CheckCircle2 className="h-6 w-6 text-green-500" />
+                    Économique
+                  </h3>
+                  <p className="text-muted-foreground ml-8">
+                    Jusqu'à 70% moins cher que les transporteurs traditionnels. Pas de frais cachés, pas de commission.
+                  </p>
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold mb-2 flex items-center gap-2">
+                    <CheckCircle2 className="h-6 w-6 text-green-500" />
+                    Écologique
+                  </h3>
+                  <p className="text-muted-foreground ml-8">
+                    Optimisez l'espace disponible dans les bagages des voyageurs. Réduisez l'empreinte carbone.
+                  </p>
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold mb-2 flex items-center gap-2">
+                    <CheckCircle2 className="h-6 w-6 text-green-500" />
+                    Humain
+                  </h3>
+                  <p className="text-muted-foreground ml-8">
+                    Créez du lien entre voyageurs et expéditeurs. Une communauté solidaire et bienveillante.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>

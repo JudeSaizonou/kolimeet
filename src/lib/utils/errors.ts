@@ -122,9 +122,12 @@ export const translateError = (error: unknown): string => {
     console.warn('🌐 Untranslated error:', message);
   }
   
-  // Fallback: Return sanitized original message or generic error
-  if (message.length > 100) {
-    return 'Une erreur est survenue. Veuillez réessayer ou contacter le support.';
+  // Fallback: Return generic error for technical codes, original for readable messages
+  // Technical error codes (like PGRST116) are not user-friendly
+  // But descriptive messages (like "Something went wrong") can be shown
+  const isTechnicalCode = /^[A-Z0-9_-]+$/.test(message) && message.length < 50;
+  if (isTechnicalCode) {
+    return ERROR_TRANSLATIONS['Unknown error'];
   }
   
   return message || ERROR_TRANSLATIONS['Unknown error'];
@@ -148,20 +151,35 @@ export const getErrorMessage = (
 
 /**
  * Check if error is a specific type
+ * Uses original error message (before translation) for accurate detection
  */
 export const isAuthError = (error: unknown): boolean => {
-  const message = translateError(error);
-  return message.toLowerCase().includes('connexion') ||
-         message.toLowerCase().includes('authentifi') ||
-         message.toLowerCase().includes('mot de passe') ||
-         message.toLowerCase().includes('email');
+  const originalMessage = typeof error === 'string' ? error : String(error || '');
+  const lower = originalMessage.toLowerCase();
+  return lower.includes('invalid') && lower.includes('login') ||
+         lower.includes('invalid') && lower.includes('credentials') ||
+         lower.includes('password') ||
+         lower.includes('auth') ||
+         lower.includes('jwt') ||
+         lower.includes('token') ||
+         lower.includes('unauthorized') ||
+         lower.includes('user not found') ||
+         lower.includes('email not confirmed');
 };
 
 export const isNetworkError = (error: unknown): boolean => {
-  const message = translateError(error);
-  return message.toLowerCase().includes('réseau') ||
-         message.toLowerCase().includes('connexion') ||
-         message.toLowerCase().includes('internet');
+  const originalMessage = typeof error === 'string' ? error : String(error || '');
+  const lower = originalMessage.toLowerCase();
+  return lower.includes('failed to fetch') ||
+         lower.includes('networkerror') ||
+         lower.includes('network') ||
+         lower.includes('timeout') ||
+         lower.includes('timed out') ||
+         lower.includes('econnrefused') ||
+         lower.includes('etimedout') ||
+         lower.includes('connection') ||
+         lower.includes('err_internet') ||
+         lower.includes('err_network');
 };
 
 export const isPermissionError = (error: unknown): boolean => {
@@ -173,20 +191,44 @@ export const isPermissionError = (error: unknown): boolean => {
 
 /**
  * Get retry suggestion based on error type
+ * Returns undefined for non-retryable errors (auth, validation)
  */
-export const getRetryMessage = (error: unknown): string | null => {
+export const getRetryMessage = (error: unknown): string | undefined => {
+  // Auth errors are not retryable - user needs to fix credentials
+  if (isAuthError(error)) {
+    return undefined;
+  }
+  
+  // Network errors are retryable
   if (isNetworkError(error)) {
     return 'Vérifiez votre connexion internet et réessayez';
   }
   
-  if (isAuthError(error)) {
-    return 'Veuillez vous reconnecter';
-  }
-  
+  // Permission errors might be retryable after re-auth
   if (isPermissionError(error)) {
     return 'Contactez un administrateur si vous pensez que c\'est une erreur';
   }
   
+  const originalMessage = typeof error === 'string' ? error : String(error || '');
+  const lower = originalMessage.toLowerCase();
+  
+  // Database/server errors are retryable
+  if (lower.includes('database') ||
+      lower.includes('server') ||
+      lower.includes('service') ||
+      lower.includes('rate limit')) {
+    return 'Veuillez réessayer dans quelques instants';
+  }
+  
+  // Validation/client errors are not retryable
+  if (lower.includes('invalid') ||
+      lower.includes('required') ||
+      lower.includes('constraint') ||
+      lower.includes('duplicate')) {
+    return undefined;
+  }
+  
+  // Default: suggest retry for unknown errors
   return 'Veuillez réessayer dans quelques instants';
 };
 
