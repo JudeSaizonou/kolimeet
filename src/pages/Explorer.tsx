@@ -64,7 +64,7 @@ const Explorer = () => {
             className="data-[state=active]:bg-primary data-[state=active]:text-white transition-all px-6 py-3 rounded-md"
           >
             <Plane className="h-4 w-4 mr-2" />
-            Kilo à vendre
+            Kilos à vendre
             {tripsTotalCount > 0 && (
               <span className="ml-2 px-2 py-0.5 text-xs bg-white/20 rounded-full">
                 {tripsTotalCount}
@@ -76,7 +76,7 @@ const Explorer = () => {
             className="data-[state=active]:bg-primary data-[state=active]:text-white transition-all px-6 py-3 rounded-md"
           >
             <Package className="h-4 w-4 mr-2" />
-            Koli à transporter
+            Colis à transporter
             {parcelsTotalCount > 0 && (
               <span className="ml-2 px-2 py-0.5 text-xs bg-white/20 rounded-full">
                 {parcelsTotalCount}
