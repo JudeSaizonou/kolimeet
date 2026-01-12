@@ -148,107 +148,90 @@ export const SimpleBookingDialog: React.FC<SimpleBookingDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Package className="h-5 w-5 text-primary" />
-            Réserver des kilos
-          </DialogTitle>
-          <DialogDescription>
-            Envoyez une demande de réservation au voyageur
-          </DialogDescription>
-        </DialogHeader>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Résumé du trajet */}
-          <div className="bg-slate-50 rounded-xl p-4 space-y-2">
-            <div className="flex items-center gap-2 text-sm">
-              <MapPin className="h-4 w-4 text-primary" />
+      <DialogContent className="sm:max-w-[420px] p-0">
+        <form onSubmit={handleSubmit}>
+          {/* Header compact */}
+          <div className="px-5 pt-5 pb-4 border-b">
+            <DialogTitle className="text-lg font-semibold flex items-center gap-2">
+              <Package className="h-4 w-4 text-primary" />
+              Réserver des kilos
+            </DialogTitle>
+            <div className="flex items-center gap-1.5 text-sm text-muted-foreground mt-1">
               <span className="font-medium">{trip.from_city}</span>
-              <span className="text-muted-foreground">→</span>
+              <span>→</span>
               <span className="font-medium">{trip.to_city}</span>
-            </div>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Calendar className="h-4 w-4" />
-              <span>{format(new Date(trip.date_departure), "d MMMM yyyy", { locale: fr })}</span>
-            </div>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <User className="h-4 w-4" />
-              <span>{trip.profiles?.full_name || 'Voyageur'}</span>
-            </div>
-            <div className="flex items-center gap-2 text-sm">
-              <Weight className="h-4 w-4 text-green-600" />
-              <span className="text-green-600 font-medium">{trip.capacity_available_kg} kg disponibles</span>
+              <span className="mx-1">•</span>
+              <span>{format(new Date(trip.date_departure), "d MMM", { locale: fr })}</span>
             </div>
           </div>
 
-          {/* Poids à réserver */}
-          <div className="space-y-2">
-            <Label htmlFor="weight">Poids à réserver (kg)</Label>
-            <Input
-              id="weight"
-              type="number"
-              min={1}
-              max={trip.capacity_available_kg}
-              value={weightKg}
-              onChange={(e) => setWeightKg(Number(e.target.value))}
-              className="text-lg font-medium"
-            />
-            <p className="text-xs text-muted-foreground">
-              Maximum: {trip.capacity_available_kg} kg
-            </p>
-          </div>
+          <div className="px-5 py-4 space-y-4">
+            {/* Poids disponible - Compact badge */}
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-muted-foreground">Disponible</span>
+              <span className="font-semibold text-green-600">{trip.capacity_available_kg} kg</span>
+            </div>
 
-          {/* Prix estimé */}
-          {trip.price_expect && trip.price_expect > 0 && (
-            <div className="bg-primary/5 rounded-xl p-4">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Prix estimé</span>
-                <span className="text-xl font-bold text-primary">
+            {/* Input poids - Compact */}
+            <div className="space-y-1.5">
+              <Label htmlFor="weight" className="text-sm">Quantité (kg)</Label>
+              <Input
+                id="weight"
+                type="number"
+                min={1}
+                max={trip.capacity_available_kg}
+                value={weightKg}
+                onChange={(e) => setWeightKg(Number(e.target.value))}
+                className="h-10"
+              />
+            </div>
+
+            {/* Prix - Compact et visible */}
+            {trip.price_expect && trip.price_expect > 0 && (
+              <div className="flex items-center justify-between py-2 px-3 bg-primary/5 rounded-lg">
+                <span className="text-sm text-muted-foreground">Prix total</span>
+                <span className="text-lg font-bold text-primary">
                   {estimatedPrice.toFixed(2)} €
                 </span>
               </div>
-              <p className="text-xs text-muted-foreground mt-1">
-                {trip.price_expect}€/kg × {weightKg} kg
-              </p>
-            </div>
-          )}
+            )}
 
-          {/* Message optionnel */}
-          <div className="space-y-2">
-            <Label htmlFor="message">Message (optionnel)</Label>
-            <Textarea
-              id="message"
-              placeholder="Décrivez brièvement ce que vous souhaitez envoyer..."
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              rows={3}
-            />
+            {/* Message - Compact */}
+            <div className="space-y-1.5">
+              <Label htmlFor="message" className="text-sm">Message (optionnel)</Label>
+              <Textarea
+                id="message"
+                placeholder="Décrivez votre besoin..."
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                rows={2}
+                className="resize-none text-sm"
+              />
+            </div>
           </div>
 
-          <DialogFooter className="gap-2 sm:gap-0">
+          {/* Footer compact */}
+          <div className="px-5 py-3 bg-slate-50/50 border-t flex gap-2">
             <Button
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
               disabled={loading}
+              className="flex-1 h-9"
             >
               Annuler
             </Button>
-            <Button type="submit" disabled={loading}>
+            <Button type="submit" disabled={loading} className="flex-1 h-9">
               {loading ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
                   Envoi...
                 </>
               ) : (
-                <>
-                  <Package className="mr-2 h-4 w-4" />
-                  Envoyer la demande
-                </>
+                'Envoyer'
               )}
             </Button>
-          </DialogFooter>
+          </div>
         </form>
       </DialogContent>
     </Dialog>
