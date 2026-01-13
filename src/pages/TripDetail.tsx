@@ -161,7 +161,7 @@ const TripDetail = () => {
 
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-3 md:px-4 py-6 md:py-8">
         <Skeleton className="h-96 mb-6" />
         <Skeleton className="h-64" />
       </div>
@@ -193,8 +193,8 @@ const TripDetail = () => {
         url={shareUrl}
         type="article"
       />
-      <div className="min-h-screen bg-slate-50 pb-24 pt-20 md:pt-24">
-        <div className="container mx-auto px-4 max-w-3xl">
+      <div className="min-h-screen bg-slate-50 pb-24 pt-20 md:pt-32">
+        <div className="container mx-auto px-3 md:px-4 max-w-3xl">
         
         {/* Hero Card - Design épuré sur fond blanc */}
         <div 

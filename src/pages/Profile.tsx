@@ -347,7 +347,7 @@ const Profile = () => {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-slate-50/50 pt-20 md:pt-28">
+      <div className="min-h-screen bg-slate-50/50 pt-20 md:pt-32">
         {/* Header profil avec fond dégradé - largeur max */}
         <div className="bg-primary/5 px-4 pt-6 pb-8">
           <div className="max-w-4xl mx-auto">
@@ -571,23 +571,6 @@ const Profile = () => {
                 <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
                   Préférences
                 </p>
-              </div>
-
-              {/* Publication anonyme */}
-              <div className="px-4 py-4 border-b border-slate-100 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 bg-violet-100 rounded-xl flex items-center justify-center">
-                    <EyeOff className="h-4.5 w-4.5 text-violet-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-slate-900">Publication anonyme</p>
-                    <p className="text-xs text-slate-500">Cacher votre identité</p>
-                  </div>
-                </div>
-                <Switch
-                  checked={defaultAnonymous}
-                  onCheckedChange={setDefaultAnonymous}
-                />
               </div>
 
               {/* Notifications intégré */}

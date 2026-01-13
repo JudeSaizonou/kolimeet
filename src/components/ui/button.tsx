@@ -18,7 +18,7 @@ const buttonVariants = cva(
       },
       size: {
         default: "h-11 px-4 py-2", // Increased from h-10 to h-11 for better touch target
-        sm: "h-9 rounded-md px-3",
+        sm: "h-10 rounded-md px-3 text-sm", // h-10 (40px) + padding = 44px minimum touch
         lg: "h-12 rounded-md px-8 text-base", // Increased to h-12 (48px)
         icon: "h-11 w-11",
       },

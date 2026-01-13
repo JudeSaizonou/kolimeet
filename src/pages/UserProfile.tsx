@@ -121,7 +121,7 @@ export default function UserProfile() {
 
   if (loading) {
     return (
-      <div className="bg-background min-h-screen pt-20 md:pt-28 py-8">
+      <div className="bg-background min-h-screen pt-20 md:pt-32 py-6 md:py-8">
         <div className="container max-w-4xl mx-auto px-4">
           <Skeleton className="h-32 w-full mb-8" />
           <Skeleton className="h-96 w-full" />
@@ -132,7 +132,7 @@ export default function UserProfile() {
 
   if (!profile) {
     return (
-      <div className="bg-background min-h-screen pt-20 md:pt-28 py-8">
+      <div className="bg-background min-h-screen pt-20 md:pt-32 py-6 md:py-8">
         <div className="container max-w-4xl mx-auto px-4">
           <Card className="p-8 text-center">
             <h1 className="text-xl font-semibold mb-2">Profil introuvable</h1>
@@ -153,7 +153,7 @@ export default function UserProfile() {
 
   return (
     <>
-      <div className="bg-background min-h-screen pt-20 md:pt-28 py-8">
+      <div className="bg-background min-h-screen pt-20 md:pt-32 py-6 md:py-8">
         <div className="container max-w-4xl mx-auto px-4">
           {/* Profile Header */}
           <Card className="p-6 mb-8">

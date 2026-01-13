@@ -28,7 +28,7 @@ export const TripCard = ({ trip }: TripCardProps) => {
           <Button
             variant="secondary"
             size="icon"
-            className="h-8 w-8 rounded-full bg-white/80 backdrop-blur-sm shadow-sm hover:bg-white"
+            className="h-10 w-10 rounded-full bg-white/80 backdrop-blur-sm shadow-sm hover:bg-white"
             onClick={(e) => {
               e.stopPropagation();
               toggleFavorite();
@@ -39,7 +39,7 @@ export const TripCard = ({ trip }: TripCardProps) => {
         </div>
         
         <div className="absolute bottom-2 left-3">
-          <Badge variant={trip.status === "open" ? "default" : "secondary"} className="text-[10px] px-2 h-5">
+          <Badge variant={trip.status === "open" ? "default" : "secondary"} className="text-xs px-2 py-1 h-6">
             {trip.status === "open" ? "Ouvert" : "Fermé"}
           </Badge>
         </div>
@@ -55,7 +55,7 @@ export const TripCard = ({ trip }: TripCardProps) => {
 
         {/* Date & Price Row */}
         <div className="flex items-center justify-between mt-3">
-          <div className="flex items-center gap-1.5 text-xs text-slate-600 font-medium">
+          <div className="flex items-center gap-2 text-xs text-slate-600 font-medium">
             <Calendar className="h-3.5 w-3.5" />
             <span>
               {format(new Date(trip.date_departure), "d MMM", { locale: fr })}
@@ -63,34 +63,21 @@ export const TripCard = ({ trip }: TripCardProps) => {
           </div>
           
           {trip.price_expect && (
-            <div className="font-extrabold text-primary text-sm md:text-base">
-              {trip.price_expect}€<span className="text-[10px] font-normal text-muted-foreground">/kg</span>
+            <div className="font-extrabold text-primary text-lg md:text-xl">
+              {trip.price_expect}€<span className="text-xs font-normal text-muted-foreground">/kg</span>
             </div>
           )}
         </div>
 
         {/* User Info (Compact) */}
         <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-100">
-          {trip.is_anonymous ? (
-            <>
-              <div className="h-5 w-5 md:h-6 md:w-6 rounded-full bg-muted flex items-center justify-center">
-                <EyeOff className="h-3 w-3 text-muted-foreground" />
-              </div>
-              <span className="text-xs text-muted-foreground italic">
-                Anonyme
-              </span>
-            </>
-          ) : (
-            <>
-              <Avatar className="h-5 w-5 md:h-6 md:w-6">
-                <AvatarImage src={profile?.avatar_url} />
-                <AvatarFallback className="text-[10px]">{profile?.full_name?.[0] || "U"}</AvatarFallback>
-              </Avatar>
-              <span className="text-xs text-muted-foreground truncate max-w-[100px]">
-                {profile?.full_name || "Utilisateur"}
-              </span>
-            </>
-          )}
+          <Avatar className="h-5 w-5 md:h-6 md:w-6">
+            <AvatarImage src={profile?.avatar_url} />
+            <AvatarFallback className="text-[10px]">{profile?.full_name?.[0] || "U"}</AvatarFallback>
+          </Avatar>
+          <span className="text-xs text-muted-foreground truncate max-w-[100px]">
+            {profile?.full_name || "Utilisateur"}
+          </span>
           <span className="ml-auto text-xs font-medium text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">
             {trip.capacity_available_kg}kg
           </span>

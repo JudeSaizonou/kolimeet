@@ -142,7 +142,7 @@ const NewMessageThread = () => {
     <div className="md:relative md:flex md:flex-col md:h-auto fixed inset-0 top-0 flex flex-col bg-background md:bg-transparent md:top-auto">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-background border-b md:relative md:z-auto">
-        <div className="flex items-center gap-3 px-4 py-3 md:px-6 md:py-4">
+        <div className="flex items-center gap-2 md:gap-3 px-3 md:px-6 py-3 md:py-4">
           <Button
             variant="ghost"
             size="icon"

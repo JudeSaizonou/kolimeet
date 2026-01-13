@@ -46,8 +46,8 @@ const Notifications = () => {
         <meta name="description" content="Gérez vos notifications sur Kolimeet" />
       </Helmet>
 
-      <div className="min-h-screen bg-secondary pt-20 md:pt-28">
-        <div className="container mx-auto px-4 py-8 max-w-2xl">
+      <div className="min-h-screen bg-secondary pt-20 md:pt-32">
+        <div className="container mx-auto px-3 md:px-4 py-6 md:py-8 max-w-2xl">
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
@@ -59,7 +59,7 @@ const Notifications = () => {
                 <ArrowLeft className="h-5 w-5" />
               </Button>
               <div>
-                <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
+                <h1 className="text-xl md:text-2xl font-bold text-foreground flex items-center gap-2">
                   <Bell className="h-6 w-6" />
                   Notifications
                 </h1>

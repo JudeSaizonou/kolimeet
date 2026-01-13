@@ -12,7 +12,7 @@ const MessagesLayout = () => {
   const { id } = useParams();
 
   return (
-    <div className="pt-20 md:pt-28 h-screen">
+    <div className="pt-20 md:pt-32 h-screen">
       <div className="h-[calc(100vh-5rem)] md:h-[calc(100vh-7rem)]">
         {/* Mobile: full page, Desktop: split view */}
         <div className="h-full flex md:border md:border-border md:rounded-lg md:overflow-hidden md:shadow-sm md:mx-4 lg:mx-8">
@@ -26,8 +26,8 @@ const MessagesLayout = () => {
         >
           <div className="h-full flex flex-col">
             {/* Header */}
-            <div className="px-4 py-4 md:px-6 md:py-5 border-b">
-              <h1 className="text-2xl md:text-3xl font-bold">Messagerie</h1>
+            <div className="px-3 md:px-6 py-3 md:py-5 border-b">
+              <h1 className="text-xl md:text-3xl font-bold">Messagerie</h1>
             </div>
 
             {/* Liste scrollable */}

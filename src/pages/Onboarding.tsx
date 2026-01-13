@@ -163,11 +163,11 @@ const Onboarding = () => {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-secondary pt-20 md:pt-28 py-12 px-4">
+      <div className="min-h-screen bg-secondary pt-20 md:pt-32 py-6 md:py-8 px-3 md:px-4">
         <div className="max-w-2xl mx-auto">
           <Card className="p-8 border-2">
             <div className="text-center mb-8">
-              <h1 className="text-3xl font-bold text-foreground mb-2">
+              <h1 className="text-xl md:text-3xl font-bold text-foreground mb-2">
                 Complétez votre profil
               </h1>
               <p className="text-muted-foreground">

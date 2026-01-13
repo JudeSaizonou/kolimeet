@@ -173,10 +173,10 @@ const MyListings = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background pt-20 md:pt-28 py-4 md:py-8 px-3 md:px-4">
+    <div className="min-h-screen bg-background pt-20 md:pt-32 py-6 md:py-8 px-3 md:px-4">
       <div className="max-w-6xl mx-auto">
         <div className="mb-6 md:mb-8">
-          <h1 className="text-2xl md:text-3xl font-bold mb-1 md:mb-2">Mes annonces</h1>
+          <h1 className="text-xl md:text-3xl font-bold mb-1 md:mb-2">Mes annonces</h1>
           <p className="text-sm md:text-base text-muted-foreground">
             Gérez vos trajets et vos colis
           </p>

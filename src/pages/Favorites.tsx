@@ -65,19 +65,10 @@ const Favorites = () => {
   }
 
   return (
-    <div className="container mx-auto px-3 md:px-4 py-4 md:py-8">
-      <div className="max-w-6xl mx-auto">
-        <div className="mb-6 md:mb-8">
-          <div className="flex items-center gap-2 mb-2">
-            <Heart className="h-6 w-6 md:h-7 md:w-7 text-red-500 fill-red-500" />
-            <h1 className="text-2xl md:text-3xl font-bold">Mes favoris</h1>
-          </div>
-          <p className="text-sm md:text-base text-muted-foreground">
-            Retrouvez toutes les annonces que vous avez sauvegardées
-          </p>
-        </div>
-
-        {favorites.length === 0 ? (
+    <div className="min-h-screen bg-background pt-20 md:pt-32">
+      <div className="container mx-auto px-3 md:px-4 py-6 md:py-8">
+        <div className="max-w-6xl mx-auto">
+          {favorites.length === 0 ? (
           <EmptyState
             icon={Heart}
             title="Aucun favori"
@@ -152,6 +143,7 @@ const Favorites = () => {
             </TabsContent>
           </Tabs>
         )}
+        </div>
       </div>
     </div>
   );

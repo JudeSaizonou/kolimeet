@@ -22,36 +22,36 @@ const Home = () => {
             loading="eager"
           />
         </div>
-        <div className="container mx-auto px-4 py-12 relative z-10">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <div className="container mx-auto px-3 md:px-4 py-8 md:py-12 relative z-10">
+          <div className="grid lg:grid-cols-2 gap-8 md:gap-12 items-center">
             {/* Texte */}
             <div className="order-2 lg:order-1">
-              <span className="inline-block px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium mb-6">
+              <span className="inline-block px-3 py-1.5 md:px-4 md:py-2 bg-primary/10 text-primary rounded-full text-xs md:text-sm font-medium mb-4 md:mb-6">
                 Transport de colis entre particuliers
               </span>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6 leading-tight">
+              <h1 className="text-2xl md:text-5xl lg:text-6xl font-bold text-foreground mb-4 md:mb-6 leading-tight">
                 Envoyez vos colis <span className="text-primary">partout dans le monde</span>
               </h1>
-              <p className="text-lg md:text-xl text-muted-foreground mb-8 leading-relaxed">
+              <p className="text-base md:text-xl text-muted-foreground mb-6 md:mb-8 leading-relaxed">
                 Kolimeet connecte les voyageurs et les expéditeurs pour un transport de colis économique, écologique et humain.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 mb-8">
+              <div className="flex flex-col sm:flex-row gap-3 md:gap-4 mb-6 md:mb-8">
                 <Link to="/explorer">
-                  <Button size="lg" className="w-full sm:w-auto font-semibold text-base px-8">
+                  <Button size="default" className="w-full sm:w-auto font-semibold text-sm md:text-base px-6 md:px-8 h-10 md:h-11">
                     Explorer les annonces
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
                 </Link>
                 <Link to="/auth/register">
-                  <Button size="lg" variant="outline" className="w-full sm:w-auto font-semibold text-base px-8">
+                  <Button size="default" variant="outline" className="w-full sm:w-auto font-semibold text-sm md:text-base px-6 md:px-8 h-10 md:h-11">
                     Créer un compte gratuit
                   </Button>
                 </Link>
               </div>
               {/* Trust badges */}
-              <div className="flex flex-wrap gap-6 text-sm text-muted-foreground">
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="h-5 w-5 text-green-500" />
+              <div className="flex flex-wrap gap-4 md:gap-6 text-xs md:text-sm text-muted-foreground">
+                <div className="flex items-center gap-1.5 md:gap-2">
+                  <CheckCircle2 className="h-4 w-4 md:h-5 md:w-5 text-green-500" />
                   <span>100% gratuit</span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -114,33 +114,33 @@ const Home = () => {
       </section>
 
       {/* Comment ça marche - Alternating layout */}
-      <section className="py-20 bg-muted/30">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+      <section className="py-10 md:py-20 bg-muted/30">
+        <div className="container mx-auto px-3 md:px-4">
+          <div className="text-center mb-8 md:mb-16">
+            <h2 className="text-xl md:text-4xl font-bold text-foreground mb-3 md:mb-4">
               Comment ça marche ?
             </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
               Trois étapes simples pour envoyer ou transporter un colis
             </p>
           </div>
           
           {/* Étape 1 */}
-          <div className="grid lg:grid-cols-2 gap-12 items-center mb-20">
-            <div className="rounded-3xl overflow-hidden shadow-xl">
+          <div className="grid lg:grid-cols-2 gap-8 md:gap-12 items-center mb-12 md:mb-20">
+            <div className="rounded-2xl md:rounded-3xl overflow-hidden shadow-xl">
               <img 
                 srcSet="/images/savings-320w.webp 320w, /images/savings-640w.webp 640w, /images/savings-1024w.webp 1024w"
                 sizes="(max-width: 1024px) 100vw, 50vw"
                 src="/images/savings.webp" 
                 alt="Économies sur l'envoi de colis"
-                className="w-full h-[350px] object-cover"
+                className="w-full h-[250px] md:h-[350px] object-cover"
                 loading="lazy"
               />
             </div>
             <div>
-              <span className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary text-primary-foreground font-bold text-xl mb-6">1</span>
-              <h3 className="text-2xl md:text-3xl font-bold mb-4">Publiez votre annonce</h3>
-              <p className="text-muted-foreground text-lg mb-6">
+              <span className="inline-flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-full bg-primary text-primary-foreground font-bold text-lg md:text-xl mb-4 md:mb-6">1</span>
+              <h3 className="text-xl md:text-3xl font-bold mb-3 md:mb-4">Publiez votre annonce</h3>
+              <p className="text-muted-foreground text-sm md:text-lg mb-4 md:mb-6">
                 Vous avez un colis à envoyer ? Créez une annonce détaillée en quelques minutes. 
                 Vous voyagez bientôt ? Proposez vos kilos disponibles et rentabilisez votre trajet.
               </p>
@@ -158,11 +158,11 @@ const Home = () => {
           </div>
 
           {/* Étape 2 - Inversé */}
-          <div className="grid lg:grid-cols-2 gap-12 items-center mb-20">
+          <div className="grid lg:grid-cols-2 gap-8 md:gap-12 items-center mb-12 md:mb-20">
             <div className="order-2 lg:order-1">
-              <span className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary text-primary-foreground font-bold text-xl mb-6">2</span>
-              <h3 className="text-2xl md:text-3xl font-bold mb-4">Trouvez votre match</h3>
-              <p className="text-muted-foreground text-lg mb-6">
+              <span className="inline-flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-full bg-primary text-primary-foreground font-bold text-lg md:text-xl mb-4 md:mb-6">2</span>
+              <h3 className="text-xl md:text-3xl font-bold mb-3 md:mb-4">Trouvez votre match</h3>
+              <p className="text-muted-foreground text-sm md:text-lg mb-4 md:mb-6">
                 Parcourez les annonces disponibles et trouvez le voyageur ou l'expéditeur idéal. 
                 Filtrez par destination, date et prix pour trouver l'offre parfaite.
               </p>
@@ -177,34 +177,34 @@ const Home = () => {
                 </li>
               </ul>
             </div>
-            <div className="order-1 lg:order-2 rounded-3xl overflow-hidden shadow-xl">
+            <div className="order-1 lg:order-2 rounded-2xl md:rounded-3xl overflow-hidden shadow-xl">
               <img 
                 srcSet="/images/community-320w.webp 320w, /images/community-640w.webp 640w, /images/community-1024w.webp 1024w"
                 sizes="(max-width: 1024px) 100vw, 50vw"
                 src="/images/community.webp" 
                 alt="Communauté Kolimeet"
-                className="w-full h-[350px] object-cover"
+                className="w-full h-[250px] md:h-[350px] object-cover"
                 loading="lazy"
               />
             </div>
           </div>
 
           {/* Étape 3 */}
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="rounded-3xl overflow-hidden shadow-xl">
+          <div className="grid lg:grid-cols-2 gap-8 md:gap-12 items-center">
+            <div className="rounded-2xl md:rounded-3xl overflow-hidden shadow-xl">
               <img 
                 srcSet="/images/trust-handshake-320w.webp 320w, /images/trust-handshake-640w.webp 640w, /images/trust-handshake-1024w.webp 1024w"
                 sizes="(max-width: 1024px) 100vw, 50vw"
                 src="/images/trust-handshake.webp" 
                 alt="Confiance et poignée de main"
-                className="w-full h-[350px] object-cover"
+                className="w-full h-[250px] md:h-[350px] object-cover"
                 loading="lazy"
               />
             </div>
             <div>
-              <span className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary text-primary-foreground font-bold text-xl mb-6">3</span>
-              <h3 className="text-2xl md:text-3xl font-bold mb-4">Échangez en toute confiance</h3>
-              <p className="text-muted-foreground text-lg mb-6">
+              <span className="inline-flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-full bg-primary text-primary-foreground font-bold text-lg md:text-xl mb-4 md:mb-6">3</span>
+              <h3 className="text-xl md:text-3xl font-bold mb-3 md:mb-4">Échangez en toute confiance</h3>
+              <p className="text-muted-foreground text-sm md:text-lg mb-4 md:mb-6">
                 Convenez des modalités de remise et d'un prix équitable. 
                 Effectuez la transaction en toute sécurité et laissez un avis après livraison.
               </p>
@@ -224,21 +224,21 @@ const Home = () => {
       </section>
 
       {/* Section Pourquoi Kolimeet avec image traveler */}
-      <section className="py-20 bg-primary/5">
-        <div className="container mx-auto px-4">
-          <div className="grid lg:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
-            <div className="rounded-3xl overflow-hidden shadow-xl">
+      <section className="py-10 md:py-20 bg-primary/5">
+        <div className="container mx-auto px-3 md:px-4">
+          <div className="grid lg:grid-cols-2 gap-8 md:gap-12 items-center max-w-6xl mx-auto">
+            <div className="rounded-2xl md:rounded-3xl overflow-hidden shadow-xl">
               <img 
                 srcSet="/images/traveler-320w.webp 320w, /images/traveler-640w.webp 640w, /images/traveler-1024w.webp 1024w, /images/traveler-1920w.webp 1920w"
                 sizes="(max-width: 1024px) 100vw, 50vw"
                 src="/images/traveler.webp" 
                 alt="Voyageur avec valise"
-                className="w-full h-[400px] object-cover"
+                className="w-full h-[300px] md:h-[400px] object-cover"
                 loading="lazy"
               />
             </div>
             <div>
-              <h2 className="text-3xl md:text-4xl font-bold mb-6">
+              <h2 className="text-xl md:text-4xl font-bold mb-4 md:mb-6">
                 Pourquoi choisir Kolimeet ?
               </h2>
               <div className="space-y-6">

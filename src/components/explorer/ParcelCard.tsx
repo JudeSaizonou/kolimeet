@@ -35,7 +35,7 @@ export const ParcelCard = ({ parcel }: ParcelCardProps) => {
           <Button
             variant="secondary"
             size="icon"
-            className="h-8 w-8 rounded-full bg-white/80 backdrop-blur-sm shadow-sm hover:bg-white"
+            className="h-10 w-10 rounded-full bg-white/80 backdrop-blur-sm shadow-sm hover:bg-white"
             onClick={(e) => {
               e.stopPropagation();
               toggleFavorite();
@@ -46,7 +46,7 @@ export const ParcelCard = ({ parcel }: ParcelCardProps) => {
         </div>
         
         <div className="absolute bottom-2 left-3">
-          <Badge variant={parcel.status === "open" ? "default" : "secondary"} className="text-[10px] px-2 h-5">
+          <Badge variant={parcel.status === "open" ? "default" : "secondary"} className="text-xs px-2 py-1 h-6">
             {parcel.status === "open" ? "Ouvert" : "Fermé"}
           </Badge>
         </div>
@@ -62,40 +62,27 @@ export const ParcelCard = ({ parcel }: ParcelCardProps) => {
 
         {/* Date & Type Row */}
         <div className="flex items-center justify-between mt-3">
-          <div className="flex items-center gap-1.5 text-xs text-slate-600 font-medium">
+          <div className="flex items-center gap-2 text-xs text-slate-600 font-medium">
             <Calendar className="h-3.5 w-3.5" />
             <span>
               {format(new Date(parcel.deadline), "d MMM", { locale: fr })}
             </span>
           </div>
           
-          <Badge variant="outline" className="text-[10px] h-5 px-1.5 bg-white/50">
+          <Badge variant="outline" className="text-xs h-6 px-2 bg-white/50">
             {typeLabels[parcel.type] || parcel.type}
           </Badge>
         </div>
 
         {/* User Info (Compact) */}
         <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-100">
-          {parcel.is_anonymous ? (
-            <>
-              <div className="h-5 w-5 md:h-6 md:w-6 rounded-full bg-muted flex items-center justify-center">
-                <EyeOff className="h-3 w-3 text-muted-foreground" />
-              </div>
-              <span className="text-xs text-muted-foreground italic">
-                Anonyme
-              </span>
-            </>
-          ) : (
-            <>
-              <Avatar className="h-5 w-5 md:h-6 md:w-6">
-                <AvatarImage src={profile?.avatar_url} />
-                <AvatarFallback className="text-[10px]">{profile?.full_name?.[0] || "U"}</AvatarFallback>
-              </Avatar>
-              <span className="text-xs text-muted-foreground truncate max-w-[100px]">
-                {profile?.full_name || "Utilisateur"}
-              </span>
-            </>
-          )}
+          <Avatar className="h-5 w-5 md:h-6 md:w-6">
+            <AvatarImage src={profile?.avatar_url} />
+            <AvatarFallback className="text-[10px]">{profile?.full_name?.[0] || "U"}</AvatarFallback>
+          </Avatar>
+          <span className="text-xs text-muted-foreground truncate max-w-[100px]">
+            {profile?.full_name || "Utilisateur"}
+          </span>
           <span className="ml-auto text-xs font-medium text-violet-600 bg-violet-50 px-1.5 py-0.5 rounded">
             {parcel.weight_kg}kg
           </span>

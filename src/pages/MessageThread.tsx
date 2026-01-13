@@ -121,7 +121,7 @@ const MessageThread = () => {
     <div className="md:relative md:flex md:flex-col md:h-auto md:pt-20 fixed inset-0 top-0 flex flex-col bg-background md:bg-transparent md:top-auto">
       {/* Header fixe - Mobile-first, normal sur desktop */}
       <header className="sticky top-0 z-50 bg-background border-b md:relative md:z-auto">
-        <div className="flex items-center gap-3 px-4 py-3 md:px-6 md:py-4">
+        <div className="flex items-center gap-2 md:gap-3 px-3 md:px-6 py-3 md:py-4">
           <Button
             variant="ghost"
             size="icon"
@@ -187,7 +187,7 @@ const MessageThread = () => {
               transition={{ duration: 0.2 }}
               className="overflow-hidden"
             >
-              <div className="px-4 pb-3 md:px-6">
+              <div className="px-3 md:px-6 pb-3">
                 {thread?.related_type === "trip" && trip && (
                   <div className="bg-primary/5 rounded-lg p-3 space-y-2">
                     <div className="flex items-center justify-between">
@@ -282,7 +282,7 @@ const MessageThread = () => {
       </header>
 
       {/* Messages scrollables - Full-screen mobile, auto desktop */}
-      <div className="flex-1 overflow-y-auto overscroll-contain px-4 py-4 md:px-6 md:max-h-[calc(100vh-20rem)]">
+      <div className="flex-1 overflow-y-auto overscroll-contain px-3 md:px-6 py-3 md:py-4 md:max-h-[calc(100vh-20rem)]">
         {/* Debug logs */}
         {console.log('[MessageThread] Messages:', messages.map(m => ({ id: m.id, type: m.message_type, reqId: m.reservation_request_id })))}
         {console.log('[MessageThread] Requests:', requests.map(r => ({ id: r.id, messageId: r.message_id, status: r.status })))}

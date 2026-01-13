@@ -24,15 +24,15 @@ export const ParcelFiltersComponent = ({ filters, onChange, onReset }: ParcelFil
     <GlassCard 
       intensity="subtle"
       variant="default"
-      padding="lg"
+      padding="sm"
       rounded="xl"
       className="bg-white/80 backdrop-blur-md border border-border/50"
     >
       {/* Filtres principaux toujours visibles */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="fromCountry" className="flex items-center gap-2 text-sm font-medium">
-            <MapPin className="h-4 w-4 text-primary" />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
+        <div className="space-y-1.5">
+          <Label htmlFor="fromCountry" className="flex items-center gap-1.5 text-xs sm:text-sm font-medium">
+            <MapPin className="h-3 w-3 sm:h-4 sm:w-4 text-primary hidden sm:inline" />
             Départ
           </Label>
           <Combobox
@@ -46,9 +46,9 @@ export const ParcelFiltersComponent = ({ filters, onChange, onReset }: ParcelFil
           />
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="toCountry" className="flex items-center gap-2 text-sm font-medium">
-            <MapPin className="h-4 w-4 text-primary" />
+        <div className="space-y-1.5">
+          <Label htmlFor="toCountry" className="flex items-center gap-1.5 text-xs sm:text-sm font-medium">
+            <MapPin className="h-3 w-3 sm:h-4 sm:w-4 text-primary hidden sm:inline" />
             Arrivée
           </Label>
           <Combobox
@@ -62,9 +62,9 @@ export const ParcelFiltersComponent = ({ filters, onChange, onReset }: ParcelFil
           />
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="deadline" className="flex items-center gap-2 text-sm font-medium">
-            <Calendar className="h-4 w-4 text-primary" />
+        <div className="space-y-1.5">
+          <Label htmlFor="deadline" className="flex items-center gap-1.5 text-xs sm:text-sm font-medium">
+            <Calendar className="h-3 w-3 sm:h-4 sm:w-4 text-primary hidden sm:inline" />
             Deadline
           </Label>
           <Input
@@ -76,9 +76,9 @@ export const ParcelFiltersComponent = ({ filters, onChange, onReset }: ParcelFil
           />
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="type" className="flex items-center gap-2 text-sm font-medium">
-            <Package className="h-4 w-4 text-primary" />
+        <div className="space-y-1.5">
+          <Label htmlFor="type" className="flex items-center gap-1.5 text-xs sm:text-sm font-medium">
+            <Package className="h-3 w-3 sm:h-4 sm:w-4 text-primary hidden sm:inline" />
             Type
           </Label>
           <Select
@@ -101,10 +101,10 @@ export const ParcelFiltersComponent = ({ filters, onChange, onReset }: ParcelFil
 
       {/* Filtres avancés */}
       {showAdvanced && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4 pt-4 border-t border-border/50">
-          <div className="space-y-2">
-            <Label htmlFor="fromCity" className="flex items-center gap-2 text-sm font-medium">
-              <MapPin className="h-4 w-4 text-accent" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 mt-3 pt-3 border-t border-border/50">
+          <div className="space-y-1.5">
+            <Label htmlFor="fromCity" className="flex items-center gap-1.5 text-xs sm:text-sm font-medium">
+              <MapPin className="h-3 w-3 sm:h-4 sm:w-4 text-accent hidden sm:inline" />
               Ville de départ
             </Label>
             {filters.fromCountry && citiesByCountry[filters.fromCountry] ? (
@@ -188,21 +188,21 @@ export const ParcelFiltersComponent = ({ filters, onChange, onReset }: ParcelFil
       )}
 
       {/* Actions */}
-      <div className="flex items-center justify-between mt-4 pt-4 border-t border-border/50">
+      <div className="flex items-center justify-between mt-3 pt-3 border-t border-border/50">
         <Button 
           variant="ghost" 
           size="sm"
           onClick={() => setShowAdvanced(!showAdvanced)}
-          className="text-muted-foreground hover:text-foreground"
+          className="text-muted-foreground hover:text-foreground h-9 text-xs sm:text-sm"
         >
           {showAdvanced ? (
             <>
-              <ChevronUp className="h-4 w-4 mr-1" />
+              <ChevronUp className="h-3.5 w-3.5 mr-1" />
               Moins de filtres
             </>
           ) : (
             <>
-              <ChevronDown className="h-4 w-4 mr-1" />
+              <ChevronDown className="h-3.5 w-3.5 mr-1" />
               Plus de filtres
             </>
           )}
@@ -213,9 +213,9 @@ export const ParcelFiltersComponent = ({ filters, onChange, onReset }: ParcelFil
             variant="ghost" 
             size="sm"
             onClick={onReset} 
-            className="text-muted-foreground hover:text-destructive transition-all"
+            className="text-muted-foreground hover:text-destructive transition-all h-9 text-xs sm:text-sm"
           >
-            <RotateCcw className="h-4 w-4 mr-1" />
+            <RotateCcw className="h-3.5 w-3.5 mr-1" />
             Réinitialiser
           </Button>
         )}

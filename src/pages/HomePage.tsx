@@ -20,7 +20,7 @@ const HomePage = () => {
   return (
     <>
       {/* Hero Section - Full viewport with background image */}
-      <section className="relative min-h-[70vh] lg:min-h-[85vh] flex items-center pt-20 md:pt-28 pb-16 md:pb-24 lg:pb-32 px-4 overflow-hidden">
+      <section className="relative min-h-[70vh] lg:min-h-[85vh] flex items-center pt-20 md:pt-32 pb-16 md:pb-24 lg:pb-32 px-4 overflow-hidden">
         {/* Background Image with Overlay */}
         <div className="absolute inset-0 z-0">
           <img 
@@ -177,7 +177,7 @@ const HomePage = () => {
         </div>
         
         <div className="container mx-auto max-w-7xl relative z-10">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-16 tracking-tight">
+          <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-center mb-8 md:mb-16 tracking-tight">
             Comment ça marche ?
           </h2>
           
@@ -312,7 +312,7 @@ const HomePage = () => {
       </section>
 
       {/* Why Trust Us - New section with images */}
-      <section className="py-20 lg:py-32 px-4 bg-secondary/30">
+      <section className="py-12 md:py-20 lg:py-32 px-3 md:px-4 bg-secondary/30">
         <div className="container mx-auto max-w-7xl">
           <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-6 tracking-tight">
             Pourquoi nous faire confiance ?
@@ -440,20 +440,20 @@ const HomePage = () => {
         <div className="absolute inset-0 bg-primary" />
         
         <div className="container mx-auto max-w-4xl text-center relative z-10 text-primary-foreground">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-6 tracking-tight">
+          <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-4 md:mb-6 tracking-tight">
             Prêt à rejoindre Kolimeet ?
           </h2>
           <p className="text-lg sm:text-xl md:text-2xl opacity-90 mb-10 max-w-2xl mx-auto">
             Créez votre compte gratuitement et commencez à envoyer ou transporter des colis dès aujourd'hui.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" variant="secondary" asChild className="text-lg px-8 py-6">
+            <Button size="default" variant="secondary" asChild className="text-sm md:text-lg px-6 md:px-8 h-10 md:h-12">
               <Link to="/auth/register">
                 S'inscrire gratuitement
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
-            <Button size="lg" variant="outline" asChild className="text-lg px-8 py-6 bg-transparent border-white text-white hover:bg-white/10">
+            <Button size="default" variant="outline" asChild className="text-sm md:text-lg px-6 md:px-8 h-10 md:h-12 bg-transparent border-white text-white hover:bg-white/10">
               <Link to="/explorer">
                 Explorer sans compte
               </Link>

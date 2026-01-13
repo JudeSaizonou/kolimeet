@@ -118,7 +118,7 @@ export function PendingReferrals() {
               <Button
                 size="sm"
                 variant="ghost"
-                className="h-8 w-8 p-0 text-red-600 hover:bg-red-50"
+                className="h-10 w-10 p-0 text-red-600 hover:bg-red-50"
                 onClick={() => handleDecline(request.id)}
                 disabled={processingId === request.id}
               >
@@ -130,7 +130,7 @@ export function PendingReferrals() {
               </Button>
               <Button
                 size="sm"
-                className="h-8 w-8 p-0"
+                className="h-10 w-10 p-0"
                 onClick={() => handleAccept(request.id, request.referrer_name)}
                 disabled={processingId === request.id}
               >

@@ -202,7 +202,7 @@ export function ReservationRequestMessage({ request, onUpdate, isOwn }: Reservat
                   onClick={handleAccept}
                   disabled={loading}
                   size="sm"
-                  className="flex-1 h-9 bg-emerald-600 hover:bg-emerald-700 text-white"
+                  className="flex-1 h-10 bg-emerald-600 hover:bg-emerald-700 text-white"
                 >
                   {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <>
                     <CheckCircle className="h-3.5 w-3.5 mr-1.5" />
@@ -214,7 +214,7 @@ export function ReservationRequestMessage({ request, onUpdate, isOwn }: Reservat
                   disabled={loading}
                   variant="outline"
                   size="sm"
-                  className="h-9 px-3"
+                  className="h-10 w-10 p-0"
                 >
                   <MessageSquare className="h-3.5 w-3.5" />
                 </Button>
@@ -223,7 +223,7 @@ export function ReservationRequestMessage({ request, onUpdate, isOwn }: Reservat
                   disabled={loading}
                   variant="ghost"
                   size="sm"
-                  className="h-9 px-3 text-rose-600 hover:bg-rose-50"
+                  className="h-10 w-10 p-0 text-rose-600 hover:bg-rose-50"
                 >
                   <XCircle className="h-3.5 w-3.5" />
                 </Button>
@@ -238,7 +238,7 @@ export function ReservationRequestMessage({ request, onUpdate, isOwn }: Reservat
                   disabled={loading}
                   variant="ghost"
                   size="sm"
-                  className="h-7 text-xs text-slate-500 hover:text-rose-600"
+                  className="h-8 text-xs text-slate-500 hover:text-rose-600"
                 >
                   Annuler
                 </Button>

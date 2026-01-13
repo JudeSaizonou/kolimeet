@@ -34,10 +34,16 @@ export function MobileHeader() {
   return (
     <header className="md:hidden fixed top-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-xl border-b border-slate-100">
       <div className="flex items-center justify-between h-14 px-4 safe-area-top">
-        {/* Titre */}
-        <h1 className="text-xl font-bold text-slate-900">
-          {pageTitle}
-        </h1>
+        {/* Logo */}
+        {pageTitle === 'Kolimeet' ? (
+          <Link to="/explorer" className="flex-shrink-0">
+            <img src="/Kolimeetlogo.png" alt="Kolimeet" className="h-8 w-auto" />
+          </Link>
+        ) : (
+          <h1 className="text-xl font-bold text-slate-900">
+            {pageTitle}
+          </h1>
+        )}
 
         {/* Icône de notification */}
         <Link

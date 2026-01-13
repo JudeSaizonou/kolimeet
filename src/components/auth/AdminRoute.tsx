@@ -20,27 +20,30 @@ export const AdminRoute = ({ children }: AdminRouteProps) => {
       adminLoading 
     });
 
-    // Wait for ALL loading to complete before making any decisions
+    // CRITICAL: Wait for ALL loading to complete before making any decisions
     if (authLoading || adminLoading) {
       console.log('[AdminRoute] Still loading, waiting...');
       return;
     }
 
-    // Auth check
-    if (!user) {
+    // Auth check - only redirect if loading is complete AND no user
+    if (!authLoading && !user) {
       console.log('[AdminRoute] No user, redirecting to login');
       navigate("/auth/login", { replace: true });
       return;
     }
 
-    // Admin check
-    if (!isAdmin) {
+    // Admin check - only redirect if BOTH loading are complete AND not admin
+    if (!authLoading && !adminLoading && user && !isAdmin) {
       console.log('[AdminRoute] User not admin, redirecting to home');
       navigate("/", { replace: true });
       return;
     }
 
-    console.log('[AdminRoute] Access granted!');
+    // Grant access only if we have user AND isAdmin
+    if (user && isAdmin) {
+      console.log('[AdminRoute] Access granted!');
+    }
   }, [user, isAdmin, authLoading, adminLoading, navigate]);
 
   // Show loading screen while checking
@@ -58,13 +61,18 @@ export const AdminRoute = ({ children }: AdminRouteProps) => {
     );
   }
 
-  // Only show nothing if we're definitely not authorized
+  // Block access if no user or not admin (after loading complete)
   if (!user || !isAdmin) {
-    console.log('[AdminRoute] Blocking access:', { user: !!user, isAdmin });
+    console.log('[AdminRoute] Blocking access:', { 
+      hasUser: !!user, 
+      isAdmin,
+      authLoading,
+      adminLoading 
+    });
     return null;
   }
 
-  // Grant access
+  // Grant access - we have user AND isAdmin AND loading is complete
   console.log('[AdminRoute] Rendering admin content');
   return <>{children}</>;
 };

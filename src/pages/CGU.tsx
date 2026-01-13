@@ -11,12 +11,12 @@ const CGU = () => {
         <meta name="description" content="Conditions générales d'utilisation de Kolimeet, plateforme de mise en relation pour l'envoi de colis à l'international." />
       </Helmet>
 
-      <div className="min-h-screen bg-secondary pt-20 md:pt-28">
+      <div className="min-h-screen bg-secondary pt-20 md:pt-32">
         <div className="container mx-auto px-4 py-8 max-w-4xl">
           <div className="bg-background rounded-lg shadow-sm p-6 md:p-8">
             <div className="flex items-center gap-3 mb-6">
               <FileText className="h-8 w-8 text-primary" />
-              <h1 className="text-3xl font-bold text-foreground">Conditions Générales d'Utilisation</h1>
+              <h1 className="text-xl md:text-3xl font-bold text-foreground">Conditions Générales d'Utilisation</h1>
             </div>
 
             <div className="prose prose-sm md:prose-base max-w-none">

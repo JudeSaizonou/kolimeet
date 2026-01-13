@@ -1688,6 +1688,10 @@ export const Constants = {
         "counter_offered",
         "cancelled",
       ],
+      admin_role: ["super_admin", "moderator", "support", "analyst"],
+      support_status: ["new", "open", "pending", "resolved", "closed"],
+      ticket_priority: ["low", "medium", "high", "critical"],
+      sender_type: ["user", "admin"],
     },
   },
 } as const
@@ -1699,3 +1703,103 @@ export type Trip = Database["public"]["Tables"]["trips"]["Row"]
 export type Parcel = Database["public"]["Tables"]["parcels"]["Row"]
 export type Message = Database["public"]["Tables"]["messages"]["Row"]
 export type Thread = Database["public"]["Tables"]["threads"]["Row"]
+
+// Admin types
+export type AdminRole = "super_admin" | "moderator" | "support" | "analyst"
+export type SupportStatus = "new" | "open" | "pending" | "resolved" | "closed"
+export type TicketPriority = "low" | "medium" | "high" | "critical"
+export type SenderType = "user" | "admin"
+
+export interface AdminUser {
+  id: string
+  user_id: string
+  role: AdminRole
+  permissions: {
+    users?: string[]
+    content?: string[]
+    flags?: string[]
+    analytics?: string[]
+    settings?: string[]
+  }
+  is_active: boolean
+  last_login: string | null
+  created_at: string
+  created_by: string | null
+  updated_at: string
+}
+
+export interface AdminActivityLog {
+  id: string
+  admin_id: string
+  action: string
+  target_type: string | null
+  target_id: string | null
+  details: Record<string, any> | null
+  ip_address: string | null
+  user_agent: string | null
+  created_at: string
+}
+
+export interface SupportTicket {
+  id: string
+  ticket_number: string
+  user_id: string | null
+  subject: string
+  message: string
+  status: SupportStatus
+  priority: TicketPriority
+  assigned_to: string | null
+  category: string | null
+  tags: string[] | null
+  created_at: string
+  updated_at: string
+  resolved_at: string | null
+}
+
+export interface SupportMessage {
+  id: string
+  ticket_id: string
+  sender_id: string | null
+  sender_type: SenderType
+  message: string
+  attachments: any[]
+  is_internal: boolean
+  created_at: string
+}
+
+export interface PlatformSettings {
+  key: string
+  value: Record<string, any>
+  description: string | null
+  updated_by: string | null
+  updated_at: string
+}
+
+export interface CannedResponse {
+  id: string
+  title: string
+  content: string
+  category: string | null
+  usage_count: number
+  created_by: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface DashboardStats {
+  total_users: number
+  active_users_30d: number
+  new_users_today: number
+  verified_users: number
+  banned_users: number
+  total_trips: number
+  active_trips: number
+  total_parcels: number
+  active_parcels: number
+  total_reservations: number
+  completed_reservations: number
+  pending_flags: number
+  total_feedbacks: number
+  avg_trust_score: number
+  success_rate: number
+}

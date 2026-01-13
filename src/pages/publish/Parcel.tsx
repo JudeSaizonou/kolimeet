@@ -172,18 +172,18 @@ const PublishParcel = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center pt-20 md:pt-28">
+      <div className="min-h-screen flex items-center justify-center pt-20 md:pt-32">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background pt-20 md:pt-28 py-8 px-4">
+    <div className="min-h-screen bg-background pt-20 md:pt-32 py-6 md:py-8 px-3 md:px-4">
       <div className="max-w-2xl mx-auto">
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl">
+            <CardTitle className="text-xl md:text-2xl">
               {id ? "Modifier le colis" : "Publier un colis"}
             </CardTitle>
             <CardDescription>
@@ -455,31 +455,6 @@ const PublishParcel = () => {
                     Formats acceptés : JPG, PNG, WEBP. Taille max : 3 Mo par photo.
                   </p>
                 </div>
-
-                {/* Option anonyme */}
-                <FormField
-                  control={form.control}
-                  name="is_anonymous"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                      <div className="space-y-0.5">
-                        <FormLabel className="text-base flex items-center gap-2">
-                          <EyeOff className="h-4 w-4" />
-                          Publication anonyme
-                        </FormLabel>
-                        <FormDescription>
-                          Votre identité sera masquée dans l'annonce
-                        </FormDescription>
-                      </div>
-                      <FormControl>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
 
                 {/* Acceptation des CGU - uniquement pour nouvelle publication */}
                 {!id && (

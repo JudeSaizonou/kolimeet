@@ -52,6 +52,16 @@ const ProhibitedItems = lazy(() => import("./pages/ProhibitedItems"));
 const PaymentTest = lazy(() => import("./pages/PaymentTest"));
 const Notifications = lazy(() => import("./pages/Notifications"));
 
+// Admin pages
+const Dashboard = lazy(() => import("./pages/admin/Dashboard"));
+const Users = lazy(() => import("./pages/admin/Users"));
+const UserDetail = lazy(() => import("./pages/admin/UserDetail"));
+const Content = lazy(() => import("./pages/admin/Content"));
+const Flags = lazy(() => import("./pages/admin/Flags"));
+const Support = lazy(() => import("./pages/admin/Support"));
+const Settings = lazy(() => import("./pages/admin/Settings"));
+const AdminLayout = lazy(() => import("@/components/admin/layout/AdminLayout").then(m => ({ default: m.AdminLayout })));
+
 // Import admin utilities for console access (development only)
 if (import.meta.env.DEV) {
   import("./utils/adminUtils");
@@ -251,14 +261,35 @@ const App = () => (
                   </AdminRoute>
                 }
               />
+              
+              {/* Admin Routes */}
               <Route
                 path="/admin"
+                element={
+                  <AdminRoute>
+                    <AdminLayout />
+                  </AdminRoute>
+                }
+              >
+                <Route index element={<Dashboard />} />
+                <Route path="users" element={<Users />} />
+                <Route path="users/:userId" element={<UserDetail />} />
+                <Route path="content" element={<Content />} />
+                <Route path="flags" element={<Flags />} />
+                <Route path="support" element={<Support />} />
+                <Route path="settings" element={<Settings />} />
+              </Route>
+              
+              {/* Old admin dashboard (legacy) */}
+              <Route
+                path="/admin/old"
                 element={
                   <AdminRoute>
                     <AdminDashboard />
                   </AdminRoute>
                 }
               />
+              
               <Route path="*" element={<NotFound />} />
             </Routes>
             </Suspense>

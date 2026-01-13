@@ -154,7 +154,7 @@ const MyReservations = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background pt-20 md:pt-28 py-8 px-4">
+      <div className="min-h-screen bg-background pt-20 md:pt-32 py-6 md:py-8 px-3 md:px-4">
         <div className="container mx-auto max-w-4xl space-y-6">
           <div className="space-y-2">
             <Skeleton className="h-8 w-64" />
@@ -174,7 +174,7 @@ const MyReservations = () => {
     <div className="min-h-screen bg-background pt-20 md:pt-28 py-8 px-4">
       <div className="container mx-auto max-w-4xl">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">
+          <h1 className="text-xl md:text-3xl font-bold text-foreground mb-2">
             Mes réservations
           </h1>
           <p className="text-muted-foreground">

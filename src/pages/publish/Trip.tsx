@@ -128,20 +128,20 @@ const PublishTrip = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center pt-20 md:pt-28">
+      <div className="min-h-screen flex items-center justify-center pt-20 md:pt-32">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background pt-20 md:pt-28 py-8 px-4">
+    <div className="min-h-screen bg-background pt-20 md:pt-32 py-6 md:py-8 px-3 md:px-4">
       <div className="max-w-2xl mx-auto">
         {/* Mode création - pas de tabs */}
         {!id ? (
           <Card>
             <CardHeader>
-              <CardTitle className="text-2xl">Publier un trajet</CardTitle>
+              <CardTitle className="text-xl md:text-2xl">Publier un trajet</CardTitle>
               <CardDescription>
                 Partagez votre itinéraire et transportez des colis
               </CardDescription>
@@ -444,30 +444,6 @@ const PublishTrip = () => {
                   )}
                 />
 
-                {/* Option Annonce Anonyme */}
-                <FormField
-                  control={form.control}
-                  name="is_anonymous"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 bg-muted/50">
-                      <div className="space-y-0.5">
-                        <FormLabel className="text-base flex items-center gap-2">
-                          <EyeOff className="h-4 w-4" />
-                          Publier anonymement
-                        </FormLabel>
-                        <FormDescription>
-                          Votre nom et photo de profil seront masqués sur l'annonce
-                        </FormDescription>
-                      </div>
-                      <FormControl>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
       </>
     );
   }

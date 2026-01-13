@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 
 const PrivacyPolicy = () => {
   return (
-    <div className="bg-background min-h-screen pt-20 md:pt-28">
+    <div className="bg-background min-h-screen pt-20 md:pt-32">
       <div className="container mx-auto max-w-4xl py-8">
         <Button variant="ghost" asChild className="mb-6">
           <Link to="/">
@@ -13,7 +13,7 @@ const PrivacyPolicy = () => {
           </Link>
         </Button>
           
-          <h1 className="text-3xl font-bold mb-2">Politique de confidentialité</h1>
+          <h1 className="text-xl md:text-3xl font-bold mb-2">Politique de confidentialité</h1>
           <p className="text-muted-foreground mb-8">Dernière mise à jour : 10 janvier 2026</p>
           
           <div className="prose prose-gray max-w-none">
